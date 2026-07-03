@@ -1,0 +1,211 @@
+site_name: SWAT+ Documentation
+site_url: https://swat-model.github.io/swatplus-documentation/
+site_description: Documentation for the Soil and Water Assessment Tool Plus (SWAT+), an open-source watershed model.
+repo_url: https://github.com/swat-model/swatplus
+repo_name: swat-model/swatplus
+edit_uri: ""
+
+theme:
+  name: material
+  logo: assets/swat-logo.svg
+  favicon: assets/favicon.ico
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - assets/extra.css
+  - assets/pdf-download.css?v=2
+
+extra_javascript:
+  - assets/pdf-download.js?v=2
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/index.md
+      - Introduction:
+          - introduction/index.md
+          - What is SWAT+: introduction/what-is-swatplus.md
+          - SWAT vs SWAT+: introduction/swat-vs-swatplus.md
+          - Citing and license: introduction/citing-and-license.md
+          - Release notes: introduction/release-notes.md
+      - Install: getting-started/install.md
+      - "Quick start: Ames_sub1": getting-started/quick-start-ames.md
+      - Project folder anatomy: getting-started/project-folder-anatomy.md
+      - Your first watershed: getting-started/first-watershed.md
+  - Model Theory:
+      - model-theory/index.md
+      - Overview and water balance: model-theory/overview-water-balance.md
+      - Climate and weather: model-theory/climate-weather.md
+      - Hydrology: model-theory/hydrology.md
+      - Soil water and temperature: model-theory/soil-water-temperature.md
+      - Erosion and sediment: model-theory/erosion-sediment.md
+      - Plant growth and land use management: model-theory/plant-growth-lum.md
+      - Nutrient cycling: model-theory/nutrient-cycling.md
+      - Carbon: model-theory/carbon.md
+      - Pesticides: model-theory/pesticides.md
+      - Salts and constituents: model-theory/salts-constituents.md
+      - Channels: model-theory/channels.md
+      - Aquifers: model-theory/aquifers.md
+      - Reservoirs and wetlands: model-theory/reservoirs-wetlands.md
+      - Recall and point sources: model-theory/recall-point-sources.md
+      - Decision tables: model-theory/decision-tables.md
+  - Input Reference:
+      - input-reference/index.md
+      - Simulation control:
+          - file.cio: input-reference/file-cio.md
+          - time.sim: input-reference/time-sim.md
+          - print.prt: input-reference/print-prt.md
+          - object.cnt: input-reference/object-cnt.md
+      - Basin parameters:
+          - codes.bsn: input-reference/codes-bsn.md
+          - parameters.bsn: input-reference/parameters-bsn.md
+          - carbon.bsn: input-reference/carbon-bsn.md
+          - carbon_lyr.bsn: input-reference/carbon-lyr-bsn.md
+      - Spatial and connectivity:
+          - "*.con": input-reference/con.md
+          - hru-data.hru: input-reference/hru.md
+          - hydrology and topography: input-reference/hyd.md
+          - recall: input-reference/recall.md
+      - Climate:
+          - "*.cli": input-reference/cli.md
+          - "*.pcp": input-reference/pcp.md
+          - "*.tmp": input-reference/tmp.md
+          - "*.tem": input-reference/tem.md
+          - snow.sno: input-reference/sno.md
+      - Soils and land use:
+          - soils.sol: input-reference/sol.md
+          - landuse.lum: input-reference/lum.md
+          - lum lookup tables: input-reference/lum-tables.md
+      - Channels:
+          - "*.cha (legacy)": input-reference/cha.md
+          - sd_channel: input-reference/sd-channel.md
+      - Aquifers, reservoirs, wetlands:
+          - "*.aqu": input-reference/aqu.md
+          - "*.res": input-reference/res.md
+          - "*.wet": input-reference/wet.md
+      - Management:
+          - "*.ops": input-reference/ops.md
+          - "*.dtl": input-reference/dtl.md
+          - plants.plt: input-reference/plt.md
+          - fertilizer.frt: input-reference/frt.md
+          - tillage.til: input-reference/til.md
+          - "carb_coefs.cbn (deprecated)": input-reference/cbn.md
+          - treatment.trt: input-reference/trt.md
+          - manure allocation: input-reference/manure-allocation.md
+          - management schedule and minor inputs: input-reference/management.md
+      - Initial conditions:
+          - "*.ini files": input-reference/ini.md
+      - Structural BMPs:
+          - "*.str family": input-reference/str.md
+      - Pollutants:
+          - pesticide: input-reference/pes.md
+          - pathogen: input-reference/pth.md
+          - metals: input-reference/mtl.md
+      - Groundwater:
+          - gwflow: input-reference/gwflow.md
+      - Solute transport:
+          - salt (rtb salt): input-reference/salt.md
+          - constituents (rtb cs): input-reference/cs.md
+      - Water allocation:
+          - water allocation: input-reference/water-allocation.md
+  - Output Reference:
+      - output-reference/index.md
+      - Naming convention: output-reference/naming-convention.md
+      - Water balance: output-reference/water-balance.md
+      - Channel, sediment, nutrient: output-reference/channel-sediment-nutrient.md
+      - Aquifer, reservoir, plant: output-reference/aquifer-reservoir-plant.md
+      - Carbon: output-reference/carbon.md
+      - gwflow: output-reference/gwflow.md
+      - Checker and diagnostics: output-reference/checker-diagnostics.md
+      - Post-processing: output-reference/post-processing.md
+  - Developer Guide:
+      - developer-guide/index.md
+      - Build from source (CMake): developer-guide/build-cmake.md
+      - Visual Studio (Windows): developer-guide/visual-studio-windows.md
+      - VS Code Codespaces: developer-guide/vscode-codespaces.md
+      - Testing: developer-guide/testing.md
+      - Tagging and releases: developer-guide/tagging-releases.md
+      - Coding conventions: developer-guide/coding-conventions.md
+      - Code of conduct: developer-guide/code-of-conduct.md
+      - Contributing: developer-guide/contributing.md
+  - Other:
+      - Calibration:
+          - calibration/index.md
+          - Soft calibration: calibration/soft-calibration.md
+          - Hard calibration: calibration/hard-calibration.md
+          - Parameter change files: calibration/parameter-change-files.md
+          - Conditions and regionalization: calibration/conditions-regionalization.md
+          - Sensitivity workflow: calibration/sensitivity-workflow.md
+      - Tutorials and examples:
+          - tutorials/index.md
+          - Ames_sub1 walkthrough: tutorials/ames-sub1.md
+          - Osu_1hru walkthrough: tutorials/osu-1hru.md
+          - Carbon notebook: tutorials/carbon-notebook.md
+          - Cookbook: tutorials/cookbook.md
+      - Source reference: source-reference/index.md
+  - FAQ:
+      - faq-troubleshooting/index.md
+      - Common runtime errors: faq-troubleshooting/common-runtime-errors.md
+      - Water balance issues: faq-troubleshooting/water-balance-issues.md
+      - Performance tips: faq-troubleshooting/performance-tips.md
+  - Download as PDF: downloads.md

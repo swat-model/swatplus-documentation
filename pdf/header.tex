@@ -1,0 +1,13 @@
+% xelatex header includes for SWAT+ docs PDFs
+\usepackage{etoolbox}
+\usepackage{fvextra}
+% wrap long code lines instead of overflowing the margin
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,breaknonspaceingroup,commandchars=\\\{\}}
+\fvset{breaklines=true,breakanywhere=true}
+% smaller font + breakable long tables so wide reference tables fit
+\AtBeginEnvironment{longtable}{\footnotesize}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\emergencystretch}{3em}
+\usepackage{pdflscape}   % rotate wide tables onto landscape pages
+\usepackage{sectsty}
