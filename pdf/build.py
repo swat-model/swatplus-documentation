@@ -321,7 +321,10 @@ def rewrite_file(rel_md, text, docs_dir, included, maps, firstids, prefix, site_
                     dest = "#" + firstids[key]
             else:
                 url = page_url(key, prefix)
-                dest = (site_url.rstrip("/").rsplit(prefix, 1)[0] + url) if site_url else url
+                base = site_url.rstrip("/")
+                if prefix:
+                    base = base.rsplit(prefix, 1)[0]
+                dest = (base + url) if site_url else url
                 if frag:
                     dest += "#" + frag
             return f"[{label}]({dest})"
@@ -400,7 +403,7 @@ def pandoc_render(node, md_text, pdf_path, landscape_cols):
     ]
     if multi:
         cmd += ["--toc", "--toc-depth=2", "--top-level-division=chapter",
-                "-V", "subtitle=SWAT+ Documentation", "-V", "date=swat-model.github.io/swatplus-documentation"]
+                "-V", "subtitle=SWAT+ Documentation", "-V", "date=docs.swat.tamu.edu"]
     try:
         r = subprocess.run(cmd, capture_output=True, text=True)
         if r.returncode != 0:
