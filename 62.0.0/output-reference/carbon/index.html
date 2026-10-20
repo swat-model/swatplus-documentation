@@ -1,0 +1,6688 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The carbon output family at HRU and LSU level. Ten HRU files and three LSU files, each with a dedicated print.prt row.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.swat.tamu.edu/latest/output-reference/carbon/">
+      
+      
+        <link rel="prev" href="../aquifer-reservoir-plant/">
+      
+      
+        <link rel="next" href="../gwflow/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Carbon outputs - SWAT+ Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/pdf-download.css?v=2">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#purpose" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SWAT+ Documentation" class="md-header__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SWAT+ Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Carbon outputs
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../model-theory/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Model Theory
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../input-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Input Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Output Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer-guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../calibration/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Other
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq-troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  FAQ
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../downloads/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Download as PDF
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SWAT+ Documentation" class="md-nav__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    SWAT+ Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../introduction/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introduction
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/what-is-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What is SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/swat-vs-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWAT vs SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/citing-and-license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citing and license
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/release-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start-ames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick start: Ames_sub1
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/project-folder-anatomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project folder anatomy
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/first-watershed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first watershed
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../model-theory/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Theory
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Model Theory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/overview-water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview and water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/climate-weather/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate and weather
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/hydrology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrology
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/soil-water-temperature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil water and temperature
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/erosion-sediment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erosion and sediment
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/plant-growth-lum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plant growth and land use management
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/nutrient-cycling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nutrient cycling
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/carbon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--updated"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/pesticides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pesticides
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/salts-constituents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Salts and constituents
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/aquifers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/reservoirs-wetlands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reservoirs and wetlands
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/recall-point-sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recall and point sources
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/decision-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../input-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Input Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation control
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simulation control
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/file-cio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    file.cio
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/time-sim/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    time.sim
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/print-prt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    print.prt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/object-cnt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    object.cnt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basin parameters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basin parameters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/codes-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    codes.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/parameters-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parameters.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/carbon-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--new"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/carbon-lyr-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon_lyr.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--new"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial and connectivity
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Spatial and connectivity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/con/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.con
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hru-data.hru
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/hyd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hydrology and topography
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/recall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    recall
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Climate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cli
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.pcp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/tmp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tmp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/tem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tem
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    snow.sno
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soils and land use
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Soils and land use
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    soils.sol
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/lum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    landuse.lum
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/lum-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    lum lookup tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Channels
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cha/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cha (legacy)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sd-channel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    sd_channel
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers, reservoirs, wetlands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Aquifers, reservoirs, wetlands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/aqu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.aqu
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/res/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.res
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/wet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.wet
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/ops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ops
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/dtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.dtl
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/plt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plants.plt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/frt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    fertilizer.frt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tillage.til
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cbn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carb_coefs.cbn (deprecated)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--deprecated"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/trt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    treatment.trt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/manure-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    manure allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    management schedule and minor inputs
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initial conditions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Initial conditions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/ini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ini files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural BMPs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural BMPs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/str/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.str family
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pollutants
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pollutants
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pesticide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pathogen
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/mtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metals
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Groundwater
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Groundwater
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Solute transport
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Solute transport
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/salt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    salt (rtb salt)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    constituents (rtb cs)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water allocation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Water allocation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/water-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    water allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Output Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../naming-convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming convention
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channel-sediment-nutrient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channel, sediment, nutrient
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aquifer-reservoir-plant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifer, reservoir, plant
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--updated"></span>
+  
+
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--updated"></span>
+  
+
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File naming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-family-printprt-gating" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-family print.prt gating
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#legacy-csu-carbon-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy CSU carbon outputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hru-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HRU files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HRU files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_gl_-family-hru_cb_gl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_gl_* (family hru_cb_gl)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_scf_-family-hru_cb_trf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_scf_* (family hru_cb_trf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cbn_lyr_-family-hru_cb_lyr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cbn_lyr_* (family hru_cb_lyr)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cpool_stat_-family-hru_cb_cpool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cpool_stat_* (family hru_cb_cpool)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_n_p_pool_stat_-family-hru_cb_npool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_n_p_pool_stat_* (family hru_cb_npool)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_plc_stat_-family-hru_cb_plt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_plc_stat_* (family hru_cb_plt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cflux_stat_-family-hru_cb_flux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cflux_stat_* (family hru_cb_flux)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_drv_-family-hru_cb_drv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_drv_* (family hru_cb_drv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_dyn_-family-hru_cb_dyn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_dyn_* (family hru_cb_dyn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_soil_snap_-family-hru_cb_snap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_soil_snap_* (family hru_cb_snap)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lsu-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSU files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LSU files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lsu_carb_gl_-family-lsu_cb_gl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_carb_gl_* (family lsu_cb_gl)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsu_scf_-family-lsu_cb_trf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_scf_* (family lsu_cb_trf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsu_plc_stat_-family-lsu_cb_plt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_plc_stat_* (family lsu_cb_plt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-supporting-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional supporting file
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional supporting file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#carbon_layersprt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        carbon_layers.prt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../checker-diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checker and diagnostics
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../post-processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-processing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/build-cmake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Build from source (CMake)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/visual-studio-windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Studio (Windows)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/vscode-codespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Codespaces
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/tagging-releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging and releases
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/coding-conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding conventions
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/code-of-conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of conduct
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../source-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Other
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Other
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../calibration/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Calibration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/soft-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soft calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/hard-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hard calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/parameter-change-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parameter change files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--updated"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/conditions-regionalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions and regionalization
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/sensitivity-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity workflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorials/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials and examples
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials and examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/ames-sub1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ames_sub1 walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/osu-1hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Osu_1hru walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/carbon-notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon notebook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../faq-troubleshooting/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    FAQ
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/common-runtime-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common runtime errors
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/water-balance-issues/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance issues
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/performance-tips/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance tips
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../downloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download as PDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#file-naming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File naming
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#per-family-printprt-gating" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Per-family print.prt gating
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#legacy-csu-carbon-outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy CSU carbon outputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hru-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HRU files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="HRU files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_gl_-family-hru_cb_gl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_gl_* (family hru_cb_gl)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_scf_-family-hru_cb_trf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_scf_* (family hru_cb_trf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cbn_lyr_-family-hru_cb_lyr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cbn_lyr_* (family hru_cb_lyr)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cpool_stat_-family-hru_cb_cpool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cpool_stat_* (family hru_cb_cpool)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_n_p_pool_stat_-family-hru_cb_npool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_n_p_pool_stat_* (family hru_cb_npool)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_plc_stat_-family-hru_cb_plt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_plc_stat_* (family hru_cb_plt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_cflux_stat_-family-hru_cb_flux" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_cflux_stat_* (family hru_cb_flux)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_drv_-family-hru_cb_drv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_drv_* (family hru_cb_drv)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_carb_dyn_-family-hru_cb_dyn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_carb_dyn_* (family hru_cb_dyn)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hru_soil_snap_-family-hru_cb_snap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        hru_soil_snap_* (family hru_cb_snap)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lsu-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSU files
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LSU files">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lsu_carb_gl_-family-lsu_cb_gl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_carb_gl_* (family lsu_cb_gl)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsu_scf_-family-lsu_cb_trf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_scf_* (family lsu_cb_trf)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lsu_plc_stat_-family-lsu_cb_plt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lsu_plc_stat_* (family lsu_cb_plt)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-supporting-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional supporting file
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional supporting file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#carbon_layersprt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        carbon_layers.prt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Carbon</h1>
+
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
+<p>The carbon output family reports the state and fluxes of the SWAT+ Century-style carbon module: per-HRU and per-LSU gain and loss totals, soil C transformations, per-layer pool composition, plant carbon state, and process drivers. The family supersedes the old sprawl of 47 files in 26 base names. Every file is opt-in through <a href="../../input-reference/print-prt/"><code>print.prt</code></a>: each carbon family has its own row with the standard four-slot <code>d / m / y / a</code> layout.</p>
+<p>The outputs are produced only when <code>bsn_cc%cswat == 2</code> (the dynamic carbon model; the activation value moved from 1 to 2). See <a href="../../input-reference/codes-bsn/"><code>codes.bsn</code></a> and the <a href="../../model-theory/carbon/">carbon model theory</a>.</p>
+<h2 id="source">Source<a class="headerlink" href="#source" title="Permanent link">&para;</a></h2>
+<ul>
+<li>HRU writer: <a href="https://github.com/swat-model/swatplus/blob/main/src/hru_carbon_output.f90"><code>src/hru_carbon_output.f90</code></a> (gain/loss and transformations) and <a href="https://github.com/swat-model/swatplus/blob/main/src/soil_nutcarb_write.f90"><code>src/soil_nutcarb_write.f90</code></a> (per-layer pools, fluxes, drivers, dynamics, soil snapshot).</li>
+<li>LSU writer: <a href="https://github.com/swat-model/swatplus/blob/main/src/lsu_carbon_output.f90"><code>src/lsu_carbon_output.f90</code></a>.</li>
+<li>File opening and headers: <a href="https://github.com/swat-model/swatplus/blob/main/src/output_landscape_init.f90"><code>src/output_landscape_init.f90</code></a>.</li>
+<li>Header types and variable-name lists: <a href="https://github.com/swat-model/swatplus/blob/main/src/output_landscape_module.f90"><code>src/output_landscape_module.f90</code></a> (<code>output_carb_gl_header</code>, <code>output_hscf_header</code>, ...); <a href="https://github.com/swat-model/swatplus/blob/main/src/carbon_module.f90"><code>src/carbon_module.f90</code></a> (<code>cpool_vars</code>, <code>n_p_pool_vars</code>, <code>cflux_vars</code>, <code>carb_drv_vars</code>, <code>carb_dyn_vars</code>, <code>soil_snap_vars</code>).</li>
+<li>Per-family <code>print.prt</code> parsing: <a href="https://github.com/swat-model/swatplus/blob/main/src/basin_print_codes_read.f90"><code>src/basin_print_codes_read.f90</code></a>, <code>hru_cb_*</code> and <code>lsu_cb_*</code> case branches.</li>
+</ul>
+<h2 id="file-naming">File naming<a class="headerlink" href="#file-naming" title="Permanent link">&para;</a></h2>
+<p>Every file follows the canonical convention <code>&lt;family&gt;_{day,mon,yr,aa}.{txt,csv}</code>. The <code>_day</code> variant is daily, <code>_mon</code> is end-of-month, <code>_yr</code> is end-of-year, <code>_aa</code> is the average-annual record written once at end-of-simulation. The <code>hru_soil_snap</code> family uses <code>_tot</code> instead of <code>_aa</code> because an annual average of a snapshot pool is degenerate; the <code>_tot</code> file carries one begsim row and one endsim row, so <code>endsim_c - begsim_c</code> is the simulated SOC change per layer (see the carbon outputs reference).</p>
+<p>CSV variants are emitted in parallel when <code>csvout = y</code> in <code>print.prt</code>. Both variants share the same column header and units row.</p>
+<h2 id="per-family-printprt-gating">Per-family print.prt gating<a class="headerlink" href="#per-family-printprt-gating" title="Permanent link">&para;</a></h2>
+<p>Each carbon family has its own row in the per-object output block of <code>print.prt</code>. The <code>basin_print_codes_read.f90</code> <code>case (...)</code> table accepts these names; each row is one object label followed by four flags (<code>d m y a</code>):</p>
+<table>
+<thead>
+<tr>
+<th><code>print.prt</code> row</th>
+<th>Files gated</th>
+<th>Output scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hru_cb_gl</code></td>
+<td><code>hru_carb_gl_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_trf</code></td>
+<td><code>hru_scf_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_lyr</code></td>
+<td><code>hru_cbn_lyr_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_cpool</code></td>
+<td><code>hru_cpool_stat_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_npool</code></td>
+<td><code>hru_n_p_pool_stat_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_plt</code></td>
+<td><code>hru_plc_stat_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_flux</code></td>
+<td><code>hru_cflux_stat_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_drv</code></td>
+<td><code>hru_carb_drv_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_dyn</code></td>
+<td><code>hru_carb_dyn_*.{txt,csv}</code></td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>hru_cb_snap</code></td>
+<td><code>hru_soil_snap_*.{txt,csv}</code> (uses <code>_tot</code> instead of <code>_aa</code>)</td>
+<td>HRU</td>
+</tr>
+<tr>
+<td><code>lsu_cb_gl</code></td>
+<td><code>lsu_carb_gl_*.{txt,csv}</code></td>
+<td>LSU</td>
+</tr>
+<tr>
+<td><code>lsu_cb_trf</code></td>
+<td><code>lsu_scf_*.{txt,csv}</code></td>
+<td>LSU</td>
+</tr>
+<tr>
+<td><code>lsu_cb_plt</code></td>
+<td><code>lsu_plc_stat_*.{txt,csv}</code></td>
+<td>LSU</td>
+</tr>
+</tbody>
+</table>
+<p>The output restructure split the previous coarse <code>hru_cb</code> flag into the ten per-family flags above. The old <code>hru_cb</code> and <code>hru_cb_vars</code> rows now drive a parallel set of legacy CSU output files (see below), reinstated so the CSU team's existing workflows keep working alongside the standardised per-family files.</p>
+<p>The LSU files are emitted only when <code>db_mx%lsu_out &gt; 0</code> (the dataset contains routing units), regardless of the <code>lsu_cb_*</code> flag. Datasets without <code>rout_unit.con</code> populated do not create empty LSU carbon files.</p>
+<h2 id="legacy-csu-carbon-outputs">Legacy CSU carbon outputs<a class="headerlink" href="#legacy-csu-carbon-outputs" title="Permanent link">&para;</a></h2>
+<p>A second, older set of carbon output files runs alongside the standardised per-family files above. These are not exposed in SWAT+ Editor, so regular users do not see them; the CSU team adds the driving rows to <code>print.prt</code> by hand. This legacy path is temporary and is marked for removal in revision 63.</p>
+<p>Two <code>print.prt</code> rows drive it, both read by <code>basin_print_codes_read.f90</code> and name-driven (a <code>print.prt</code> without them produces none of these files):</p>
+<table>
+<thead>
+<tr>
+<th><code>print.prt</code> row</th>
+<th>When</th>
+<th>Files</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>hru_cb</code></td>
+<td>always when present</td>
+<td><code>hru_cbn_lyr</code>, <code>hru_seq_lyr</code>, <code>hru_n_p_pool_stat</code></td>
+</tr>
+<tr>
+<td><code>hru_cb</code> = <code>l</code> (layer detail)</td>
+<td>flag letter <code>l</code> turns diagnostics on</td>
+<td>adds <code>hru_cpool_stat</code>, <code>hru_cflux_stat</code>, <code>hru_plc_stat</code>, <code>hru_begsim_soil_prop</code>, <code>hru_endsim_soil_prop</code>, <code>basin_carbon_all</code></td>
+</tr>
+<tr>
+<td><code>hru_cb</code> = <code>y</code> (profile)</td>
+<td>flag letter <code>y</code></td>
+<td>light set only (diagnostics off)</td>
+</tr>
+<tr>
+<td><code>hru_cb_vars</code></td>
+<td>requires carbon on (<code>cswat == 2</code>)</td>
+<td><code>hru_carbvars</code>, <code>hru_org_allo_vars</code>, <code>hru_org_ratio_vars</code>, <code>hru_org_trans_vars</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each file is written as <code>.txt</code>, plus <code>.csv</code> when <code>csvout = y</code> in <code>print.prt</code>.</p>
+<p>The legacy and standardised files hold the same values in a different layout. For example, legacy <code>hru_cbn_lyr</code> (totals) plus <code>hru_seq_lyr</code> (sequestered) together equal the merged new <code>hru_cbn_lyr_yr</code>, which carries totals, sequestered, and depths in one wide table.</p>
+<p>The internal <code>cbn_diagnostics</code> switch (which gates the heavy diagnostic files) is no longer read from an input file; it is set at startup from the <code>hru_cb</code> flag letter (<code>l</code> = on, <code>y</code> = off). Legacy output uses Fortran file units 8348-8387.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code>cbn_diagnostics</code> flag in the old <code>carb_coefs.cbn</code> is retired. Output gating now lives entirely in <code>print.prt</code>.</p>
+</div>
+<h2 id="hru-files">HRU files<a class="headerlink" href="#hru-files" title="Permanent link">&para;</a></h2>
+<h3 id="hru_carb_gl_-family-hru_cb_gl"><code>hru_carb_gl_*</code> (family <code>hru_cb_gl</code>)<a class="headerlink" href="#hru_carb_gl_-family-hru_cb_gl" title="Permanent link">&para;</a></h3>
+<p>Merged HRU carbon gain and loss totals. 21 value columns covering soil C balance, residue C balance, and plant C balance. Replaces the former <code>hru_soilcarb_*</code>, <code>hru_rescarb_*</code>, and <code>hru_plcarb_*</code> triplet. Units are <code>kg C/ha</code> for every value column.</p>
+<p>Columns (in declaration order in <code>output_carb_gl_header</code>): <code>jday</code>, <code>mon</code>, <code>day</code>, <code>yr</code>, <code>unit</code>, <code>gis_id</code>, <code>name</code>, then <code>sed_c</code>, <code>surq_c</code>, <code>latq_c</code>, <code>perc_c</code>, <code>res_decay</code>, <code>man_app_c</code>, <code>man_graze_c</code>, <code>rsp_c</code>, <code>soil_emit_c</code>, <code>plant_surf_c</code>, <code>plant_root_c</code>, <code>rsd_surfdecay_c</code>, <code>rsd_rootdecay_c</code>, <code>harv_stov_c</code>, <code>rsd_emit_c</code>, <code>npp_c</code>, <code>harv_abgr_c</code>, <code>harv_root_c</code>, <code>drop_c</code>, <code>grazeat_c</code>, <code>plant_emit_c</code>.</p>
+<p>The output restructure broke out four sub-fields that the previous output silently summed under a single label: <code>plant_surf_c</code>, <code>plant_root_c</code>, <code>harv_abgr_c</code>, <code>harv_root_c</code>.</p>
+<h3 id="hru_scf_-family-hru_cb_trf"><code>hru_scf_*</code> (family <code>hru_cb_trf</code>)<a class="headerlink" href="#hru_scf_-family-hru_cb_trf" title="Permanent link">&para;</a></h3>
+<p>HRU-level soil carbon transformations (the 13 inter-pool fluxes). One row per HRU per timestep.</p>
+<p>Columns: <code>jday</code>, <code>mon</code>, <code>day</code>, <code>yr</code>, <code>unit</code>, <code>gis_id</code>, <code>name</code>, then <code>meta_micr</code>, <code>str_micr</code>, <code>str_hs</code>, <code>co2_meta</code>, <code>co2_str</code>, <code>micr_hs</code>, <code>micr_hp</code>, <code>hs_micr</code>, <code>hs_hp</code>, <code>hp_micr</code>, <code>co2_micr</code>, <code>co2_hs</code>, <code>co2_hp</code>.</p>
+<h3 id="hru_cbn_lyr_-family-hru_cb_lyr"><code>hru_cbn_lyr_*</code> (family <code>hru_cb_lyr</code>)<a class="headerlink" href="#hru_cbn_lyr_-family-hru_cb_lyr" title="Permanent link">&para;</a></h3>
+<p>Per-layer total soil carbon, written wide (one row per HRU per timestep with per-layer columns). The number of layers in the output is <code>cb_n_layers</code>. When the optional <code>carbon_layers.prt</code> is absent this defaults to the largest soil layer count across all HRUs, so the deepest profile is written in full; when the file is present it fixes the count to the value given. Each row carries that HRU's own layer depths, and layers a soil does not have are filled with the sentinel <code>-99</code>.</p>
+<p>Header is built at first data write and carries the structure <code>layer depth (mm) | total_c_lyr1 | total_c_lyr2 | ... | total_c_lyrN</code>. Units: <code>Mg C/ha</code> per layer column.</p>
+<h3 id="hru_cpool_stat_-family-hru_cb_cpool"><code>hru_cpool_stat_*</code> (family <code>hru_cb_cpool</code>)<a class="headerlink" href="#hru_cpool_stat_-family-hru_cb_cpool" title="Permanent link">&para;</a></h3>
+<p>Per-layer C pools. Wide layout, with the columns in <code>cpool_vars</code> (<code>src/carbon_module.f90:20</code>) expanded to <code>&lt;var&gt;_lyr1 ... &lt;var&gt;_lyrN</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>residue_c, structural_c, metabolic_c, hs_c, hp_c, microbial_c,
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>lignin_c, nonlignin_c, root_mass, soil_water
+</span></code></pre></div>
+<p>10 variables x <code>cb_n_layers</code> columns. Units are kg C/ha for the C pools, kg/ha for <code>root_mass</code>, mm for <code>soil_water</code>.</p>
+<h3 id="hru_n_p_pool_stat_-family-hru_cb_npool"><code>hru_n_p_pool_stat_*</code> (family <code>hru_cb_npool</code>)<a class="headerlink" href="#hru_n_p_pool_stat_-family-hru_cb_npool" title="Permanent link">&para;</a></h3>
+<p>Per-layer N and P content of the carbon pools. Variables in <code>n_p_pool_vars</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tot_pool_n, residue_n, structural_n, metabolic_n, hs_n, hp_n,
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>microbial_n, lignin_n, nonlignin_n,
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>tot_pool_p, residue_p, structural_p, metabolic_p, hs_p, hp_p,
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>microbial_p, lignin_p, nonlignin_p
+</span></code></pre></div>
+<p>18 variables x <code>cb_n_layers</code> columns. Units kg N/ha or kg P/ha as the column name implies.</p>
+<h3 id="hru_plc_stat_-family-hru_cb_plt"><code>hru_plc_stat_*</code> (family <code>hru_cb_plt</code>)<a class="headerlink" href="#hru_plc_stat_-family-hru_cb_plt" title="Permanent link">&para;</a></h3>
+<p>HRU-level plant carbon state. No per-layer expansion. Seven flat columns:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>total_c, ab_gr_c, leaf_c, stem_c, seed_c, root_c, surf_rsd_c
+</span></code></pre></div>
+<p>Units kg C/ha.</p>
+<h3 id="hru_cflux_stat_-family-hru_cb_flux"><code>hru_cflux_stat_*</code> (family <code>hru_cb_flux</code>)<a class="headerlink" href="#hru_cflux_stat_-family-hru_cb_flux" title="Permanent link">&para;</a></h3>
+<p>Per-layer C and N fluxes from the Century pool transformations. Variables in <code>cflux_vars</code> (37 entries):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>cfmets1, cfstrs1, cfstrs2,                          (C flows from litter)
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>efmets1, efstrs1, efstrs2,                          (E = effective C)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>immmets1, immstrs1, immstrs2,                       (immobilisation)
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>mnrmets1, mnrstrs1, mnrstrs2,                       (mineralisation)
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>co2fmet, co2fstr,                                   (CO2 from litter)
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>cfs1s2, cfs1s3, cfs2s1, cfs2s3, cfs3s1,             (inter-SOC pool C flows)
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>efs1s2, efs1s3, efs2s1, efs2s3, efs3s1,
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>imms1s2, imms1s3, imms2s1, imms2s3, imms3s1,
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>mnrs1s2, mnrs1s3, mnrs2s1, mnrs2s3, mnrs3s1,
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>co2fs1, co2fs2, co2fs3                              (CO2 from SOC pools)
+</span></code></pre></div>
+<p>37 variables x <code>cb_n_layers</code> columns. Pool indices: <code>s1</code> = microbial, <code>s2</code> = slow humus, <code>s3</code> = passive humus, <code>met</code> = metabolic litter, <code>str</code> = structural litter.</p>
+<h3 id="hru_carb_drv_-family-hru_cb_drv"><code>hru_carb_drv_*</code> (family <code>hru_cb_drv</code>)<a class="headerlink" href="#hru_carb_drv_-family-hru_cb_drv" title="Permanent link">&para;</a></h3>
+<p>Per-layer environmental drivers and intermediate factors for the Century transformations. Variables in <code>carb_drv_vars</code> (14 entries):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>sut, tillagef, cons_bmix, tillagef_biomix, tillagef_tillmix,
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>till_eff, cdg, ox, cs, no3, nh4, co2_resp, soil_temp, emix
+</span></code></pre></div>
+<p>14 variables x <code>cb_n_layers</code> columns. <code>sut</code>, <code>cdg</code>, <code>ox</code>, <code>cs</code> are dimensionless factors; <code>no3</code>, <code>nh4</code> are kg/ha; <code>co2_resp</code> is kg C/ha; <code>soil_temp</code> is deg C; <code>tillagef*</code>, <code>till_eff</code>, <code>cons_bmix</code>, <code>emix</code> are dimensionless.</p>
+<h3 id="hru_carb_dyn_-family-hru_cb_dyn"><code>hru_carb_dyn_*</code> (family <code>hru_cb_dyn</code>)<a class="headerlink" href="#hru_carb_dyn_-family-hru_cb_dyn" title="Permanent link">&para;</a></h3>
+<p>Per-layer carbon pool dynamics: allocation fractions and the C-to-N ratios of each pool transformation. Variables in <code>carb_dyn_vars</code> (21 entries):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>asp, abp, abco2, a1co2, asco2, apco2,               (CO2 / passive allocations)
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>ncbm, nchp, nchs,                                   (N:C of microbial, passive, slow)
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>bmctp, bmntp, hsctp, hsntp, hpctp, hpntp,           (pool C and N totals)
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>lmctp, lmntp, lsctp, lslctp, lslnctp, lsntp         (litter pool totals)
+</span></code></pre></div>
+<p>21 variables x <code>cb_n_layers</code> columns. Allocation fractions are dimensionless; pool totals are kg C/ha or kg N/ha.</p>
+<h3 id="hru_soil_snap_-family-hru_cb_snap"><code>hru_soil_snap_*</code> (family <code>hru_cb_snap</code>)<a class="headerlink" href="#hru_soil_snap_-family-hru_cb_snap" title="Permanent link">&para;</a></h3>
+<p>Per-layer soil snapshot. Uses <code>_tot</code> in place of <code>_aa</code> because an annual average of a snapshot is degenerate.</p>
+<p>Variables in <code>soil_snap_vars</code> (13 entries):</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>bd, awc, soil_k, tot_c, clay, silt, sand, rock,
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>alb, usle_k, ec, caco3, ph
+</span></code></pre></div>
+<p>13 variables x <code>cb_n_layers</code> columns.</p>
+<p>The <code>_day</code>, <code>_mon</code>, <code>_yr</code> files emit end-of-period rows on the usual cadence. The <code>_tot</code> file is special: it emits one row at simulation begin (<code>begsim</code>) and one at simulation end (<code>endsim</code>). Both rows carry pool values in the same unit (<code>kg C/ha</code> for <code>tot_c</code>), so <code>endsim_tot_c_lyrK - begsim_tot_c_lyrK</code> is the simulated SOC change for layer K. The previous design wrote a percentage on the begsim row and a mass on the endsim row, which made the delta meaningless.</p>
+<h2 id="lsu-files">LSU files<a class="headerlink" href="#lsu-files" title="Permanent link">&para;</a></h2>
+<p>The LSU files are area-weighted HRU aggregates produced by <code>lsu_carbon_output.f90</code>. Per-layer families are <strong>not</strong> aggregated to LSU because different HRUs within an LSU can have different soil profiles.</p>
+<h3 id="lsu_carb_gl_-family-lsu_cb_gl"><code>lsu_carb_gl_*</code> (family <code>lsu_cb_gl</code>)<a class="headerlink" href="#lsu_carb_gl_-family-lsu_cb_gl" title="Permanent link">&para;</a></h3>
+<p>LSU-level carbon gain and loss totals, area-weighted from the HRU <code>hru_carb_gl_*</code> values. Reuses the <code>output_carb_gl_header</code> columns (same 21 value columns as the HRU file).</p>
+<h3 id="lsu_scf_-family-lsu_cb_trf"><code>lsu_scf_*</code> (family <code>lsu_cb_trf</code>)<a class="headerlink" href="#lsu_scf_-family-lsu_cb_trf" title="Permanent link">&para;</a></h3>
+<p>LSU-level soil C transformations, area-weighted from the HRU values. Reuses the <code>output_hscf_header</code> columns.</p>
+<h3 id="lsu_plc_stat_-family-lsu_cb_plt"><code>lsu_plc_stat_*</code> (family <code>lsu_cb_plt</code>)<a class="headerlink" href="#lsu_plc_stat_-family-lsu_cb_plt" title="Permanent link">&para;</a></h3>
+<p>LSU-level plant carbon, summed across HRUs with the <code>ru_frac</code> weight. Single value column <code>plant_c</code> (kg C/ha), printed once per LSU per timestep.</p>
+<h2 id="optional-supporting-file">Optional supporting file<a class="headerlink" href="#optional-supporting-file" title="Permanent link">&para;</a></h2>
+<h3 id="carbon_layersprt"><code>carbon_layers.prt</code><a class="headerlink" href="#carbon_layersprt" title="Permanent link">&para;</a></h3>
+<p>Optional file that fixes <code>cb_n_layers</code>, the number of soil layers expanded in every wide per-layer carbon file. It is only needed when you want a specific column count; if it is absent the model uses the largest soil layer count across all HRUs (see below). Format:</p>
+<ul>
+<li>Line 1: title (free text, skipped).</li>
+<li>Line 2: header (free text, skipped).</li>
+<li>Line 3: single integer giving the layer count.</li>
+</ul>
+<p>Only line 3 carries data. The reader skips lines 1 and 2 entirely, so their text is for the reader's own benefit and may say anything. An integer below 1 is rejected and the automatic default is used instead.</p>
+<h3 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h3>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>carbon_layers.prt: layers to expand in per-layer carbon output
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>n_layers
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>10
+</span></code></pre></div>
+<p>Here line 1 is a free-text title, line 2 is a free-text header, and line 3 is the only value the reader uses. With <code>10</code>, every per-layer carbon file carries ten layer columns regardless of the soils present, and any unused slots are filled by <code>-99</code>. Use this to force a fixed column count, for example to truncate output to the top layers or to keep a constant width across runs.</p>
+<p>If the file is absent, <code>cb_n_layers</code> defaults to the largest soil layer count across all HRUs. This means the deepest profile is written in full and no real layer is truncated; HRUs with fewer layers than that maximum get the sentinel <code>-99</code> in their extra slots. (Earlier versions defaulted to a fixed 7, which silently truncated deeper soils.) Reader: <a href="https://github.com/swat-model/swatplus/blob/main/src/carbon_layers_read.f90"><code>src/carbon_layers_read.f90</code></a>. Not listed in <code>file.cio</code>.</p>
+<h2 id="related-pages">Related pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../model-theory/carbon/">Carbon (model theory)</a>. Pool definitions and Century-style transformation equations.</li>
+<li><a href="../../input-reference/carbon-bsn/"><code>carbon.bsn</code></a>. Basin-wide scalar inputs.</li>
+<li><a href="../../input-reference/carbon-lyr-bsn/"><code>carbon_lyr.bsn</code></a>. Per-layer inputs.</li>
+<li><a href="../../input-reference/print-prt/"><code>print.prt</code></a>. Output gating.</li>
+<li><a href="../naming-convention/">Naming convention</a>. Common naming rules across output files.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../assets/pdf-download.js?v=2"></script>
+      
+    
+  </body>
+</html>

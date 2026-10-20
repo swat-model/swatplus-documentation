@@ -1,0 +1,66 @@
+/* Dark navy primary palette. */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #0d1b2a;
+  --md-primary-fg-color--light: #1b263b;
+  --md-primary-fg-color--dark: #06101c;
+  --md-primary-bg-color: #ffffff;
+  --md-primary-bg-color--light: rgba(255, 255, 255, 0.7);
+
+  --md-accent-fg-color: #5a9eff;
+  --md-accent-fg-color--transparent: rgba(90, 158, 255, 0.1);
+  --md-accent-bg-color: #ffffff;
+  --md-accent-bg-color--light: rgba(255, 255, 255, 0.7);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #0d1b2a;
+  --md-primary-fg-color--light: #1b263b;
+  --md-primary-fg-color--dark: #06101c;
+
+  --md-accent-fg-color: #ffffff;
+  --md-accent-fg-color--transparent: rgba(255, 255, 255, 0.12);
+
+  /* Slightly cooler page background so the navy header reads as part of the page. */
+  --md-default-bg-color: #0f1620;
+
+  /* Body-content links: white, always underlined so they remain readable
+     against the dark navy palette without blending into body text. */
+  --md-typeset-a-color: #ffffff;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+[data-md-color-scheme="slate"] .md-typeset a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Cap overall page width on very wide screens. */
+@media (min-width: 90em) {
+  .md-grid {
+    max-width: 1500px;
+  }
+}
+
+/* Slightly larger reading text. */
+.md-typeset {
+  font-size: 0.78rem;
+}
+
+/* "Important" admonition: lighter chrome, used by our "Potential bug" sections. */
+.md-typeset h2#important {
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+  padding-top: 1rem;
+  margin-top: 2rem;
+}
+
+/* Make the SVG wordmark logo a bit larger in the header. */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.6rem;
+  width: auto;
+}
