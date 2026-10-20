@@ -1,0 +1,7251 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Heat units, light interception, biomass, leaf area, roots, stresses, nutrient uptake and harvest in SWAT+, and how land use, management schedules and decision tables drive operations.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.swat.tamu.edu/latest/model-theory/plant-growth-lum/">
+      
+      
+        <link rel="prev" href="../erosion-sediment/">
+      
+      
+        <link rel="next" href="../nutrient-cycling/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Plant Growth and Land Use Management - SWAT+ Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/pdf-download.css?v=2">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SWAT+ Documentation" class="md-header__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SWAT+ Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Plant Growth and Land Use Management
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Model Theory
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../input-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Input Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../output-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Output Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer-guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../calibration/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Other
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq-troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  FAQ
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../downloads/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Download as PDF
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SWAT+ Documentation" class="md-nav__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    SWAT+ Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../introduction/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introduction
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/what-is-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What is SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/swat-vs-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWAT vs SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/citing-and-license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citing and license
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/release-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start-ames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick start: Ames_sub1
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/project-folder-anatomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project folder anatomy
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/first-watershed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first watershed
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Theory
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Model Theory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview-water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview and water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../climate-weather/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate and weather
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hydrology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrology
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../soil-water-temperature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil water and temperature
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../erosion-sediment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erosion and sediment
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plant growth and land use management
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plant growth and land use management
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plant-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plant types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heat-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heat units
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dormancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dormancy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#light-interception-and-biomass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light interception and biomass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Light interception and biomass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#radiation-use-efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Radiation use efficiency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#biomass-growth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Biomass growth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leaf-area-and-canopy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf area and canopy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Leaf area and canopy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leaf-area-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf area development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leaf-senescence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf senescence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#canopy-height-and-roots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Canopy height and roots
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#water-uptake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Water uptake
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Water uptake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aeration-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aeration stress
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temperature-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temperature stress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nitrogen-and-phosphorus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nitrogen and phosphorus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nitrogen and phosphorus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#demand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uptake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uptake
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nitrogen-fixation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nitrogen fixation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nutrient-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nutrient stress
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#harvest-index-and-yield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Harvest index and yield
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#land-use-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Land use management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Land use management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#landuselum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        landuse.lum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-schedules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management schedules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switches-and-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switches and parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nutrient-cycling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nutrient cycling
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../carbon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pesticides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pesticides
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../salts-constituents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Salts and constituents
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aquifers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reservoirs-wetlands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reservoirs and wetlands
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recall-point-sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recall and point sources
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../decision-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../input-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Input Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation control
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simulation control
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/file-cio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    file.cio
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/time-sim/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    time.sim
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/print-prt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    print.prt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/object-cnt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    object.cnt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basin parameters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basin parameters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/codes-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    codes.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/parameters-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parameters.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/carbon-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/carbon-lyr-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon_lyr.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial and connectivity
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Spatial and connectivity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/con/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.con
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hru-data.hru
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/hru-lte/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hru-lte.hru
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/units/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routing and landscape units
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/link/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.lin (link files)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/hyd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hydrology and topography
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/recall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    recall
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Climate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cli
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.pcp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/tmp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tmp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/tem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tem
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    snow.sno
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soils and land use
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Soils and land use
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    soils.sol
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/lum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    landuse.lum
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/lum-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    lum lookup tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Channels
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cha/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cha (channel group)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/sd-channel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    chandeg channel files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers, reservoirs, wetlands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Aquifers, reservoirs, wetlands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/aqu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.aqu
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/res/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.res
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/wet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.wet
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/ops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ops
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/dtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.dtl
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/plt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plants.plt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/frt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    fertilizer.frt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tillage.til
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cbn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carb_coefs.cbn (deprecated)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--deprecated"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/trt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    treatment.trt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/manure-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    manure allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    management schedule and minor inputs
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initial conditions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Initial conditions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/ini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ini files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural BMPs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural BMPs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/str/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.str family
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pollutants
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pollutants
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pesticide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/pth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pathogen
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/mtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metals
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Groundwater
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Groundwater
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Solute transport
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Solute transport
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/salt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    salt (rtb salt)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/cs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    constituents (rtb cs)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water allocation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Water allocation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../input-reference/water-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    water allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../output-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Output Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/naming-convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming convention
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/channel-sediment-nutrient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channel, sediment, nutrient
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/aquifer-reservoir-plant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifer, reservoir, plant
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/nutrient-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nutrient balance and losses
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/hydrographs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrographs
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/recall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recall
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/carbon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/checker-diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checker and diagnostics
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/post-processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-processing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/build-cmake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Build from source (CMake)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/visual-studio-windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Studio (Windows)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/vscode-codespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Codespaces
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/tagging-releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging and releases
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/coding-conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding conventions
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/code-of-conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of conduct
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../source-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Other
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Other
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../calibration/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Calibration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/soft-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soft calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/hard-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hard calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/parameter-change-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parameter change files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/conditions-regionalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions and regionalization
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/sensitivity-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity workflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorials/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials and examples
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials and examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/ames-sub1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ames_sub1 walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/osu-1hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Osu_1hru walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/carbon-notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon notebook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../faq-troubleshooting/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    FAQ
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/common-runtime-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common runtime errors
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/water-balance-issues/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/performance-tips/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance tips
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../downloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download as PDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plant-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plant types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#heat-units" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heat units
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dormancy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dormancy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#light-interception-and-biomass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Light interception and biomass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Light interception and biomass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#radiation-use-efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Radiation use efficiency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#biomass-growth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Biomass growth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leaf-area-and-canopy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf area and canopy
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Leaf area and canopy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leaf-area-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf area development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leaf-senescence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaf senescence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#canopy-height-and-roots" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Canopy height and roots
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#water-uptake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Water uptake
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Water uptake">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aeration-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aeration stress
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#temperature-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temperature stress
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nitrogen-and-phosphorus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nitrogen and phosphorus
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Nitrogen and phosphorus">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#demand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Demand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uptake" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uptake
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nitrogen-fixation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nitrogen fixation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nutrient-stress" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Nutrient stress
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#harvest-index-and-yield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Harvest index and yield
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#land-use-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Land use management
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Land use management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#landuselum" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        landuse.lum
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#management-schedules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Management schedules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision tables
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switches-and-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switches and parameters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related pages
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Plant growth and land use management</h1>
+
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Each HRU has a plant community: one or more plants listed in <a href="../../input-reference/ini/#plantini"><code>plant.ini</code></a> and described in <a href="../../input-reference/plt/"><code>plants.plt</code></a>. SWAT+ grows every living plant of the community each day with a simplified version of the EPIC plant growth model. Phenological development follows accumulated heat units. Potential growth comes from intercepted light and the radiation use efficiency of the plant, and is reduced by water, temperature, nitrogen, phosphorus, aeration and (when salts are simulated) salinity stress. Growth removes water and nutrients from the soil, and harvest, kill and senescence return plant material to the residue and soil pools.</p>
+<p>Plants are planted, harvested and killed by the management schedule of the HRU and by decision tables (see <a href="#land-use-management">Land use management</a>).</p>
+<h2 id="plant-types">Plant types<a class="headerlink" href="#plant-types" title="Permanent link">&para;</a></h2>
+<p>The <code>plnt_typ</code> column of <a href="../../input-reference/plt/"><code>plants.plt</code></a> sets how a plant develops:</p>
+<table>
+<thead>
+<tr>
+<th><code>plnt_typ</code></th>
+<th>Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>warm_annual</code>, <code>warm_annual_tuber</code></td>
+<td>Annual; leaf area declines towards the end of the season</td>
+</tr>
+<tr>
+<td><code>cold_annual</code>, <code>cold_annual_tuber</code></td>
+<td>Annual; goes dormant in winter if planted late enough</td>
+</tr>
+<tr>
+<td><code>perennial</code></td>
+<td>Grows over several years towards maturity (<code>yrs_mat</code>); goes dormant each year</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>gro_trig</code> column sets what restarts growth: <code>temp_gro</code> for plants driven by temperature and day length, <code>moisture_gro</code> for plants in climates with a wet and dry season, where growth follows the ratio of precipitation to PET.</p>
+<h2 id="heat-units">Heat units<a class="headerlink" href="#heat-units" title="Permanent link">&para;</a></h2>
+<p>Plants develop at a rate set by temperature. Each day a plant above its base temperature accumulates heat units:</p>
+<div class="arithmatex">\[HU = \bar{T} - T_{base} \quad\text{when } \bar{T} &gt; T_{base}\]</div>
+<p>and the fraction of potential heat units reached is</p>
+<div class="arithmatex">\[fr_{PHU} = \sum_{i=1}^{d}\frac{HU_i}{PHU}\]</div>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Meaning</th>
+<th>Input</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\bar{T}\)</span></td>
+<td>Mean air temperature of the day</td>
+<td>°C</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(T_{base}\)</span></td>
+<td>Minimum (base) temperature for growth</td>
+<td><code>tmp_base</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>, °C</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(PHU\)</span></td>
+<td>Potential heat units needed to bring the plant to maturity</td>
+<td>see below</td>
+</tr>
+</tbody>
+</table>
+<p><span class="arithmatex">\(fr_{PHU}\)</span> starts at 0 at planting and reaches 1 at maturity. SWAT+ sets PHU for each plant at the start of the run from the long-term monthly temperatures of the weather generator station and <code>days_mat</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>:</p>
+<ul>
+<li><code>days_mat</code> &gt; 0: the heat units accumulated over <code>days_mat</code> days, starting from an estimated planting date. For annuals the planting date is taken where base-zero heat units reach 15% of their annual total.</li>
+<li><code>days_mat</code> = 0: 95% of the heat units above <span class="arithmatex">\(T_{base}\)</span> in a whole year, so the plant can stay active through the entire growing season.</li>
+</ul>
+<p>For perennials a second counter runs over the years to maturity, with <span class="arithmatex">\(PHU \times\)</span> <code>yrs_mat</code> as its target. It sets canopy height and root depth.</p>
+<p>Base-zero heat units (<span class="arithmatex">\(T_{base} = 0\)</span>, divided by the annual total) are also accumulated each year from 1 January. They schedule operations that happen when no plant is growing.</p>
+<h2 id="dormancy">Dormancy<a class="headerlink" href="#dormancy" title="Permanent link">&para;</a></h2>
+<p>Perennials and cold-season annuals go dormant when the day length falls below the minimum day length of the station plus a threshold. While dormant a plant does not grow. When a perennial goes dormant its seed mass is moved to residue and its heat unit counter is reset; it starts accumulating heat units again when the day length rises above the threshold. Cold-season annuals go dormant only if they have reached less than 75% of their heat units.</p>
+<h2 id="light-interception-and-biomass">Light interception and biomass<a class="headerlink" href="#light-interception-and-biomass" title="Permanent link">&para;</a></h2>
+<p>Each growing plant intercepts photosynthetically active radiation (PAR), taken as half of incoming solar radiation, according to Beer's law:</p>
+<div class="arithmatex">\[H_{phosyn} = 0.5\,H_{day}\left[1 - \exp\left(-k_\ell\,(LAI + 0.05)\right)\right]\]</div>
+<p>where <span class="arithmatex">\(H_{day}\)</span> is the solar radiation (MJ/m²), <span class="arithmatex">\(k_\ell\)</span> the light extinction coefficient (<code>ext_co</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>) and <span class="arithmatex">\(LAI\)</span> the leaf area index of the plant. Each plant intercepts light as though it were alone: SWAT+ 62.0.1 has a routine for competition for light between taller and shorter plants, but it is switched off.</p>
+<h3 id="radiation-use-efficiency">Radiation use efficiency<a class="headerlink" href="#radiation-use-efficiency" title="Permanent link">&para;</a></h3>
+<p>The radiation use efficiency (RUE) is the biomass produced per unit of intercepted light. It responds to CO2 (Stockle et al., 1992). When <code>co2</code> in <a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a> is above 350 ppm,</p>
+<div class="arithmatex">\[RUE = \frac{100\,CO_2}{CO_2 + \exp(r_1 - r_2\,CO_2)}\]</div>
+<p>where <span class="arithmatex">\(r_1\)</span> and <span class="arithmatex">\(r_2\)</span> are fitted so that RUE equals <code>bm_e</code> at 330 ppm and <code>bm_e_hi</code> at <code>co2_hi</code>. Otherwise RUE is <code>bm_e</code>. <span class="arithmatex">\(CO_2\)</span> is the concentration for the year (see <a href="../climate-weather/">Climate and weather</a>).</p>
+<p>When the vapour pressure deficit <span class="arithmatex">\(vpd\)</span> is above 1 kPa, RUE declines:</p>
+<div class="arithmatex">\[RUE = RUE - \Delta ruedcl_{vpd}\,(vpd - 1), \qquad RUE \ge 0.27\,\mathrm{bm\_e}\]</div>
+<p>where <span class="arithmatex">\(\Delta ruedcl_{vpd}\)</span> is <code>ru_vpd</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>.</p>
+<h3 id="biomass-growth">Biomass growth<a class="headerlink" href="#biomass-growth" title="Permanent link">&para;</a></h3>
+<p>Potential daily biomass growth is <span class="arithmatex">\(\Delta bio = RUE \times H_{phosyn}\)</span> (kg/ha). The actual growth is</p>
+<div class="arithmatex">\[\Delta bio_{act} = \Delta bio\;\gamma_{reg}, \qquad \gamma_{reg} = \min\left(\gamma_w,\;\gamma_t,\;\gamma_n,\;\gamma_p,\;\gamma_a,\;\gamma_s\right)\]</div>
+<p>where each <span class="arithmatex">\(\gamma\)</span> is a growth factor between 0 (no growth) and 1 (no stress) for water, temperature, nitrogen, phosphorus, aeration and salinity. When salinity is simulated with the salt tolerance option, the salinity factor multiplies the minimum of the others instead. Plant carbon is taken as 42% of biomass. <code>nostress</code> in <a href="../../input-reference/codes-bsn/"><code>codes.bsn</code></a> turns stresses off: <code>1</code> sets all factors to 1 and <code>2</code> sets only the nitrogen and phosphorus factors to 1.</p>
+<p>The new biomass is split into roots, leaves, stems and seed. The root fraction falls from <code>rt_st_beg</code> at the start of the season to <code>rt_st_end</code> at maturity (for perennials, over the first 20% of the years to maturity).</p>
+<h2 id="leaf-area-and-canopy">Leaf area and canopy<a class="headerlink" href="#leaf-area-and-canopy" title="Permanent link">&para;</a></h2>
+<h3 id="leaf-area-development">Leaf area development<a class="headerlink" href="#leaf-area-development" title="Permanent link">&para;</a></h3>
+<p>Leaf area follows an optimal curve defined by two points from <a href="../../input-reference/plt/"><code>plants.plt</code></a>: at <code>frac_hu1</code> of the heat units the plant reaches <code>lai_max1</code> of its maximum LAI, and at <code>frac_hu2</code> it reaches <code>lai_max2</code>. The fraction of maximum LAI for a given <span class="arithmatex">\(fr_{PHU}\)</span> is</p>
+<div class="arithmatex">\[fr_{LAImx} = \frac{fr_{PHU}}{fr_{PHU} + \exp(\ell_1 - \ell_2\,fr_{PHU})}\]</div>
+<p>with the shape coefficients <span class="arithmatex">\(\ell_1\)</span> and <span class="arithmatex">\(\ell_2\)</span> fitted to the two points. Until <span class="arithmatex">\(fr_{PHU}\)</span> reaches <code>hu_lai_decl</code>, the leaf area added on a day is</p>
+<div class="arithmatex">\[\Delta LAI = \left(fr_{LAImx,i} - fr_{LAImx,i-1}\right)LAI_{mx}\left[1 - \exp\left(5\,(LAI_{i-1} - LAI_{mx})\right)\right]\sqrt{\gamma_w}\]</div>
+<p>and is shared among plants in proportion to their LAI times canopy height. <span class="arithmatex">\(LAI_{mx}\)</span> is <code>lai_pot</code>. For perennials it grows with age:</p>
+<div class="arithmatex">\[LAI_{mx} = \mathrm{lai\_pot}\left(\frac{yr_{cur}}{\mathrm{yrs\_mat}}\right)^{\mathrm{bm\_tree\_acc}}\]</div>
+<h3 id="leaf-senescence">Leaf senescence<a class="headerlink" href="#leaf-senescence" title="Permanent link">&para;</a></h3>
+<p>After <code>hu_lai_decl</code>, annuals lose leaf area until maturity:</p>
+<div class="arithmatex">\[LAI = LAI_{mx}\left(\frac{1 - fr_{PHU}}{1 - fr_{PHU,sen}}\right)^{\mathrm{dlai\_rate}}\]</div>
+<p>where <span class="arithmatex">\(fr_{PHU,sen}\)</span> is the heat unit fraction at which decline started. Temperature-driven perennials drop to <code>lai_min</code> over 15 days once <code>hu_lai_decl</code> is passed. Moisture-driven perennials shed leaves continuously at a turnover rate between <code>leaf_tov_mn</code> and <code>leaf_tov_mx</code> months, faster when the 30-day precipitation to PET ratio is below 0.5. Leaves that fall are added to the surface residue.</p>
+<h3 id="canopy-height-and-roots">Canopy height and roots<a class="headerlink" href="#canopy-height-and-roots" title="Permanent link">&para;</a></h3>
+<div class="arithmatex">\[h_c = h_{c,mx}\sqrt{fr_{LAImx}}\]</div>
+<p>with <span class="arithmatex">\(h_{c,mx}\)</span> = <code>can_ht_max</code>. Root depth grows with heat units:</p>
+<div class="arithmatex">\[z_{root} = 2.5\,fr_{PHU}\,z_{root,mx}, \qquad 25.4\text{ mm} \le z_{root} \le \text{profile depth}\]</div>
+<p>with <span class="arithmatex">\(z_{root,mx}\)</span> = <code>rt_dp_max</code> (converted to mm). Perennials use the multi-year heat unit fraction, so their roots keep deepening until maturity.</p>
+<h2 id="water-uptake">Water uptake<a class="headerlink" href="#water-uptake" title="Permanent link">&para;</a></h2>
+<p>The potential transpiration of the HRU (see <a href="../soil-water-temperature/">Soil water and temperature</a>) is shared among growing plants in proportion to their LAI. Each plant takes up water from the layers within its root zone. The potential uptake down to depth <span class="arithmatex">\(z\)</span> is</p>
+<div class="arithmatex">\[w_{up,z} = \frac{E_t}{1 - \exp(-\beta_w)}\left[1 - \exp\left(-\beta_w\,\frac{z}{z_{root}}\right)\right]\]</div>
+<p>with the water use distribution parameter <span class="arithmatex">\(\beta_w\)</span> fixed at 10, so about half of the demand comes from the top 7% of the root zone. The uptake from a layer is the potential uptake to its bottom minus that to its top, with the shortfall of the layers above added back in part:</p>
+<div class="arithmatex">\[w'_{up,ly} = w_{up,z_l} - w_{up,z_u}\,(1 - \mathrm{epco})\]</div>
+<p>where <code>epco</code> is the plant uptake compensation factor in <a href="../../input-reference/hyd/"><code>hydrology.hyd</code></a>. With <code>epco</code> near 1 deeper layers can make up for dry layers above; near 0 they cannot. The second soil layer always compensates fully. Uptake is limited by the water in the layer, and SWAT+ does not reduce uptake as the soil dries below 25% of available water as SWAT 2009 did.</p>
+<p>The water stress factor is the ratio of actual to potential transpiration:</p>
+<div class="arithmatex">\[\gamma_w = \frac{\sum w_{actualup}}{E_t}\]</div>
+<h3 id="aeration-stress">Aeration stress<a class="headerlink" href="#aeration-stress" title="Permanent link">&para;</a></h3>
+<p>When the profile contains more water than field capacity, roots lack oxygen. With <span class="arithmatex">\(sat_{co} = (SW - FC)/(SAT - FC)\)</span> for the whole profile and <span class="arithmatex">\(a\)</span> = <code>aeration</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>,</p>
+<div class="arithmatex">\[\gamma_a = 1 - \frac{s}{s + \exp(2.9014 - 0.03867\,s)}, \qquad s = 100\,\frac{sat_{co} - a}{1.0001 - a}\]</div>
+<p>for <span class="arithmatex">\(s &gt; 0\)</span>; otherwise <span class="arithmatex">\(\gamma_a = 1\)</span>.</p>
+<h2 id="temperature-stress">Temperature stress<a class="headerlink" href="#temperature-stress" title="Permanent link">&para;</a></h2>
+<p>In SWAT+ 62.0.1 temperature stress is</p>
+<div class="arithmatex">\[\gamma_t = \sin\left(\frac{\pi}{2}\cdot\frac{\bar{T} - T_{base}}{T_{opt} - T_{base}}\right), \qquad 0 \le \gamma_t \le 1\]</div>
+<p>where <span class="arithmatex">\(T_{opt}\)</span> is <code>tmp_opt</code>. The factor is 0 at or below the base temperature, 1 at the optimum, falls again above it, and reaches 0 at <span class="arithmatex">\(2\,T_{opt} - T_{base}\)</span>. The SWAT 2009 exponential temperature stress and the cold-night rule (no growth when the minimum temperature is 15 °C below the annual mean) are computed first but replaced by this sine function.</p>
+<h2 id="nitrogen-and-phosphorus">Nitrogen and phosphorus<a class="headerlink" href="#nitrogen-and-phosphorus" title="Permanent link">&para;</a></h2>
+<h3 id="demand">Demand<a class="headerlink" href="#demand" title="Permanent link">&para;</a></h3>
+<p>The optimal nitrogen fraction of the plant falls as it develops:</p>
+<div class="arithmatex">\[fr_N = (fr_{N,1} - fr_{N,3})\left[1 - \frac{x}{x + \exp(n_1 - n_2\,x)}\right] + fr_{N,3}\]</div>
+<p>where <span class="arithmatex">\(fr_{N,1}\)</span>, <span class="arithmatex">\(fr_{N,2}\)</span> and <span class="arithmatex">\(fr_{N,3}\)</span> are <code>frac_n_em</code>, <code>frac_n_50</code> and <code>frac_n_mat</code> (at emergence, at 50% of maturity and at maturity), <span class="arithmatex">\(n_1\)</span> and <span class="arithmatex">\(n_2\)</span> are fitted to them, and <span class="arithmatex">\(x\)</span> is <span class="arithmatex">\(fr_{PHU}\)</span> for annuals or the fraction of <code>yrs_mat</code> reached for perennials. The demand is the optimal nitrogen mass, <span class="arithmatex">\(fr_N \times\)</span> biomass, minus the nitrogen in the plant, and is limited to four times <code>frac_n_mat</code> times the day's potential growth. Phosphorus follows the same form with <code>frac_p_em</code>, <code>frac_p_50</code> and <code>frac_p_mat</code>.</p>
+<h3 id="uptake">Uptake<a class="headerlink" href="#uptake" title="Permanent link">&para;</a></h3>
+<p>Nitrate is taken from the root zone with a depth distribution like water uptake, using <code>n_uptake</code> in <a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a> as the distribution parameter; labile phosphorus uses <code>p_uptake</code>. When several plants compete and the soil cannot meet the total demand, each plant gets a share in proportion to its demand.</p>
+<h3 id="nitrogen-fixation">Nitrogen fixation<a class="headerlink" href="#nitrogen-fixation" title="Permanent link">&para;</a></h3>
+<p>Legumes (<code>nfix_co</code> &gt; 0 in <a href="../../input-reference/plt/"><code>plants.plt</code></a>) fix nitrogen when the soil cannot supply their demand. Fixation depends on growth stage, soil water and soil nitrate:</p>
+<div class="arithmatex">\[N_{fix} = \min\left(6,\; f_{gr}\,\min(1, f_{sw}, f_{no3})\,(N_{dem} - N_{up})\right)\]</div>
+<table>
+<thead>
+<tr>
+<th>Factor</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(f_{gr}\)</span></td>
+<td>0 before 15% of heat units; rises to 1 at 30%; 1 to 55%; falls to 0 at 75%</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(f_{sw}\)</span></td>
+<td><span class="arithmatex">\(SW/(0.85\,FC)\)</span> for the profile</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(f_{no3}\)</span></td>
+<td>1 for profile nitrate up to 100 kg N/ha, falling linearly to 0 at 300 kg N/ha</td>
+</tr>
+</tbody>
+</table>
+<p>The result is blended with the unmet demand by the legume coefficient, <span class="arithmatex">\(N'_{fix} = \mathrm{nfix\_co}\,N_{fix} + (1 - \mathrm{nfix\_co})(N_{dem} - N_{up})\)</span>, and limited to the unmet demand and to <code>n_fix_max</code> in <a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a> (kg N/ha/day).</p>
+<h3 id="nutrient-stress">Nutrient stress<a class="headerlink" href="#nutrient-stress" title="Permanent link">&para;</a></h3>
+<p>For non-legumes the nitrogen stress factor is</p>
+<div class="arithmatex">\[\gamma_n = \frac{\varphi}{\varphi + \exp(3.535 - 0.02597\,\varphi)}, \qquad \varphi = 200\left(\frac{N_{plant}}{N_{opt}} - 0.5\right)\]</div>
+<p>which is 0 when the plant contains half its optimal nitrogen and close to 1 at the optimum. It is raised to the ratio of the day's uptake to demand when that is larger. Legumes have no nitrogen stress. Phosphorus stress uses the same form.</p>
+<h2 id="harvest-index-and-yield">Harvest index and yield<a class="headerlink" href="#harvest-index-and-yield" title="Permanent link">&para;</a></h2>
+<p>The harvest index is the fraction of above-ground biomass removed as yield. It grows through the season towards the optimal value <code>harv_idx</code> in <a href="../../input-reference/plt/"><code>plants.plt</code></a>:</p>
+<div class="arithmatex">\[HI = \mathrm{harv\_idx}\,\frac{100\,fr_{PHU}}{100\,fr_{PHU} + \exp(11.1 - 10\,fr_{PHU})}\]</div>
+<p>After half the heat units are reached, water deficit lowers it. With <span class="arithmatex">\(wu = 100\,\sum E_t/\sum PET\)</span> accumulated from that point,</p>
+<div class="arithmatex">\[HI_{act} = (HI - HI_{min})\frac{wu}{wu + \exp(6.13 - 0.0883\,wu)} + HI_{min}\]</div>
+<p>with <span class="arithmatex">\(HI_{min}\)</span> = HI/2. The seed (yield) pool of the plant is kept at this fraction of the above-ground biomass as the plant grows. A grain harvest raises the plant's harvest index target to at least <code>harv_idx_ws</code>, but only after the seed pool has been built, so <code>harv_idx_ws</code> does not change the yield of that harvest.</p>
+<p>Harvest operations are defined in <a href="../../input-reference/ops/#harvops"><code>harv.ops</code></a> by <code>harv_typ</code>, <code>harv_idx</code>, <code>harv_eff</code> and <code>harv_bm_min</code>. A harvest takes place only when the plant biomass is above <code>harv_bm_min</code> (kg/ha).</p>
+<table>
+<thead>
+<tr>
+<th><code>harv_typ</code></th>
+<th>Yield removed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grain</code>, <code>picker</code></td>
+<td><code>harv_eff</code> × seed mass; the rest of the seed goes to the soil's active humus</td>
+</tr>
+<tr>
+<td><code>biomass</code>, <code>tree</code>, <code>stripper</code></td>
+<td><code>harv_idx</code> × <code>harv_eff</code> × (seed + leaf + stem)</td>
+</tr>
+<tr>
+<td><code>tuber</code>, <code>peanuts</code></td>
+<td>Below-ground yield</td>
+</tr>
+<tr>
+<td><code>residue</code></td>
+<td>A fraction of surface residue, given in the operation</td>
+</tr>
+</tbody>
+</table>
+<p>Yield is reduced by any pesticide stress on the plant, and pesticide in the plant is removed with the yield.</p>
+<h2 id="land-use-management">Land use management<a class="headerlink" href="#land-use-management" title="Permanent link">&para;</a></h2>
+<h3 id="landuselum">landuse.lum<a class="headerlink" href="#landuselum" title="Permanent link">&para;</a></h3>
+<p>Each HRU points to a row of <a href="../../input-reference/lum/"><code>landuse.lum</code></a>, which names the plant community (<code>plnt_com</code>), the management schedule (<code>mgt</code>), the curve number row (<code>cn2</code>), the conservation practice (<code>cons_prac</code>), the urban land type, the overland Manning's n row (<code>ov_mann</code>), and any tile drain, septic system, filter strip, grassed waterway or user BMP.</p>
+<h3 id="management-schedules">Management schedules<a class="headerlink" href="#management-schedules" title="Permanent link">&para;</a></h3>
+<p>A schedule in <a href="../../input-reference/management/#managementsch"><code>management.sch</code></a> lists operations by date or by heat units, followed by the names of any decision tables that apply to the HRU. Each operation has a type, a month and day, a heat unit value and up to three data columns:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plnt</code></td>
+<td>Plant one plant or the whole community</td>
+</tr>
+<tr>
+<td><code>harv</code></td>
+<td>Harvest (see above)</td>
+</tr>
+<tr>
+<td><code>kill</code></td>
+<td>Kill the plant; biomass goes to residue</td>
+</tr>
+<tr>
+<td><code>hvkl</code></td>
+<td>Harvest and kill</td>
+</tr>
+<tr>
+<td><code>till</code></td>
+<td>Tillage, mixing residue and nutrients into the soil (<a href="../../input-reference/til/"><code>tillage.til</code></a>)</td>
+</tr>
+<tr>
+<td><code>irrm</code></td>
+<td>Irrigation by date (<a href="../../input-reference/ops/#irrops"><code>irr.ops</code></a>)</td>
+</tr>
+<tr>
+<td><code>fert</code></td>
+<td>Fertiliser (<a href="../../input-reference/frt/#fertilizerfrt"><code>fertilizer.frt</code></a>)</td>
+</tr>
+<tr>
+<td><code>manu</code></td>
+<td>Manure application</td>
+</tr>
+<tr>
+<td><code>pest</code></td>
+<td>Pesticide application (<a href="../../input-reference/ops/#chem_appops"><code>chem_app.ops</code></a>)</td>
+</tr>
+<tr>
+<td><code>graz</code></td>
+<td>Start grazing (<a href="../../input-reference/ops/#grazeops"><code>graze.ops</code></a>)</td>
+</tr>
+<tr>
+<td><code>cnup</code></td>
+<td>Change the curve number</td>
+</tr>
+<tr>
+<td><code>burn</code></td>
+<td>Prescribed burn (<a href="../../input-reference/ops/#fireops"><code>fire.ops</code></a>)</td>
+</tr>
+<tr>
+<td><code>swep</code></td>
+<td>Street sweeping</td>
+</tr>
+<tr>
+<td><code>dwm</code></td>
+<td>Set drain depth for drainage water management</td>
+</tr>
+<tr>
+<td><code>weir</code></td>
+<td>Set or change a paddy or wetland weir height</td>
+</tr>
+<tr>
+<td><code>irrp</code>, <code>irpm</code>, <code>pudl</code></td>
+<td>Rice paddy irrigation and puddling</td>
+</tr>
+<tr>
+<td><code>mons</code></td>
+<td>Start or end of a monsoon planting window</td>
+</tr>
+<tr>
+<td><code>skip</code></td>
+<td>Skip to the end of the year</td>
+</tr>
+</tbody>
+</table>
+<p>What each operation does to plants and soil, with its equations, is described with its parameters: harvest types and harvest efficiency, grazing, irrigation, burning and street sweeping in <a href="../../input-reference/ops/"><code>*.ops</code></a>; fertilizer and manure placement in <a href="../../input-reference/frt/#fertilizer-application"><code>fertilizer.frt</code></a>; tillage and biological mixing in <a href="../../input-reference/til/"><code>tillage.til</code></a>; and automatic irrigation and fertilization by decision table in <a href="../../input-reference/dtl/"><code>*.dtl</code></a>.</p>
+<p>An operation with a heat unit value runs when the heat unit fraction passes it: <span class="arithmatex">\(fr_{PHU}\)</span> of the plant named in the operation if that plant is growing, or the base-zero heat units otherwise. An operation without a heat unit value runs on its month and day. When all remaining operations of a year share one date, the scheduler moves on after one full pass.</p>
+<h3 id="decision-tables">Decision tables<a class="headerlink" href="#decision-tables" title="Permanent link">&para;</a></h3>
+<p>Decision tables in <a href="../../input-reference/dtl/"><code>lum.dtl</code></a> are conditional rule sets: each table has conditions, alternatives that combine them, and actions that fire when an alternative is true. The tables named in an HRU's schedule are evaluated every day before the other landscape processes, so they can plant, harvest, irrigate, fertilise or change land use in response to weather, soil water or plant growth. See <a href="../decision-tables/">Decision tables</a>.</p>
+<h2 id="switches-and-parameters">Switches and parameters<a class="headerlink" href="#switches-and-parameters" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>File</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nostress</code></td>
+<td><a href="../../input-reference/codes-bsn/"><code>codes.bsn</code></a></td>
+<td><code>0</code> all stresses, <code>1</code> no stress, <code>2</code> no nutrient stress</td>
+</tr>
+<tr>
+<td><code>co2</code></td>
+<td><a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a></td>
+<td>CO2 concentration without <code>co2_yr.dat</code>, ppm</td>
+</tr>
+<tr>
+<td><code>n_uptake</code>, <code>p_uptake</code></td>
+<td><a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a></td>
+<td>Depth distribution of N and P uptake</td>
+</tr>
+<tr>
+<td><code>n_fix_max</code></td>
+<td><a href="../../input-reference/parameters-bsn/"><code>parameters.bsn</code></a></td>
+<td>Maximum daily N fixation, kg N/ha</td>
+</tr>
+<tr>
+<td><code>epco</code></td>
+<td><a href="../../input-reference/hyd/"><code>hydrology.hyd</code></a></td>
+<td>Plant uptake compensation</td>
+</tr>
+<tr>
+<td><code>plnt_typ</code>, <code>gro_trig</code>, <code>days_mat</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Plant type, growth trigger, days to maturity</td>
+</tr>
+<tr>
+<td><code>bm_e</code>, <code>bm_e_hi</code>, <code>co2_hi</code>, <code>ru_vpd</code>, <code>ext_co</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Light interception and RUE</td>
+</tr>
+<tr>
+<td><code>lai_pot</code>, <code>frac_hu1</code>, <code>lai_max1</code>, <code>frac_hu2</code>, <code>lai_max2</code>, <code>hu_lai_decl</code>, <code>dlai_rate</code>, <code>lai_min</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Leaf area curve and decline</td>
+</tr>
+<tr>
+<td><code>can_ht_max</code>, <code>rt_dp_max</code>, <code>rt_st_beg</code>, <code>rt_st_end</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Canopy height, root depth, root fraction</td>
+</tr>
+<tr>
+<td><code>tmp_base</code>, <code>tmp_opt</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Temperature response</td>
+</tr>
+<tr>
+<td><code>frac_n_*</code>, <code>frac_p_*</code>, <code>nfix_co</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Nutrient demand and fixation</td>
+</tr>
+<tr>
+<td><code>harv_idx</code>, <code>harv_idx_ws</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Harvest index</td>
+</tr>
+<tr>
+<td><code>aeration</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Aeration stress threshold</td>
+</tr>
+<tr>
+<td><code>yrs_mat</code>, <code>bm_tree_acc</code>, <code>bm_tree_max</code>, <code>leaf_tov_mn</code>, <code>leaf_tov_mx</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Perennials</td>
+</tr>
+<tr>
+<td><code>bm_dieoff</code></td>
+<td><a href="../../input-reference/plt/"><code>plants.plt</code></a></td>
+<td>Read but not applied at dormancy in 62.0.1</td>
+</tr>
+</tbody>
+</table>
+<h2 id="related-pages">Related pages<a class="headerlink" href="#related-pages" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../input-reference/plt/"><code>plants.plt</code></a>, <a href="../../input-reference/lum/"><code>landuse.lum</code></a>, <a href="../../input-reference/ops/"><code>management.sch</code> and operations</a>, <a href="../../input-reference/dtl/"><code>lum.dtl</code></a></li>
+<li><a href="../soil-water-temperature/">Soil water and temperature</a> for the transpiration demand.</li>
+<li><a href="../nutrient-cycling/">Nutrient cycling</a> for the soil nitrogen and phosphorus pools.</li>
+<li><a href="../carbon/">Carbon</a> for residue and soil carbon.</li>
+<li><a href="../decision-tables/">Decision tables</a>.</li>
+</ul>
+<details class="quote">
+<summary>Sources</summary>
+<ul>
+<li>Community, PAR and transpiration split: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_community.f90"><code>pl_community.f90</code></a></li>
+<li>Growth driver: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_grow.f90"><code>pl_grow.f90</code></a>; biomass: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_biomass_gro.f90"><code>pl_biomass_gro.f90</code></a></li>
+<li>Heat units and nutrient demand: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nut_demand.f90"><code>pl_nut_demand.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nupd.f90"><code>pl_nupd.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_pupd.f90"><code>pl_pupd.f90</code></a>; PHU setup in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/plant_init.f90"><code>plant_init.f90</code></a></li>
+<li>Leaf area, roots, seed: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_leaf_gro.f90"><code>pl_leaf_gro.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_leaf_senes.f90"><code>pl_leaf_senes.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_root_gro.f90"><code>pl_root_gro.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_seed_gro.f90"><code>pl_seed_gro.f90</code></a></li>
+<li>Dormancy: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_dormant.f90"><code>pl_dormant.f90</code></a></li>
+<li>Stresses: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_waterup.f90"><code>pl_waterup.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_tstr.f90"><code>pl_tstr.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/nuts.f90"><code>nuts.f90</code></a></li>
+<li>Uptake and fixation: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nup.f90"><code>pl_nup.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_pup.f90"><code>pl_pup.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nfix.f90"><code>pl_nfix.f90</code></a></li>
+<li>Scheduling: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_operatn.f90"><code>mgt_operatn.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_sched.f90"><code>mgt_sched.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_read_mgtops.f90"><code>mgt_read_mgtops.f90</code></a>; decision tables evaluated in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_control.f90"><code>hru_control.f90</code></a></li>
+<li>Harvest: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvgrain.f90"><code>mgt_harvgrain.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvbiomass.f90"><code>mgt_harvbiomass.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvtuber.f90"><code>mgt_harvtuber.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvresidue.f90"><code>mgt_harvresidue.f90</code></a>; <code>type harvest_operation</code> in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_operations_module.f90"><code>mgt_operations_module.f90</code></a></li>
+<li>Plant database type: <code>type plant_db</code> in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/plant_data_module.f90"><code>plant_data_module.f90</code></a></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th><code>plants.plt</code> column</th>
+<th>Fortran variable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plnt_typ</code>, <code>gro_trig</code></td>
+<td><code>pldb%typ</code>, <code>pldb%trig</code></td>
+</tr>
+<tr>
+<td><code>bm_e</code>, <code>bm_e_hi</code>, <code>co2_hi</code>, <code>ru_vpd</code></td>
+<td><code>pldb%bio_e</code>, <code>pldb%bioehi</code>, <code>pldb%co2hi</code>, <code>pldb%wavp</code></td>
+</tr>
+<tr>
+<td><code>harv_idx</code>, <code>harv_idx_ws</code></td>
+<td><code>pldb%hvsti</code>, <code>pldb%wsyf</code></td>
+</tr>
+<tr>
+<td><code>lai_pot</code>, <code>frac_hu1</code>, <code>lai_max1</code>, <code>frac_hu2</code>, <code>lai_max2</code></td>
+<td><code>pldb%blai</code>, <code>pldb%frgrw1</code>, <code>pldb%laimx1</code>, <code>pldb%frgrw2</code>, <code>pldb%laimx2</code></td>
+</tr>
+<tr>
+<td><code>hu_lai_decl</code>, <code>dlai_rate</code>, <code>lai_min</code></td>
+<td><code>pldb%dlai</code>, <code>pldb%dlai_rate</code>, <code>pldb%alai_min</code></td>
+</tr>
+<tr>
+<td><code>can_ht_max</code>, <code>rt_dp_max</code></td>
+<td><code>pldb%chtmx</code>, <code>pldb%rdmx</code></td>
+</tr>
+<tr>
+<td><code>tmp_opt</code>, <code>tmp_base</code></td>
+<td><code>pldb%t_opt</code>, <code>pldb%t_base</code></td>
+</tr>
+<tr>
+<td><code>frac_n_em</code>, <code>frac_n_50</code>, <code>frac_n_mat</code></td>
+<td><code>pldb%pltnfr1</code>, <code>pldb%pltnfr2</code>, <code>pldb%pltnfr3</code></td>
+</tr>
+<tr>
+<td><code>frac_p_em</code>, <code>frac_p_50</code>, <code>frac_p_mat</code></td>
+<td><code>pldb%pltpfr1</code>, <code>pldb%pltpfr2</code>, <code>pldb%pltpfr3</code></td>
+</tr>
+<tr>
+<td><code>stcon_max</code>, <code>vpd</code>, <code>frac_stcon</code></td>
+<td><code>pldb%gsi</code>, <code>pldb%vpdfr</code>, <code>pldb%gmaxfr</code></td>
+</tr>
+<tr>
+<td><code>usle_c_min</code></td>
+<td><code>pldb%usle_c</code></td>
+</tr>
+<tr>
+<td><code>plnt_decomp</code></td>
+<td><code>pldb%rsdco_pl</code></td>
+</tr>
+<tr>
+<td><code>bm_tree_acc</code>, <code>yrs_mat</code>, <code>bm_tree_max</code></td>
+<td><code>pldb%laixco_tree</code>, <code>pldb%mat_yrs</code>, <code>pldb%bmx_peren</code></td>
+</tr>
+<tr>
+<td><code>ext_co</code>, <code>leaf_tov_mn</code>, <code>leaf_tov_mx</code></td>
+<td><code>pldb%ext_coef</code>, <code>pldb%leaf_tov_min</code>, <code>pldb%leaf_tov_max</code></td>
+</tr>
+<tr>
+<td><code>rt_st_beg</code>, <code>rt_st_end</code></td>
+<td><code>pldb%rsr1</code>, <code>pldb%rsr2</code></td>
+</tr>
+<tr>
+<td><code>n_uptake</code>, <code>p_uptake</code>, <code>n_fix_max</code> (parameters.bsn)</td>
+<td><code>bsn_prm%n_updis</code>, <code>bsn_prm%p_updis</code>, <code>bsn_prm%nfixmx</code></td>
+</tr>
+<tr>
+<td><code>harv_typ</code>, <code>harv_idx</code>, <code>harv_eff</code>, <code>harv_bm_min</code> (harv.ops)</td>
+<td><code>harvop_db%typ</code>, <code>%hi_ovr</code>, <code>%eff</code>, <code>%bm_min</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Symbol</th>
+<th>Fortran variable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(fr_{PHU}\)</span>, multi-year fraction</td>
+<td><code>pcom(j)%plcur(ipl)%phuacc</code>, <code>%phuacc_p</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(PHU\)</span></td>
+<td><code>pcom(j)%plcur(ipl)%phumat</code>, <code>%phumat_p</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(H_{phosyn}\)</span></td>
+<td><code>par(ipl)</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\Delta bio\)</span>, <span class="arithmatex">\(\gamma_{reg}\)</span></td>
+<td><code>bioday</code>, <code>pcom(j)%plstr(ipl)%reg</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\gamma_w\)</span>, <span class="arithmatex">\(\gamma_t\)</span>, <span class="arithmatex">\(\gamma_n\)</span>, <span class="arithmatex">\(\gamma_p\)</span>, <span class="arithmatex">\(\gamma_a\)</span>, <span class="arithmatex">\(\gamma_s\)</span></td>
+<td><code>pcom(j)%plstr(ipl)%strsw</code>, <code>%strst</code>, <code>%strsn</code>, <code>%strsp</code>, <code>%strsa</code>, <code>%strss</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(E_t\)</span> per plant</td>
+<td><code>epmax(ipl)</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\beta_w\)</span></td>
+<td><code>uptake%water_dis</code></td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(HI\)</span></td>
+<td><code>pcom(j)%plg(ipl)%hi_adj</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../assets/pdf-download.js?v=2"></script>
+      
+        <script src="../../assets/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

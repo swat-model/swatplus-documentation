@@ -1,0 +1,7261 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Basin-wide parameters. Coefficients for runoff, peak rate, nutrients, pesticides, channel routing, lapse rates, erosion and CO2 that apply to the whole watershed.">
+      
+      
+      
+        <link rel="canonical" href="https://docs.swat.tamu.edu/latest/input-reference/parameters-bsn/">
+      
+      
+        <link rel="prev" href="../codes-bsn/">
+      
+      
+        <link rel="next" href="../carbon-bsn/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>parameters.bsn - SWAT+ Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/extra.css">
+    
+      <link rel="stylesheet" href="../../assets/pdf-download.css?v=2">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#purpose" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="SWAT+ Documentation" class="md-header__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            SWAT+ Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              parameters.bsn
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../getting-started/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../model-theory/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Model Theory
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Input Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../output-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Output Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer-guide/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../calibration/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Other
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../faq-troubleshooting/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  FAQ
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../downloads/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Download as PDF
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="SWAT+ Documentation" class="md-nav__button md-logo" aria-label="SWAT+ Documentation" data-md-component="logo">
+      
+  <img src="../../assets/swat-logo.svg" alt="logo">
+
+    </a>
+    SWAT+ Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/swat-model/swatplus" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    swat-model/swatplus
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../getting-started/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../introduction/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Introduction
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/what-is-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What is SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/swat-vs-swatplus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SWAT vs SWAT+
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/citing-and-license/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Citing and license
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/release-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quick-start-ames/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick start: Ames_sub1
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/project-folder-anatomy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project folder anatomy
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/first-watershed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Your first watershed
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../model-theory/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Model Theory
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Model Theory
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/overview-water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview and water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/climate-weather/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate and weather
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/hydrology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrology
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/soil-water-temperature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soil water and temperature
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/erosion-sediment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Erosion and sediment
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/plant-growth-lum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Plant growth and land use management
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/nutrient-cycling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nutrient cycling
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/carbon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/pesticides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pesticides
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/salts-constituents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Salts and constituents
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/channels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/aquifers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/reservoirs-wetlands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reservoirs and wetlands
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/recall-point-sources/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recall and point sources
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../model-theory/decision-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decision tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Input Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Input Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Simulation control
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Simulation control
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../file-cio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    file.cio
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time-sim/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    time.sim
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../print-prt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    print.prt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../object-cnt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    object.cnt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basin parameters
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Basin parameters
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../codes-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    codes.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parameters.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    parameters.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zero-and-missing-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zero and missing values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initial-soil-water" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial soil water
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#surface-runoff-lag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Surface runoff lag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peak-rate-factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peak rate factor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pesticides-in-aquifers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pesticides in aquifers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pesticide-decay-and-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pesticide decay and temperature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uptake-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uptake distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#denitrification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Denitrification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frozen-soil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frozen soil
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dormancy-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dormancy threshold
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usle-c-factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USLE C factor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sub-daily-erosion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-daily erosion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#co2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CO2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#random-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Random numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../carbon-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../carbon-lyr-bsn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carbon_lyr.bsn
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial and connectivity
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Spatial and connectivity
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../con/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.con
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hru-data.hru
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hru-lte/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hru-lte.hru
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../units/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Routing and landscape units
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../link/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.lin (link files)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hyd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    hydrology and topography
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    recall
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_5" id="__nav_4_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Climate
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Climate
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cli
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.pcp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tmp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tmp
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.tem
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    snow.sno
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_6" id="__nav_4_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soils and land use
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Soils and land use
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    soils.sol
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    landuse.lum
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lum-tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    lum lookup tables
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_7" id="__nav_4_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channels
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Channels
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cha/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.cha (channel group)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sd-channel/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    chandeg channel files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_8" id="__nav_4_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifers, reservoirs, wetlands
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Aquifers, reservoirs, wetlands
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aqu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.aqu
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../res/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.res
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.wet
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_9" id="__nav_4_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ops
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.dtl
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../plt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plants.plt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../frt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    fertilizer.frt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    tillage.til
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cbn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    carb_coefs.cbn (deprecated)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--deprecated"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../trt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    treatment.trt
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manure-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    manure allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../management/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    management schedule and minor inputs
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_10" id="__nav_4_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Initial conditions
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Initial conditions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ini/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.ini files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_11" id="__nav_4_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural BMPs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Structural BMPs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../str/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    *.str family
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_12" id="__nav_4_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pollutants
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pollutants
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pesticide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pathogen
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mtl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    metals
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_13" id="__nav_4_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Groundwater
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Groundwater
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_14" id="__nav_4_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Solute transport
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Solute transport
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../salt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    salt (rtb salt)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    constituents (rtb cs)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_15" id="__nav_4_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water allocation
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Water allocation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../water-allocation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    water allocation
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../output-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Reference
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Output Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/naming-convention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Naming convention
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/water-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/channel-sediment-nutrient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Channel, sediment, nutrient
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/aquifer-reservoir-plant/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aquifer, reservoir, plant
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/nutrient-balance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nutrient balance and losses
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/hydrographs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hydrographs
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/recall/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recall
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/carbon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/gwflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    gwflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/checker-diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Checker and diagnostics
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../output-reference/post-processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Post-processing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../developer-guide/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guide
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/build-cmake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Build from source (CMake)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/visual-studio-windows/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visual Studio (Windows)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/vscode-codespaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VS Code Codespaces
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/tagging-releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tagging and releases
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/coding-conventions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Coding conventions
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/code-of-conduct/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Code of conduct
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guide/contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../source-reference/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Other
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7" id="__nav_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Other
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../calibration/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_1" id="__nav_7_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Calibration
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/soft-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Soft calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/hard-calibration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hard calibration
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/parameter-change-files/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parameter change files
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/conditions-regionalization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Conditions and regionalization
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../calibration/sensitivity-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sensitivity workflow
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../tutorials/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials and examples
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_7_2" id="__nav_7_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_7_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials and examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/ames-sub1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ames_sub1 walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/osu-1hru/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Osu_1hru walkthrough
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/carbon-notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carbon notebook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/cookbook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cookbook
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../faq-troubleshooting/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_8" id="__nav_8_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    FAQ
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/common-runtime-errors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Common runtime errors
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--review"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/water-balance-issues/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Water balance issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq-troubleshooting/performance-tips/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance tips
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../downloads/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download as PDF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Purpose
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#zero-and-missing-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Zero and missing values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initial-soil-water" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial soil water
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#surface-runoff-lag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Surface runoff lag
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peak-rate-factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Peak rate factor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pesticides-in-aquifers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pesticides in aquifers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pesticide-decay-and-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pesticide decay and temperature
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#uptake-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Uptake distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#denitrification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Denitrification
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#frozen-soil" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frozen soil
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dormancy-threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dormancy threshold
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usle-c-factor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        USLE C factor
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sub-daily-erosion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-daily erosion
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#co2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CO2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#random-numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Random numbers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calibration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related files
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>parameters.bsn</h1>
+
+<h2 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h2>
+<p><code>parameters.bsn</code> contains the coefficients that apply to the whole watershed: initial soil water, surface runoff lag, peak rate factors, nutrient and pesticide transport coefficients, denitrification, channel routing coefficients, lapse rates, erosion coefficients for sub-daily runs and the starting CO2 concentration. It is named in the second position of the <code>basin</code> line of <a href="../file-cio/"><code>file.cio</code></a> (default <code>parameters.bsn</code>). Several of the parameters only matter for the methods selected in <a href="../codes-bsn/"><code>codes.bsn</code></a>.</p>
+<p>If the file named in <a href="../file-cio/"><code>file.cio</code></a> does not exist, every parameter keeps its built-in value, after the zero-value replacements described in <a href="#zero-and-missing-values">Zero and missing values</a>.</p>
+<h2 id="format">Format<a class="headerlink" href="#format" title="Permanent link">&para;</a></h2>
+<p>Free format, whitespace-separated. Line 1 is a title and line 2 is the column header; both are skipped. Line 3 contains 44 values in the order below: 42 real numbers followed by two integers. The reader matches values by position only, so all 44 must be present and in this order. The table gives the column headers the SWAT+ Editor writes; several no longer describe what the model does with the value.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Column</th>
+<th>Units</th>
+<th>Built-in value</th>
+<th>Typical range</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>lai_noevap</code></td>
+<td>-</td>
+<td>3.0</td>
+<td>-</td>
+<td>Not used. Read and can be changed by calibration, but no routine uses it.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>sw_init</code></td>
+<td>fraction</td>
+<td>0.0</td>
+<td>0 to 1</td>
+<td>Initial soil water as a fraction of field capacity, the same for all soils. 0 means it is calculated from average annual precipitation. See <a href="#initial-soil-water">Initial soil water</a>.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>surq_lag</code></td>
+<td>-</td>
+<td>4.0</td>
+<td>1 to 24</td>
+<td>Surface runoff lag coefficient. See <a href="#surface-runoff-lag">Surface runoff lag</a>.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>adj_pkrt</code></td>
+<td>-</td>
+<td>1.0</td>
+<td>0.5 to 2</td>
+<td>Multiplier on the monthly mean fraction of daily rain that falls in the maximum half hour, calculated from the weather generator statistics (limited to 0.1 to 0.95). The daily fraction drawn from it is used by the half-hour intensity peak rate method (<code>sed_det = 1</code>), the rainfall erosivity of the MUSLE, urban washoff and the generation of sub-daily rainfall.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>adj_pkrt_sed</code></td>
+<td>-</td>
+<td>484.0</td>
+<td>-</td>
+<td>Peak rate factor of the NRCS peak runoff equation, used for HRU erosion when <code>sed_det = 0</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a> and for wetlands. See <a href="#peak-rate-factor">Peak rate factor</a>.</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>lin_sed</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>0 and up</td>
+<td>Pesticide groundwater mixing factor. See <a href="#pesticides-in-aquifers">Pesticides in aquifers</a>.</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>exp_sed</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>0 or 1</td>
+<td>Temperature-dependent pesticide decay: <code>1</code> on, any other value off. See <a href="#pesticide-decay-and-temperature">Pesticide decay and temperature</a>.</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>orgn_min</code></td>
+<td>1/day</td>
+<td>0.003</td>
+<td>0.0003 to 0.003</td>
+<td>Rate factor for mineralization of the active humus N and P pools (static carbon model, <code>carbon = 0</code>).</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>n_uptake</code></td>
+<td>-</td>
+<td>20.0</td>
+<td>0 to 100</td>
+<td>Nitrogen uptake distribution parameter. See <a href="#uptake-distribution">Uptake distribution</a>.</td>
+</tr>
+<tr>
+<td>10</td>
+<td><code>p_uptake</code></td>
+<td>-</td>
+<td>20.0</td>
+<td>0 to 100</td>
+<td>Phosphorus uptake distribution parameter.</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>n_perc</code></td>
+<td>-</td>
+<td>0.10</td>
+<td>0 to 1</td>
+<td>Nitrate percolation coefficient: ratio of the nitrate concentration in surface runoff to the concentration in water leaving the top layer.</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>p_perc</code></td>
+<td>m³/Mg</td>
+<td>10.0</td>
+<td>10 to 17.5</td>
+<td>Phosphorus percolation coefficient, used in the leaching of soluble P from each layer.</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>p_soil</code></td>
+<td>m³/Mg</td>
+<td>175.0</td>
+<td>100 to 200</td>
+<td>Phosphorus soil partitioning coefficient: ratio of soluble P in the top 10 mm of soil to soluble P in surface runoff.</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>p_avail</code></td>
+<td>fraction</td>
+<td>0.40</td>
+<td>0.01 to 0.7</td>
+<td>Phosphorus availability index: fraction of fertilizer P that is in solution after the fast reaction period. Sets the balance between the labile and active mineral P pools in the original P model (<code>soil_p = 0</code>).</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>rsd_decomp</code></td>
+<td>fraction/day</td>
+<td>0.05</td>
+<td>0.02 to 0.1</td>
+<td>Residue decomposition coefficient: daily fraction of residue that decomposes under ideal conditions. Used for every plant whose <code>plnt_decomp</code> in <a href="../plt/"><code>plants.plt</code></a> is 0.</td>
+</tr>
+<tr>
+<td>16</td>
+<td><code>pest_perc</code></td>
+<td>-</td>
+<td>0.5</td>
+<td>0 to 1</td>
+<td>Pesticide percolation coefficient: ratio of the pesticide concentration in surface runoff and lateral flow to the concentration in percolate.</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>msk_co1</code></td>
+<td>-</td>
+<td>0.75</td>
+<td>0 to 10</td>
+<td>Weight of the storage time constant at bankfull depth in the Muskingum storage constant.</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>msk_co2</code></td>
+<td>-</td>
+<td>0.25</td>
+<td>0 to 10</td>
+<td>Weight of the storage time constant at 0.1 bankfull depth in the Muskingum storage constant.</td>
+</tr>
+<tr>
+<td>19</td>
+<td><code>msk_x</code></td>
+<td>-</td>
+<td>0.20</td>
+<td>0 to 0.3</td>
+<td>Muskingum weighting factor for inflow and outflow in channel storage.</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>nperco_lchtile</code></td>
+<td>-</td>
+<td>0.5</td>
+<td>0 to 1</td>
+<td>Ratio of the nitrate concentration in tile flow to the concentration in the mobile water of the tile layer.</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>evap_adj</code></td>
+<td>-</td>
+<td>0.60</td>
+<td>0.5 to 1</td>
+<td>Channel evaporation adjustment factor: multiplier on station PET for evaporation from the channel water surface.</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>scoef</code></td>
+<td>-</td>
+<td>1.0</td>
+<td>0 to 1</td>
+<td>Channel storage coefficient of the variable storage routing method (<code>rte_cha = 0</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a>).</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>denit_exp</code></td>
+<td>-</td>
+<td>1.40</td>
+<td>0 to 3</td>
+<td>Denitrification exponential rate coefficient. See <a href="#denitrification">Denitrification</a>.</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>denit_frac</code></td>
+<td>-</td>
+<td>1.30</td>
+<td>see text</td>
+<td>Denitrification threshold on the soil water factor. See <a href="#denitrification">Denitrification</a>.</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>man_bact</code></td>
+<td>fraction</td>
+<td>0.15</td>
+<td>-</td>
+<td>Not used.</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>adj_uhyd</code></td>
+<td>h</td>
+<td>0.0</td>
+<td>0 and up</td>
+<td>Added to the base time of the sub-daily unit hydrograph. See <a href="../codes-bsn/#unit-hydrograph">unit hydrograph</a>.</td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>cn_froz</code></td>
+<td>1/mm</td>
+<td>0.000862</td>
+<td>-</td>
+<td>Frozen soil coefficient of the curve number retention parameter. See <a href="#frozen-soil">Frozen soil</a>.</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>dorm_hr</code></td>
+<td>h</td>
+<td>-1.0</td>
+<td>0 to 24</td>
+<td>Day length threshold for dormancy. 0 or less means it is calculated from latitude. See <a href="#dormancy-threshold">Dormancy threshold</a>.</td>
+</tr>
+<tr>
+<td>29</td>
+<td><code>plaps</code></td>
+<td>mm/km</td>
+<td>0.0</td>
+<td>-</td>
+<td>Precipitation lapse rate. Positive values increase precipitation with elevation. Used when <code>lapse = 1</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a>.</td>
+</tr>
+<tr>
+<td>30</td>
+<td><code>tlaps</code></td>
+<td>°C/km</td>
+<td>6.5</td>
+<td>-</td>
+<td>Temperature lapse rate. Positive values decrease temperature with elevation. Used when <code>lapse = 1</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a>.</td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>n_fix_max</code></td>
+<td>kg N/ha/day</td>
+<td>20.0</td>
+<td>1 to 20</td>
+<td>Maximum daily nitrogen fixation of a plant.</td>
+</tr>
+<tr>
+<td>32</td>
+<td><code>rsd_decay</code></td>
+<td>fraction/day</td>
+<td>0.01</td>
+<td>0 to 0.05</td>
+<td>Minimum daily residue decay fraction. The daily decay rate of residue is never below this value.</td>
+</tr>
+<tr>
+<td>33</td>
+<td><code>rsd_cover</code></td>
+<td>ha/t</td>
+<td>0.75</td>
+<td>-</td>
+<td>Residue cover factor in the USLE C factor. See <a href="#usle-c-factor">USLE C factor</a>.</td>
+</tr>
+<tr>
+<td>34</td>
+<td><code>urb_init_abst</code></td>
+<td>mm</td>
+<td>1.0</td>
+<td>0 to 10</td>
+<td>Maximum initial abstraction on impervious urban areas. Used only with Green-Ampt (<code>gampt = 1</code>).</td>
+</tr>
+<tr>
+<td>35</td>
+<td><code>petco_pmpt</code></td>
+<td>%</td>
+<td>100.0</td>
+<td>-</td>
+<td>Not used. The PET of every method is adjusted with <code>pet_co</code> in <a href="../hyd/#hydrologyhyd"><code>hydrology.hyd</code></a> instead.</td>
+</tr>
+<tr>
+<td>36</td>
+<td><code>uhyd_alpha</code></td>
+<td>-</td>
+<td>1.0</td>
+<td>0.5 to 10</td>
+<td>Shape coefficient of the gamma unit hydrograph (<code>uhyd = 1</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a>).</td>
+</tr>
+<tr>
+<td>37</td>
+<td><code>splash</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>0.9 to 3.1</td>
+<td>Splash erosion coefficient. See <a href="#sub-daily-erosion">Sub-daily erosion</a>.</td>
+</tr>
+<tr>
+<td>38</td>
+<td><code>rill</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>0.5 to 2</td>
+<td>Rill erosion coefficient, a multiplier on the USLE K factor of the top layer.</td>
+</tr>
+<tr>
+<td>39</td>
+<td><code>surq_exp</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>1 to 3</td>
+<td>Exponent on bed shear stress in overland flow erosion.</td>
+</tr>
+<tr>
+<td>40</td>
+<td><code>cov_mgt</code></td>
+<td>-</td>
+<td>0.0</td>
+<td>0.001 to 0.45</td>
+<td>Scaling factor on the cover and management factor in overland flow erosion.</td>
+</tr>
+<tr>
+<td>41</td>
+<td><code>cha_d50</code></td>
+<td>mm</td>
+<td>0.0</td>
+<td>-</td>
+<td>Not used. The median particle size of each channel is read from the channel input.</td>
+</tr>
+<tr>
+<td>42</td>
+<td><code>co2</code></td>
+<td>ppm</td>
+<td>400.0</td>
+<td>-</td>
+<td>Atmospheric CO2 concentration, used for every year when there is no <code>co2_yr.dat</code>. See <a href="#co2">CO2</a>.</td>
+</tr>
+<tr>
+<td>43</td>
+<td><code>day_lag_max</code></td>
+<td>days</td>
+<td>0</td>
+<td>-</td>
+<td>Not used as read. The model always sets it to 2.</td>
+</tr>
+<tr>
+<td>44</td>
+<td><code>igen</code></td>
+<td>-</td>
+<td>5</td>
+<td>0 and up</td>
+<td>Random number seed code. See <a href="#random-numbers">Random numbers</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>Values are read in one free-format read. A line with fewer values continues onto the next line, and the parameters that are not reached keep their built-in values. A value that cannot be read ends the read without a message.</p>
+<h2 id="zero-and-missing-values">Zero and missing values<a class="headerlink" href="#zero-and-missing-values" title="Permanent link">&para;</a></h2>
+<p>After reading, SWAT+ replaces values that are zero or negative (strictly, below <span class="arithmatex">\(10^{-6}\)</span>) for some parameters. For most of them the replacement is the built-in value, so leaving a column at 0 has the same effect as entering the built-in value. These are: <code>lai_noevap</code>, <code>surq_lag</code>, <code>adj_pkrt</code>, <code>n_uptake</code>, <code>p_uptake</code>, <code>n_perc</code>, <code>p_perc</code>, <code>p_soil</code>, <code>p_avail</code>, <code>rsd_decomp</code>, <code>pest_perc</code>, <code>msk_co1</code>, <code>msk_co2</code>, <code>msk_x</code>, <code>nperco_lchtile</code>, <code>evap_adj</code>, <code>denit_exp</code>, <code>denit_frac</code>, <code>man_bact</code>, <code>cn_froz</code>, <code>n_fix_max</code>, <code>rsd_decay</code>, <code>rsd_cover</code> and <code>uhyd_alpha</code>.</p>
+<p>The exceptions are:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Value read</th>
+<th>Value used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>adj_pkrt_sed</code></td>
+<td>0 or less</td>
+<td>1.0 (the built-in value is 484.0)</td>
+</tr>
+<tr>
+<td><code>orgn_min</code></td>
+<td>0 or less</td>
+<td>0.0003 (the built-in value is 0.003)</td>
+</tr>
+<tr>
+<td><code>urb_init_abst</code></td>
+<td>0 or less</td>
+<td>0.0 (the built-in value is 1.0)</td>
+</tr>
+<tr>
+<td><code>co2</code></td>
+<td>below 100</td>
+<td>400.0</td>
+</tr>
+<tr>
+<td><code>day_lag_max</code></td>
+<td>any</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p><code>sw_init</code>, <code>adj_uhyd</code>, <code>dorm_hr</code>, <code>splash</code>, <code>rill</code>, <code>surq_exp</code>, <code>cov_mgt</code> and <code>cha_d50</code> stay at 0 when 0 is read, and 0 has a meaning for some of them (see the sections below). <code>lin_sed</code>, <code>exp_sed</code>, <code>scoef</code>, <code>plaps</code>, <code>tlaps</code> and <code>igen</code> are used as read.</p>
+<h2 id="initial-soil-water">Initial soil water<a class="headerlink" href="#initial-soil-water" title="Permanent link">&para;</a></h2>
+<p>All soils start at the same fraction of field capacity. If <code>sw_init</code> is 0 or less, the fraction is calculated from the average annual precipitation <span class="arithmatex">\(P\)</span> (mm) of the HRU's weather generator station:</p>
+<div class="arithmatex">\[f_{fc} = \frac{P}{P + \exp(9.043 - 0.002135\,P)}\]</div>
+<p>A warm-up period of at least one year (<code>nyskip</code> in <a href="../print-prt/"><code>print.prt</code></a>) makes results largely independent of <code>sw_init</code>.</p>
+<h2 id="surface-runoff-lag">Surface runoff lag<a class="headerlink" href="#surface-runoff-lag" title="Permanent link">&para;</a></h2>
+<p>In HRUs with a long time of concentration, only part of the surface runoff reaches the channel on the day it is generated. The fraction released each day is</p>
+<div class="arithmatex">\[f_{rel} = 1 - \exp\!\left(-\frac{\mathrm{surq\_lag}}{t_{conc}}\right)\]</div>
+<p>with <span class="arithmatex">\(t_{conc}\)</span> in hours. In sub-daily runs <span class="arithmatex">\(t_{conc}\)</span> is expressed in time steps. The rest is kept in surface storage and added to the next day's runoff. Smaller values of <code>surq_lag</code> keep more water in storage and smooth the hydrograph.</p>
+<h2 id="peak-rate-factor">Peak rate factor<a class="headerlink" href="#peak-rate-factor" title="Permanent link">&para;</a></h2>
+<p>The column labelled <code>adj_pkrt_sed</code> by the SWAT+ Editor is the peak rate factor of the NRCS peak runoff equation (see <a href="../codes-bsn/#peak-runoff-rate">peak runoff rate</a>). The built-in value, 484, is the standard factor for the NRCS dimensionless unit hydrograph. The Editor writes 1.0 in this column, and a value of 0 is also replaced by 1.0. A factor of 1 gives peak rates 484 times lower than the standard factor, which lowers MUSLE sediment yields from HRUs when <code>sed_det = 0</code>. The value only affects the peak rate used for erosion and in wetlands; it does not change runoff volumes.</p>
+<h2 id="pesticides-in-aquifers">Pesticides in aquifers<a class="headerlink" href="#pesticides-in-aquifers" title="Permanent link">&para;</a></h2>
+<p>The columns labelled <code>lin_sed</code> and <code>exp_sed</code> by the Editor are pesticide parameters in 62.0.1. In each aquifer, the pesticide concentration in return flow and seepage is the pesticide mass divided by a mixing volume:</p>
+<div class="arithmatex">\[C = \frac{M_{pest}}{f_{mix}\,S_{aqu} + Q_{rtn} + Q_{revap} + Q_{seep}}\]</div>
+<p>where <span class="arithmatex">\(f_{mix}\)</span> is <code>lin_sed</code>, <span class="arithmatex">\(S_{aqu}\)</span> is the aquifer storage and the <span class="arithmatex">\(Q\)</span> terms are the day's return flow, revap and seepage (mm). With <code>lin_sed = 0</code> the concentration is based on the day's outflows only. Larger values dilute the pesticide in more of the stored water and slow its release.</p>
+<h2 id="pesticide-decay-and-temperature">Pesticide decay and temperature<a class="headerlink" href="#pesticide-decay-and-temperature" title="Permanent link">&para;</a></h2>
+<p>With <code>exp_sed = 1</code> (the value 1.0; other values such as 2 do not count), pesticide decay in soil, on foliage, in aquifers, in channel water and in channel bed sediment uses half-lives adjusted for temperature with a Q10 model:</p>
+<div class="arithmatex">\[t_{1/2}(T) = t_{1/2,25}\; Q_{10}^{(25 - T)/10}, \qquad Q_{10} = 2.58\]</div>
+<p>where <span class="arithmatex">\(t_{1/2,25}\)</span> is the half-life from the pesticide database, taken as the value at 25 °C, and the daily fraction remaining is <span class="arithmatex">\(\exp(-0.693 / t_{1/2}(T))\)</span>. Soil decay uses the layer temperature, foliar decay the top soil layer temperature, and channel decay the water temperature. In aquifers the temperature is fixed at 0 °C, which makes aquifer half-lives about 10.7 times longer than the database value. Any other value of <code>exp_sed</code> uses the database half-lives without a temperature adjustment.</p>
+<p>The Ames example file (see <a href="#example">Example</a>) has <code>exp_sed = 1.0</code>, so temperature-dependent decay is on in that dataset.</p>
+<h2 id="uptake-distribution">Uptake distribution<a class="headerlink" href="#uptake-distribution" title="Permanent link">&para;</a></h2>
+<p>The maximum nitrogen uptake from the soil above depth <span class="arithmatex">\(z\)</span> is</p>
+<div class="arithmatex">\[U(z) = U_{pot}\,\frac{1 - \exp(-\beta_n\,z / z_{root})}{1 - \exp(-\beta_n)}\]</div>
+<p>where <span class="arithmatex">\(\beta_n\)</span> is <code>n_uptake</code> and <span class="arithmatex">\(z_{root}\)</span> is the root depth. Larger values concentrate uptake near the surface. Because the top 10 mm interacts with surface runoff, <code>n_uptake</code> affects the nitrate available for runoff; lower layers can make up a shortfall in the upper layers, so plant N stress changes little with this parameter. <code>p_uptake</code> works the same way for phosphorus.</p>
+<h2 id="denitrification">Denitrification<a class="headerlink" href="#denitrification" title="Permanent link">&para;</a></h2>
+<p>Denitrification in a soil layer is</p>
+<div class="arithmatex">\[N_{denit} = NO_3\left[1 - \exp\!\left(-\mathrm{denit\_exp}\;\gamma_{tmp}\;\frac{OC}{100}\right)\right]\]</div>
+<p>where <span class="arithmatex">\(\gamma_{tmp}\)</span> is the temperature factor and <span class="arithmatex">\(OC\)</span> the organic carbon content (%). It only occurs on days when the soil water factor <span class="arithmatex">\(\gamma_{sw}\)</span> is at or above <code>denit_frac</code>.</p>
+<p>With the static carbon model (<code>carbon = 0</code>), <span class="arithmatex">\(\gamma_{sw} = 0.1 + 0.9\sqrt{SW/FC}\)</span>, with no upper limit. With the default <code>denit_frac</code> of 1.3, denitrification needs <span class="arithmatex">\(SW/FC \ge 1.78\)</span>, that is, a layer well above field capacity.</p>
+<p>With the dynamic carbon model (<code>carbon = 2</code>), <span class="arithmatex">\(\gamma_{sw}\)</span> comes from the water factor selected in <a href="../carbon-bsn/"><code>carbon.bsn</code></a> and is never above 1. Any <code>denit_frac</code> above 1, including the default 1.3, then switches denitrification off for the whole run. Datasets using <code>carbon = 2</code> need a <code>denit_frac</code> of 1 or less to simulate denitrification.</p>
+<h2 id="frozen-soil">Frozen soil<a class="headerlink" href="#frozen-soil" title="Permanent link">&para;</a></h2>
+<p>When the second soil layer is at or below 0 °C, the curve number retention parameter <span class="arithmatex">\(S\)</span> is reduced:</p>
+<div class="arithmatex">\[S_{frz} = S_{max}\left[1 - \exp(-\mathrm{cn\_froz}\cdot S)\right]\]</div>
+<p>which increases runoff from frozen soil. The same adjustment is applied with Green-Ampt.</p>
+<h2 id="dormancy-threshold">Dormancy threshold<a class="headerlink" href="#dormancy-threshold" title="Permanent link">&para;</a></h2>
+<p>A plant goes dormant when the day length falls below the station's minimum day length plus a threshold <span class="arithmatex">\(t_{dorm}\)</span> (hours). If <code>dorm_hr</code> is above 0, <span class="arithmatex">\(t_{dorm}\)</span> = <code>dorm_hr</code> everywhere. Otherwise it depends on the latitude <span class="arithmatex">\(\phi\)</span> of the weather generator station: 1 h above 40°, <span class="arithmatex">\((|\phi| - 20)/20\)</span> h between 20° and 40°, and -1 h below 20°.</p>
+<h2 id="usle-c-factor">USLE C factor<a class="headerlink" href="#usle-c-factor" title="Permanent link">&para;</a></h2>
+<p>The C factor is the product of a residue factor and a biomass factor:</p>
+<div class="arithmatex">\[C = \exp\!\left(-\mathrm{rsd\_cover}\cdot\frac{R + 1}{1000}\right)\left[1 - f_{cov}\,\exp(-0.328\,h_c)\right]\]</div>
+<p>where <span class="arithmatex">\(R\)</span> is the residue on the surface (kg/ha), <span class="arithmatex">\(h_c\)</span> is the canopy height (m), and <span class="arithmatex">\(f_{cov}\)</span> is the ground cover fraction of the above-ground biomass. This is the only C factor method in 62.0.1 (see <a href="../codes-bsn/#usle-c-factor">USLE C factor</a>).</p>
+<h2 id="sub-daily-erosion">Sub-daily erosion<a class="headerlink" href="#sub-daily-erosion" title="Permanent link">&para;</a></h2>
+<p>With Green-Ampt (<code>gampt</code> above 0 in <a href="../codes-bsn/"><code>codes.bsn</code></a>), sediment from each time step is the sum of splash and overland flow erosion. Splash erosion decreases with runoff depth <span class="arithmatex">\(h\)</span> (mm) as <span class="arithmatex">\(\exp(-\mathrm{splash}\cdot h/1000)\)</span> and depends on rainfall kinetic energy and a soil texture erodibility. Overland flow erosion is</p>
+<div class="arithmatex">\[E_{ov} = 11.02\;\mathrm{rill}\;K\;\mathrm{cov\_mgt}\;C\;\tau^{\,\mathrm{surq\_exp}}\]</div>
+<p>in kg/h/m², where <span class="arithmatex">\(K\)</span> is the USLE K factor of the top layer, <span class="arithmatex">\(C\)</span> is a cover factor from biomass and residue, and <span class="arithmatex">\(\tau\)</span> is the bed shear stress (N/m²). With the built-in values of 0 for <code>rill</code> or <code>cov_mgt</code>, overland flow erosion is zero.</p>
+<h2 id="co2">CO2<a class="headerlink" href="#co2" title="Permanent link">&para;</a></h2>
+<p>Without a <code>co2_yr.dat</code> file in the run folder, every year uses <code>co2</code>. With the file, the yearly values come from it (see <a href="../management/#co2_yrdat-and-co2out">co2_yr.dat</a>). The radiation use efficiency of plants is adjusted for CO2 only when <code>co2</code> in <code>parameters.bsn</code> is above 350 ppm, even when the yearly values come from <code>co2_yr.dat</code>. Penman-Monteith PET uses the yearly values in all cases.</p>
+<h2 id="random-numbers">Random numbers<a class="headerlink" href="#random-numbers" title="Permanent link">&para;</a></h2>
+<p>With <code>igen = 0</code>, the weather generator and other random processes start from fixed seeds, so every run gives the same random sequence. With any other value, each seed is advanced by a number of steps that depends on <code>igen</code>, so different <code>igen</code> values give different sequences. The same <code>igen</code> always gives the same sequence, so a new value is needed for each different realisation.</p>
+<h2 id="calibration">Calibration<a class="headerlink" href="#calibration" title="Permanent link">&para;</a></h2>
+<p>These parameters can be changed during calibration through <a href="../../calibration/parameter-change-files/"><code>calibration.cal</code></a> with object type <code>bsn</code>, using their model names: <code>surlag</code> (<code>surq_lag</code>), <code>adj_pkr</code> (<code>adj_pkrt</code>), <code>prf</code> (<code>adj_pkrt_sed</code>), <code>evlai</code> (<code>lai_noevap</code>), <code>ffcb</code> (<code>sw_init</code>), <code>cmn</code> (<code>orgn_min</code>), <code>nperco</code> (<code>n_perc</code>), <code>pperco</code> (<code>p_perc</code>), <code>phoskd</code> (<code>p_soil</code>), <code>psp</code> (<code>p_avail</code>), <code>rsdco</code> (<code>rsd_decomp</code>), <code>percop</code> (<code>pest_perc</code>), <code>msk_co1</code>, <code>msk_co2</code>, <code>msk_x</code>, <code>nperco_lchtile</code>, <code>evrch</code> (<code>evap_adj</code>), <code>cdn</code> (<code>denit_exp</code>), <code>sdnco</code> (<code>denit_frac</code>), <code>tb_adj</code> (<code>adj_uhyd</code>), <code>n_updis</code> (<code>n_uptake</code>), <code>rsd_covco</code> (<code>rsd_cover</code>), <code>dorm_hr</code>, <code>plaps</code> and <code>tlaps</code>. See <a href="../../calibration/parameter-change-files/">parameter change files</a>.</p>
+<p>The changes in <a href="../../calibration/parameter-change-files/"><code>calibration.cal</code></a> are applied once, after the HRUs, channels and weather stations have been set up. Several of these parameters are only used during that setup, so changing them in <a href="../../calibration/parameter-change-files/"><code>calibration.cal</code></a> has no effect on the run:</p>
+<ul>
+<li><code>cmn</code>, <code>nperco</code>, <code>pperco</code>, <code>phoskd</code>, <code>psp</code> and <code>nperco_lchtile</code> have already been copied to each HRU. Use the HRU-level names <code>cmn_h</code>, <code>nperco_h</code>, <code>pperco_h</code>, <code>phoskd_h</code>, <code>psp_h</code> and <code>nperco_lchtile_h</code> instead.</li>
+<li><code>ffcb</code>: the initial soil water has already been set.</li>
+<li><code>adj_pkr</code> and <code>dorm_hr</code>: the half-hour rainfall fractions and the dormancy thresholds of the weather stations have already been calculated.</li>
+<li><code>msk_co1</code>, <code>msk_co2</code> and <code>msk_x</code>: the Muskingum coefficients of the channels have already been calculated.</li>
+<li><code>rsdco</code>: it has already been copied to the plants with <code>plnt_decomp</code> = 0.</li>
+</ul>
+<p><code>surlag</code> is recalculated into the runoff release fraction when it is changed, and the others are used directly during the simulation, so their changes take effect.</p>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<p><code>refdata/Ames_sub1/parameters.bsn</code> in the SWAT+ repository:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>parameters.bsn: written by SWAT+ editor v2.3.3 on 2023-10-25 08:58 for SWAT+ rev.60.5.7
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  lai_noevap       sw_init      surq_lag      adj_pkrt  adj_pkrt_sed       lin_sed       exp_sed      orgn_min      n_uptake      p_uptake        n_perc        p_perc        p_soil       p_avail    rsd_decomp     pest_perc       msk_co1       msk_co2         msk_x  nperco_lchtile      evap_adj         scoef     denit_exp    denit_frac      man_bact      adj_uhyd       cn_froz       dorm_hr         plaps         tlaps     n_fix_max     rsd_decay     rsd_cover  urb_init_abst    petco_pmpt    uhyd_alpha        splash          rill      surq_exp       cov_mgt       cha_d50           co2   day_lag_max      igen
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     3.00000       0.50000       4.00000       1.00000       1.00000       0.00000       1.00000       0.00000      20.00000      20.00000       0.10000      10.00000     175.00000       0.40000       0.05000       0.50000       0.75000       0.25000       0.20000       0.50000       0.60000       1.00000       1.40000       1.30000       0.15000       0.00000       0.00000       0.00000       0.00000       0.00000      20.00000       0.01000       0.30000       1.00000       1.00000       5.00000       1.00000       0.70000       1.20000       0.03000      50.00000     400.00000      0                0
+</span></code></pre></div>
+<p>How the model reads some of these values:</p>
+<ul>
+<li><code>sw_init = 0.5</code>: soils start at half of field capacity.</li>
+<li><code>adj_pkrt_sed = 1.0</code>: the NRCS peak rate factor is 1. The standard factor is 484.</li>
+<li><code>exp_sed = 1.0</code>: temperature-dependent pesticide decay is on.</li>
+<li><code>orgn_min = 0.0</code>: replaced by 0.0003.</li>
+<li><code>cn_froz = 0.0</code>: replaced by 0.000862.</li>
+<li><code>dorm_hr = 0.0</code>: the dormancy threshold is calculated from latitude.</li>
+<li><code>plaps = 0.0</code> and <code>tlaps = 0.0</code>: no lapse rate adjustment, even if <code>lapse = 1</code> in <a href="../codes-bsn/"><code>codes.bsn</code></a>.</li>
+<li><code>denit_frac = 1.3</code>: this dataset uses <code>carbon = 2</code> in its <a href="../codes-bsn/"><code>codes.bsn</code></a>, so no denitrification occurs (see <a href="#denitrification">Denitrification</a>).</li>
+<li><code>petco_pmpt</code>, <code>cha_d50</code> and <code>man_bact</code> have no effect; <code>day_lag_max</code> is set to 2.</li>
+<li><code>igen = 0</code>: fixed random seeds.</li>
+</ul>
+<h2 id="related-files">Related files<a class="headerlink" href="#related-files" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../file-cio/"><code>file.cio</code></a>: names <code>parameters.bsn</code> on its <code>basin</code> line.</li>
+<li><a href="../codes-bsn/"><code>codes.bsn</code></a>: method codes that decide which of these parameters are used.</li>
+<li><a href="../hyd/"><code>hydrology.hyd</code></a>: HRU-level hydrology parameters, including <code>pet_co</code>.</li>
+<li><a href="../plt/"><code>plants.plt</code></a>: <code>plnt_decomp</code> overrides <code>rsd_decomp</code> for a plant.</li>
+<li><a href="../../calibration/parameter-change-files/">Parameter change files</a>: calibration names for these parameters.</li>
+<li><a href="../../model-theory/nutrient-cycling/">Nutrient cycling</a>, <a href="../../model-theory/pesticides/">pesticides</a>, <a href="../../model-theory/erosion-sediment/">erosion and sediment</a>, <a href="../../model-theory/channels/">channels</a> and <a href="../../model-theory/hydrology/">hydrology</a>: process descriptions.</li>
+</ul>
+<details class="quote">
+<summary>Sources</summary>
+<ul>
+<li>Reader: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_read_prm.f90"><code>basin_read_prm.f90</code></a>, followed by the zero-value replacements in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_prm_default.f90"><code>basin_prm_default.f90</code></a>; both called from <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_bsn.f90"><code>proc_bsn.f90</code></a></li>
+<li>Type definition: <code>type basin_parms</code> in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_module.f90"><code>basin_module.f90</code></a></li>
+<li>File name slot: <code>in_basin%parms_bas</code> in <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90"><code>input_file_module.f90</code></a></li>
+<li>Copy to HRUs: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/hrudb_init.f90"><code>hrudb_init.f90</code></a></li>
+<li>Hydrology: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/hydro_init.f90"><code>hydro_init.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/time_conc_init.f90"><code>time_conc_init.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/sq_dailycn.f90"><code>sq_dailycn.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/sq_greenampt.f90"><code>sq_greenampt.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/unit_hyd.f90"><code>unit_hyd.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/cli_lapse.f90"><code>cli_lapse.f90</code></a></li>
+<li>Weather generator: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/cli_initwgn.f90"><code>cli_initwgn.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/gcycl.f90"><code>gcycl.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/co2_read.f90"><code>co2_read.f90</code></a></li>
+<li>Peak rate and erosion: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ero_pkq.f90"><code>ero_pkq.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/wetland_control.f90"><code>wetland_control.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ero_cfactor.f90"><code>ero_cfactor.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ero_ovrsed.f90"><code>ero_ovrsed.f90</code></a></li>
+<li>Pesticides: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/aqu_1d_control.f90"><code>aqu_1d_control.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_decay.f90"><code>pest_decay.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_tempdecay_module.f90"><code>pest_tempdecay_module.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rtpest.f90"><code>ch_rtpest.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_lch.f90"><code>pest_lch.f90</code></a></li>
+<li>Nutrients: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/nut_nminrl.f90"><code>nut_nminrl.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/cbn_zhang2.f90"><code>cbn_zhang2.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/nut_nlch.f90"><code>nut_nlch.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/nut_solp.f90"><code>nut_solp.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/nut_pminrl.f90"><code>nut_pminrl.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/rsd_decomp.f90"><code>rsd_decomp.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/cbn_surfrsd_decomp.f90"><code>cbn_surfrsd_decomp.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/plantparm_init.f90"><code>plantparm_init.f90</code></a></li>
+<li>Plants: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nup.f90"><code>pl_nup.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_pup.f90"><code>pl_pup.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nfix.f90"><code>pl_nfix.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_biomass_gro.f90"><code>pl_biomass_gro.f90</code></a></li>
+<li>Channels: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_hydsed_init.f90"><code>sd_hydsed_init.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rtmusk.f90"><code>ch_rtmusk.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rthr.f90"><code>ch_rthr.f90</code></a>, <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rtday.f90"><code>ch_rtday.f90</code></a></li>
+<li>Calibration: <a href="https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_parm_select.f90"><code>cal_parm_select.f90</code></a></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Fortran variable</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lai_noevap</code></td>
+<td><code>bsn_prm%evlai</code></td>
+</tr>
+<tr>
+<td><code>sw_init</code></td>
+<td><code>bsn_prm%ffcb</code></td>
+</tr>
+<tr>
+<td><code>surq_lag</code></td>
+<td><code>bsn_prm%surlag</code></td>
+</tr>
+<tr>
+<td><code>adj_pkrt</code></td>
+<td><code>bsn_prm%adj_pkr</code></td>
+</tr>
+<tr>
+<td><code>adj_pkrt_sed</code></td>
+<td><code>bsn_prm%prf</code></td>
+</tr>
+<tr>
+<td><code>lin_sed</code></td>
+<td><code>bsn_prm%pestgwfact</code></td>
+</tr>
+<tr>
+<td><code>exp_sed</code></td>
+<td><code>bsn_prm%temp_decay</code></td>
+</tr>
+<tr>
+<td><code>orgn_min</code></td>
+<td><code>bsn_prm%cmn</code></td>
+</tr>
+<tr>
+<td><code>n_uptake</code></td>
+<td><code>bsn_prm%n_updis</code></td>
+</tr>
+<tr>
+<td><code>p_uptake</code></td>
+<td><code>bsn_prm%p_updis</code></td>
+</tr>
+<tr>
+<td><code>n_perc</code></td>
+<td><code>bsn_prm%nperco</code></td>
+</tr>
+<tr>
+<td><code>p_perc</code></td>
+<td><code>bsn_prm%pperco</code></td>
+</tr>
+<tr>
+<td><code>p_soil</code></td>
+<td><code>bsn_prm%phoskd</code></td>
+</tr>
+<tr>
+<td><code>p_avail</code></td>
+<td><code>bsn_prm%psp</code></td>
+</tr>
+<tr>
+<td><code>rsd_decomp</code></td>
+<td><code>bsn_prm%rsdco</code></td>
+</tr>
+<tr>
+<td><code>pest_perc</code></td>
+<td><code>bsn_prm%percop</code></td>
+</tr>
+<tr>
+<td><code>msk_co1</code>, <code>msk_co2</code>, <code>msk_x</code></td>
+<td><code>bsn_prm%msk_co1</code>, <code>%msk_co2</code>, <code>%msk_x</code></td>
+</tr>
+<tr>
+<td><code>nperco_lchtile</code></td>
+<td><code>bsn_prm%nperco_lchtile</code></td>
+</tr>
+<tr>
+<td><code>evap_adj</code></td>
+<td><code>bsn_prm%evrch</code></td>
+</tr>
+<tr>
+<td><code>scoef</code></td>
+<td><code>bsn_prm%scoef</code></td>
+</tr>
+<tr>
+<td><code>denit_exp</code></td>
+<td><code>bsn_prm%cdn</code></td>
+</tr>
+<tr>
+<td><code>denit_frac</code></td>
+<td><code>bsn_prm%sdnco</code></td>
+</tr>
+<tr>
+<td><code>man_bact</code></td>
+<td><code>bsn_prm%bact_swf</code></td>
+</tr>
+<tr>
+<td><code>adj_uhyd</code></td>
+<td><code>bsn_prm%tb_adj</code></td>
+</tr>
+<tr>
+<td><code>cn_froz</code></td>
+<td><code>bsn_prm%cn_froz</code></td>
+</tr>
+<tr>
+<td><code>dorm_hr</code></td>
+<td><code>bsn_prm%dorm_hr</code></td>
+</tr>
+<tr>
+<td><code>plaps</code>, <code>tlaps</code></td>
+<td><code>bsn_prm%plaps</code>, <code>%tlaps</code></td>
+</tr>
+<tr>
+<td><code>n_fix_max</code></td>
+<td><code>bsn_prm%nfixmx</code></td>
+</tr>
+<tr>
+<td><code>rsd_decay</code></td>
+<td><code>bsn_prm%decr_min</code></td>
+</tr>
+<tr>
+<td><code>rsd_cover</code></td>
+<td><code>bsn_prm%rsd_covco</code></td>
+</tr>
+<tr>
+<td><code>urb_init_abst</code></td>
+<td><code>bsn_prm%urb_init_abst</code></td>
+</tr>
+<tr>
+<td><code>petco_pmpt</code></td>
+<td><code>bsn_prm%petco_pmpt</code></td>
+</tr>
+<tr>
+<td><code>uhyd_alpha</code></td>
+<td><code>bsn_prm%uhalpha</code></td>
+</tr>
+<tr>
+<td><code>splash</code></td>
+<td><code>bsn_prm%eros_spl</code></td>
+</tr>
+<tr>
+<td><code>rill</code></td>
+<td><code>bsn_prm%rill_mult</code></td>
+</tr>
+<tr>
+<td><code>surq_exp</code></td>
+<td><code>bsn_prm%eros_expo</code></td>
+</tr>
+<tr>
+<td><code>cov_mgt</code></td>
+<td><code>bsn_prm%c_factor</code></td>
+</tr>
+<tr>
+<td><code>cha_d50</code></td>
+<td><code>bsn_prm%ch_d50</code></td>
+</tr>
+<tr>
+<td><code>co2</code></td>
+<td><code>bsn_prm%co2</code></td>
+</tr>
+<tr>
+<td><code>day_lag_max</code></td>
+<td><code>bsn_prm%day_lag_mx</code></td>
+</tr>
+<tr>
+<td><code>igen</code></td>
+<td><code>bsn_prm%igen</code></td>
+</tr>
+</tbody>
+</table>
+</details>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.sections", "navigation.top", "navigation.indexes", "navigation.instant", "navigation.tracking", "search.suggest", "search.highlight", "toc.follow", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../assets/pdf-download.js?v=2"></script>
+      
+        <script src="../../assets/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
