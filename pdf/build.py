@@ -31,7 +31,7 @@ from urllib.parse import urlparse
 import yaml
 
 # bump to force a full rebuild when the rendering logic changes materially
-SCRIPT_VERSION = "3"
+SCRIPT_VERSION = "4"
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +167,7 @@ def page_url(rel_md, prefix):
 # ---------------------------------------------------------------------------
 FENCE = re.compile(r"^(\s*)(`{3,}|~{3,})")
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*$")
-ADMON = re.compile(r'^!!!\s+\w+(?:\s+"([^"]*)")?\s*$')
+ADMON = re.compile(r'^(?:!!!|\?\?\?\+?)\s+\w+(?:\s+"([^"]*)")?\s*$')  # !!! and collapsible ??? blocks
 EXISTING_ID = re.compile(r"\{#([\w-]+)\}\s*$")
 
 

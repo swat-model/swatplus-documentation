@@ -64,3 +64,44 @@
   height: 1.6rem;
   width: auto;
 }
+
+/* Sources block at the end of each page: collapsed and set in a smaller size */
+.md-typeset details.quote {
+  font-size: 0.68rem;
+}
+
+/* Body links in the light scheme: blue and underlined, so they stand apart
+   from the navy text. */
+[data-md-color-scheme="default"] {
+  --md-typeset-a-color: #1a5fb4;
+}
+
+[data-md-color-scheme="default"] .md-typeset a {
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+[data-md-color-scheme="default"] .md-typeset a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* File names that link to their page: link colour and underline on the code
+   itself, so a linked file name looks different from plain code. */
+.md-typeset a code {
+  color: var(--md-typeset-a-color);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.md-typeset a:hover code {
+  text-decoration-thickness: 2px;
+}
+
+/* Buttons and navigation cards keep their own look. */
+.md-typeset a.md-button,
+.md-typeset .grid.cards a,
+.md-typeset .pdf-dl a {
+  text-decoration: none;
+}

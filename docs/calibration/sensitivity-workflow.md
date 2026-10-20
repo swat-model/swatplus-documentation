@@ -1,55 +1,58 @@
 ---
 title: Sensitivity workflow
-description: Drive SWAT+ from an external sampler to compute parameter sensitivity indices.
+description: Run a parameter sensitivity analysis on SWAT+ with an external sampler that writes calibration.cal.
 status: review
+verified_against:
+  - src/proc_cal.f90
+  - src/cal_parmchg_read.f90
+  - src/cal_conditions.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-SWAT+ has no built-in sensitivity analysis. Sensitivity is run by an external tool that writes `calibration.cal`, launches the SWAT+ executable, reads an objective value from the simulation output, and repeats. The parameter list and bounds are taken from the same `cal_parms.cal` used by hard calibration.
+## Purpose
 
-## Pattern
+A sensitivity analysis shows which parameters change a chosen model result the most, so that calibration can concentrate on them. SWAT+ does not include a sensitivity analysis. It is run by an external tool that writes [`calibration.cal`](../calibration/parameter-change-files.md), runs SWAT+, reads a result from the output files, and repeats for many parameter sets. Each run applies the changes in [`calibration.cal`](../calibration/parameter-change-files.md) at start-up and leaves the input files untouched, so one project folder serves every run.
 
-1. Pick the parameters to test. Pull their absolute ranges from `cal_parms.cal` or override them with a tighter calibration range. Each parameter is one dimension of the sample space.
-2. Generate a sample matrix using a sensitivity method (Sobol, FAST, Morris, LH-OAT, ...). Each row of the matrix is one parameter vector.
-3. For each row: write `calibration.cal` with one `pctchg` (or `absval`, `abschg`) record per parameter, run SWAT+, read the chosen objective (NSE, KGE, percent bias, total flow, ...) from the output files, and record it.
-4. Feed the sample matrix and the model performance vector into the sensitivity method to compute indices: first-order, total-order, second-order interaction, or elementary effects depending on the method.
+[SWAT+ Toolbox](https://celray.github.io/SWATPlusToolbox/) does this from a graphical interface. The steps below are what any tool or script has to do.
 
-The expensive step is the simulation loop. A sample size in the hundreds to low thousands is common.
+## Steps
 
-## sensitivityAPI
+1. Choose the parameters to test and a range for each. The names are those on [Parameter names](../calibration/parameter-change-files.md#parameter-names). The `abs_min` and `abs_max` values in [`cal_parms.cal`](../calibration/parameter-change-files.md) are physical limits; a narrower range around reasonable values usually gives more useful results.
+2. Generate the samples: use a sampling design that matches the analysis method: Sobol (Saltelli sampling), FAST, Morris (elementary effects), Latin hypercube with one-at-a-time changes (LH-OAT), and so on. Each sample is one set of parameter values. Libraries such as SALib (Python) or `sensitivity` (R) provide both the sampling and the analysis.
+3. For each sample, write [`calibration.cal`](../calibration/parameter-change-files.md) with one row per parameter, run SWAT+ in the project folder, and compute the result of interest: total or peak flow at an outlet, a performance measure against observations (NSE, KGE, percent bias), a sediment or nutrient load.
+4. Compute the indices: pass the sample matrix and the vector of results to the analysis method: first-order and total-order indices for Sobol and FAST, mean and spread of elementary effects for Morris.
 
-[`sensitivityAPI`](https://github.com/celray/sensitivityAPI) is a command-line tool that implements steps 2 and 4 of the pattern. It operates on a SWAT+ TxtInOut directory: it reads a parameter CSV (`par_data.stb`), writes a sample matrix (`par_sample.stb`), and after the user has run the simulations and collected performance values into `perf_report.stb`, computes sensitivity indices.
+The runs are independent, so they can be spread over several processor cores, each in a separate copy of the project folder. Sample sizes of several hundred to a few thousand runs are common.
 
-Supported methods:
+## Writing calibration.cal
 
-| Method | Sampling | Indices |
-|--------|----------|---------|
-| `FAST` | frequency-based | S1, ST |
-| `sobol` | Saltelli quasi-random | S1, ST, S2 |
-| `RBD_FAST` | Latin Hypercube | S1 |
-| `DMIM` | Latin Hypercube | S1 (delta) |
-| `lhoat` | LH-OAT hybrid | S1 (elementary effects) |
+A sample with three parameters, written as relative and absolute changes:
 
-Usage:
-
-```bash
-sensitivityAPI generate_sample sobol /path/to/txtinout 1024
-# run the simulations here, fill perf_report.stb
-sensitivityAPI analyse_sensitivity sobol /path/to/txtinout
+```
+sensitivity sample 17
+3
+NAME     CHG_TYP     VAL   CONDS  LYR1  LYR2  YEAR1  YEAR2  DAY1  DAY2  OBJ_TOT
+cn2      pctchg    -6.2    0      0     0     0      0      0     0     0
+esco     absval     0.71   0      0     0     0      0      0     0     0
+alpha    absval     0.048  0      0     0     0      0      0     0     0
 ```
 
-The orchestration (writing `calibration.cal` per row, launching SWAT+, parsing the output) is done by a driver such as [sptAPI](https://github.com/celray/sptAPI) or [spToolboX](https://github.com/celray/spToolboX). `sensitivityAPI` is only the sampler and the post-processor.
+Points to watch:
 
-## Roll your own
+- `pctchg` scales each object's current value, so HRUs keep their differences. `absval` sets every object to the same value.
+- Every parameter name must also be in [`cal_parms.cal`](../calibration/parameter-change-files.md), and its limits there still apply. A sample value outside `abs_min` to `abs_max` is cut to the limit, which flattens the response near the edges.
+- A misspelt name is skipped without a message. Check a first run by comparing two extreme samples before starting the full set.
+- Some parameter names have no effect in 62.0.1, or work only with restrictions; see the notes on [Parameter change files](../calibration/parameter-change-files.md#parameter-names) and [Hard calibration](../calibration/hard-calibration.md#plant-parameters) before including them.
 
-Any language with a numerical library can do the same. The minimum loop:
+## Reading results
 
-1. Parse `cal_parms.cal` to get bounds for the parameters you care about.
-2. Generate `N` parameter vectors with a Python (`SALib`), R (`sensitivity`), or in-house sampler.
-3. For each vector, overwrite `calibration.cal` with the corresponding `pctchg` records and call the SWAT+ binary with the TxtInOut directory as the working directory.
-4. Read the metric from `channel_sd_day.txt` (or whichever output your objective uses), record it.
-5. Hand the matrix and the vector to your sensitivity routine.
+Daily channel output is in `channel_sd_day.txt` (or `.csv`), with flow out of each channel in the `flo_out` column (m³/s). Switch on only the output the analysis needs in [`print.prt`](../input-reference/print-prt.md); writing every file for thousands of runs costs a lot of time and disk space. The output files are described in the [Output Reference](../output-reference/index.md).
 
 ## Related pages
 
-- [Parameter change files](../calibration/parameter-change-files.md). Format of `cal_parms.cal` and `calibration.cal`.
-- [Hard calibration](../calibration/hard-calibration.md). The mechanism each sensitivity run drives, one parameter vector at a time.
+- [Parameter change files](../calibration/parameter-change-files.md). Format of [`cal_parms.cal`](../calibration/parameter-change-files.md) and [`calibration.cal`](../calibration/parameter-change-files.md), and the parameter names.
+- [Hard calibration](../calibration/hard-calibration.md). How each run applies the change list.
+
+??? quote "Sources"
+
+    - The change list is read by [`src/cal_parmchg_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_parmchg_read.f90) and applied by [`src/cal_conditions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_conditions.f90), both from [`src/proc_cal.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_cal.f90) before the simulation starts.

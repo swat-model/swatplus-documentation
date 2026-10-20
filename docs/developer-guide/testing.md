@@ -1,87 +1,68 @@
 ---
 title: Testing
-description: Scenario regression tests that compare SWAT+ output against golden reference datasets.
+description: The scenario regression test that compares SWAT+ output with reference output, and how to run it at 62.0.1.
 status: review
+verified_against:
+  - swatplus/CMakeLists.txt
+  - swatplus/test/spcheck.py
+  - swatplus/refdata/Ames_sub1/.testfiles.txt
+  - swatplus/.github/workflows/test.yml
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-SWAT+ ships a scenario test suite that runs the model against reference input datasets and compares the output files to known-good outputs. The tests catch regressions when source changes shift numeric results outside an accepted tolerance.
+SWAT+ has a scenario regression test: it runs the model on a reference dataset and compares chosen output files with copies kept in the repository. Differences outside a tolerance point to a change in results, which is then either a bug or an intended change that needs new reference outputs.
 
-Tests are wired into the CMake build and driven by `ctest`.
+## Test script
 
-## How it works
+`test/spcheck.py` (Python 3, standard library only) has three commands:
 
-The test data lives in `data/`. Each subfolder is a scenario containing input files and the golden output files. The reference output files are committed copies of model output that was reviewed and accepted as correct.
+| Command | Use |
+|---------|-----|
+| `ctest <executable> <reference folder> <work folder>` | copy the reference folder into the work folder, run the executable there, and compare the files listed in the folder's `.testfiles.txt` with the reference copies; exit with code 1 if any value differs |
+| `run <executable> <scenario>` | run `build/<executable>` on `data/<scenario>` in a new numbered folder under `runs/<scenario>/` |
+| `compare <scenario> <a> <b>` | compare two numbered runs of a scenario |
 
-The driver script `test/check.py` does the actual comparison. The wiring sits in `CMakeLists.txt`:
+Options `--abserr` and `--relerr` set the tolerances (defaults `1e-8` and `0.05`), and `--nlines` and `--nerrorlines` limit how much of each file is checked and reported.
 
-```cmake
-find_package(Python REQUIRED)
+Two numbers are equal when
 
-set(check_py "${PROJECT_SOURCE_DIR}/test/check.py")
-set(exe_path "${PROJECT_BINARY_DIR}/${SWATPLUS_EXE}")
-set(test_dir "${PROJECT_BINARY_DIR}/data")
-set(ref_dir  "${PROJECT_SOURCE_DIR}/data")
+$$|v_1 - v_2| \le e_{abs} + e_{rel}\,|v_2|$$
 
-# error tolerances
-set(rel_err "0.01")
-set(abs_err "1e-8")
+Only real numbers are compared, value by value on matching lines; integers and text are skipped, as are the title lines with the build date (lines containing `MODULAR`).
 
-add_test(Ithaca_sub6 python3 ${check_py} ${exe_path} ${ref_dir}/Ithaca_sub6 ${test_dir} ${abs_err} ${rel_err})
-add_test(Ames_sub1   python3 ${check_py} ${exe_path} ${ref_dir}/Ames_sub1   ${test_dir} ${abs_err} ${rel_err})
-```
+## Running the test at 62.0.1
 
-Two scenarios are registered by default: `Ames_sub1` and `Ithaca_sub6`. Default tolerances are 1% relative error and `1e-8` absolute error. Adding another scenario means adding another `add_test` line that points at a new subfolder in `data/`.
+`CMakeLists.txt` registers one test, `Ames_sub1`, with tolerances of `1e-8` absolute and 1 % relative, and reference data in `data/Ames_sub1`. At 62.0.1 the repository has no `data/` folder; the reference datasets are in `refdata/`. `ctest` therefore fails at once with `data dir not found`.
 
-For each scenario, `check.py`:
-
-1. Copies the scenario folder from `data/` into the build directory.
-2. Runs the SWAT+ executable inside that copy.
-3. Reads `.testfiles.txt` in the scenario, which lists the output file names to check (for example, `wb.txt` and `soc.txt`).
-4. For each listed file, compares the new output to the golden copy line by line and column by column. Only floating-point values on matching lines and columns are compared.
-5. Two values are considered equal if:
-
-   ```
-   abs(v1 - v2) <= abs_err + rel_err * abs(v2)
-   ```
-
-6. Prints the count of differing values and the maximum relative and absolute error. The scenario fails if any pair of values does not satisfy the tolerance.
-
-## Running the tests
-
-Python 3 has to be on `PATH`. From the `swatplus` directory:
+To run the comparison, call the script directly with the `refdata` folder:
 
 ```bash
-cmake -B build
-cmake --build build
-cd build
-ctest
+cmake -B build -D CMAKE_BUILD_TYPE=Release
+cmake --build build -j 8
+python3 test/spcheck.py ctest build/swatplus-*-Rel refdata/Ames_sub1 build/test-runs --abserr 1e-8 --relerr 0.01
 ```
 
-`ctest` prints a summary at the end. Detailed per-test logs land in `build/Testing/Temporary/`. The most recent run is captured in `LastTest.log`.
+Notes on the reference dataset:
 
-To run a subset:
+- A full `Ames_sub1` run writes about 9 GB, mostly daily carbon output, and takes a few minutes. Make sure the work folder has the space.
+- `.testfiles.txt` lists 42 files. With the shipped `print.prt` the model rewrites fewer than half of them; the rest (all `basin_*` files, `hydin_aa.txt`, `ru_aa.txt` and others) are copied from the reference folder and compared with themselves. The test therefore checks the HRU water and nutrient balances, plant and yield output and management output, and not channel, aquifer or basin output.
 
-```bash
-ctest -R Ames_sub1
-```
+## Adding a scenario
 
-To see test output as it runs:
+1. Put a complete input set in a new folder under `refdata/` (or `data/`).
+2. Run the model and check the outputs you want to fix as the reference.
+3. Commit the inputs and those outputs.
+4. Add a `.testfiles.txt` naming the output files to compare, one per line (`#` starts a comment).
+5. Add an `add_test` line to `CMakeLists.txt` pointing at the folder.
 
-```bash
-ctest --output-on-failure
-```
+## Continuous integration
 
-`make test` from inside `build/` works as an alias.
+`.github/workflows/test.yml` builds SWAT+ with Intel `ifx` on Ubuntu and runs `ctest` on pushes to branches whose name ends in `main`. With the `data/` path above, the test step fails. The release workflow (`build.yml`) builds the release executables for each tag and does not run the tests.
 
-## Adding a new scenario
+??? quote "Sources"
 
-1. Create a new subfolder under `data/`, for example `data/MyBasin`. Put a full SWAT+ input set in it.
-2. Run the model in that folder and review the outputs you want to lock down.
-3. Commit those output files alongside the inputs.
-4. Add a `.testfiles.txt` listing the output filenames (one per line) that `check.py` should compare.
-5. Add an `add_test` line to `CMakeLists.txt`.
-6. Reconfigure (`cmake -B build`) and run `ctest`.
-
-## CI
-
-The same tests run in GitHub Actions on every push to `main`. See `.github/workflows/test.yml` in the source repository.
+    - [`test/spcheck.py`](https://github.com/swat-model/swatplus/blob/62.0.1/test/spcheck.py): `ctest_all`, `cmp_file` and the `run`/`compare` commands.
+    - [`CMakeLists.txt`](https://github.com/swat-model/swatplus/blob/62.0.1/CMakeLists.txt): `set(ref_dir "${PROJECT_SOURCE_DIR}/data")`, tolerances `aerr = 1e-8`, `rerr = 0.01`, and `add_test(Ames_sub1 ...)`. The `Ithaca_sub6` test is commented out.
+    - [`refdata/Ames_sub1/.testfiles.txt`](https://github.com/swat-model/swatplus/blob/62.0.1/refdata/Ames_sub1/.testfiles.txt).
+    - [`.github/workflows/test.yml`](https://github.com/swat-model/swatplus/blob/62.0.1/.github/workflows/test.yml) and [`.github/workflows/build.yml`](https://github.com/swat-model/swatplus/blob/62.0.1/.github/workflows/build.yml).
+    - The 9 GB output size and the list of files rewritten are from a run of the 62.0.1 `gnu-lin_x86_64` release executable on 20 October 2026.

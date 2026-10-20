@@ -1,113 +1,119 @@
 ---
 title: Recall and point sources
-description: Recall time series, export coefficient objects, and delivery ratio objects in SWAT+.
+description: Recall objects, export coefficient objects and delivery ratios, which add measured or estimated loads to the routing network or scale loads from routing units.
 status: review
+verified_against:
+  - src/recall_read.f90
+  - src/recalldb_read.f90
+  - src/recall_module.f90
+  - src/command.f90
+  - src/recall_nut.f90
+  - src/exco_db_read.f90
+  - src/exco_read_om.f90
+  - src/exco_module.f90
+  - src/dr_ru.f90
+  - src/ru_read_elements.f90
+  - src/ru_control.f90
+  - src/hydrograph_module.f90
+  - src/input_file_module.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Overview
 
-Three related object types let SWAT+ inject water and constituent loads into the routing network from outside the simulated land surface: recall objects, export coefficient objects, and delivery ratio objects.
+Three object types put water and loads into the routing network without simulating the land surface that produced them, or change how much of a load reaches the next object:
 
-- **Recall** objects deliver a time series of flow and mass (NO3, NH3, organic N, mineral P, organic P, sediment, pesticides, salts, constituents) read from `recall.rec` and supporting per-object data files. They are the standard point source representation, including municipal and industrial discharges, atmospheric deposition points, or measured imports.
-- **Export coefficient** objects deliver an average annual flow and mass per unit area, computed once and applied each day. They are useful where only annual loading rates are known.
-- **Delivery ratio** objects scale incoming loads on a routing unit basis (delivery from HRUs to channels), either calculated from time of concentration or set to a fixed fraction.
+- Recall objects release a time series of flow and loads read from a file: measured inflow at a gauge, a wastewater treatment plant, an industrial discharge, or the output of another model. A negative flow represents a diversion.
+- Export coefficient objects release the same daily flow and loads every day of the run.
+- Delivery ratios scale the loads leaving the elements of a routing unit, or the loads passing through a delivery ratio object.
 
-All three share a common reader infrastructure under `recall_module.f90` because internally they are all stored as recall databases.
+Recall, export coefficient and delivery ratio objects are connected to the network through [`recall.con`](../input-reference/con.md), [`exco.con`](../input-reference/con.md) and [`delratio.con`](../input-reference/con.md), like any other spatial object.
 
-## Process equations
+## Recall objects
 
-### Recall objects
+### Input structure
 
-The recall reader (`recall_read.f90`) opens the file pointed to in `recall.rec` for each recall object and selects an allocation pattern based on the time step token:
+[`recall.rec`](../input-reference/recall.md#recallrec) (the file named in the `recall` line of [`file.cio`](../input-reference/file-cio.md)) lists the recall objects. Each row has an id, a name, a time step code and the name of the data file:
 
-| `tstep` | Storage shape | Meaning |
-|---------|---------------|---------|
-| `sub` | `hyd_flo(step*366, nbyr)` plus `hd(366, nbyr)` | Sub-daily values per simulation year |
-| `day` | `hd(366, nbyr)` | One record per day |
-| `mo` | `hd(12, nbyr)` | One record per month |
-| `yr` | `hd(1, nbyr)` | One record per year |
+| Code | Data file content | Value used each day |
+|---|---|---|
+| 0 | sub-daily values | the values of the day's time steps |
+| 1 | daily values | the value of the day |
+| 2 | monthly values | the value of the month, on every day of that month |
+| 3 | annual values | the value of the year, on every day of that year |
+| 4 | none; the file name is the name of an export coefficient record | the export coefficient record |
 
-At runtime the recall driver looks up the current day, month, or year and copies the stored hydrograph (`recall(irec)%hd(...)`) into the object's outgoing hydrograph. For sub-daily, flow is stored as `m^3/s` and converted to volume per step (`flo * 86400 / time%step`).
+Each data file has a title line, a line with the number of years, a column header, and one row per day, month or year: day of year, month, day of month, year, object type, object name, and then the hydrograph values
 
-Recall objects can be linked to channel objects so the volume is added to the channel inflow, or to other receiving objects through the connectivity file `recall.con`.
+`flo sed orgn sedp no3 solp chla nh3 no2 cbod dox sand silt clay sag lag gravel temp`
 
-Negative-flow recall objects represent diversions: `recall_nut.f90` and `recall_salt.f90` remove constituent mass from the source channel in proportion to the diverted volume and the source-water concentration.
+in m³ for flow, metric tons for sediment and its classes, kg for nutrients, chlorophyll-a, CBOD and oxygen, and °C for temperature. The values are daily amounts, also in monthly and annual files: a monthly value is released on every day of the month, so it must be the daily amount for that month.
 
-### Export coefficient objects
+Rows before the simulation start year are skipped, and reading stops after the simulation end year.
 
-Export coefficient objects (`exco_module.f90`) are stored in the same recall database type with one record per object that holds average annual flow and constituent loads. The reader chain (`exco_db_read.f90`, `exco_read_om.f90`, `exco_read_pest.f90`, `exco_read_path.f90`, `exco_read_hmet.f90`, `exco_read_salt.f90`) populates separate organic-mineral, pesticide, pathogen, heavy metal, and salt files keyed by `exco_*_name`. Each day the export coefficient flow is divided by 365.25 (TODO: verify exact daily fraction) and added to the receiving object.
+### Daily release
+
+On each day inside the period covered by its file, a recall object sends the stored values for that day, month or year to the objects listed in [`recall.con`](../input-reference/con.md). Outside that period a daily or monthly recall object releases nothing.
+
+When a daily value has negative flow, the object takes water out of the network (a diversion). Nutrients are then removed in proportion to the diverted volume at the concentration of the source, as are salts and constituents when they are simulated.
+
+### Salts, constituents and pesticides
+
+Salt and constituent loads for recall objects are read from separate salt and constituent recall files (see [Salts and constituents](salts-constituents.md)). Pesticide loads for recall objects are read from `pest.com` when that file is present.
+
+### Recall database
+
+[`recall_db.rec`](../input-reference/recall.md#recall_dbrec) is a separate index that names, for each source, the organic-mineral, pesticide, pathogen, heavy metal, salt and constituent data. Water allocation uses it to set the quality of water from outside sources, treatment plants and water uses, and reservoir release tables use it to find measured releases.
+
+## Export coefficient objects
+
+[`exco.exc`](../input-reference/recall.md) lists the export coefficient objects. Each row has a name followed by the names of its records in the organic-mineral ([`exco_om.exc`](../input-reference/recall.md)), pesticide, pathogen, heavy metal and salt files. Each row of [`exco_om.exc`](../input-reference/recall.md) has a name followed by the same hydrograph values as a recall file.
+
+The hydrograph of an export coefficient object is set once at the start of the run and released unchanged every day, so the values in [`exco_om.exc`](../input-reference/recall.md) are daily amounts. An export coefficient can also be an element of a routing unit, in which case the routing unit's delivery ratio is applied to it.
+
+## Delivery ratios
+
+### Routing unit elements
+
+Each element of a routing unit (an HRU, an HRU-lte, a channel or another routing unit) has a delivery ratio named in the `dlr` column of [`rout_unit.ele`](../input-reference/units.md#rout_unitele). The ratio multiplies the flow and loads the element contributes to the routing unit outflow.
+
+| `dlr` value | Ratio |
+|---|---|
+| `calc` or `0` | Flow is delivered in full. Sediment and nutrients are multiplied by $\min\left(1,\;\sqrt{t_{c,elem}/t_{c,ru}}\right)$, the square root of the ratio of the element's time of concentration to the routing unit's, for HRU and HRU-lte elements. For `sdc` channel and routing unit elements the ratio is 1. Other element types, including legacy channels, take the ratio last calculated for an earlier element (0 if there is none). |
+| `full` or `1` | Everything is delivered in full. |
+| any other value | 0 for every variable, so the element delivers only its recharge. This includes the name of a [`delratio.del`](../input-reference/con.md) record: the names are looked up before [`delratio.del`](../input-reference/con.md) is read, so none is found. |
+
+The details are on [Routing and landscape units](../input-reference/units.md#delivery-ratio).
+
+Pesticide loads from routing unit elements are not scaled by the delivery ratio.
 
 ### Delivery ratio objects
 
-Delivery ratios scale incoming loads from a routing-unit element by a fraction between 0 and 1. The element database `dr_db` in `dr_module.f90` lists the organic-mineral, pesticide, pathogen, heavy metal, and salt delivery files for each delivery ratio object.
-
-In `dr_ru.f90` each element of a routing unit gets a `dr` value built from the `dr_name` keyword:
-
-```fortran
-if (ru_elem(ielem)%dr_name == "calc" .or. "0") then
-   ! compute from time of concentration
-   rto = tconc(ihru) / ru_tc(iru)
-   rto = min(1.0, sqrt(rto))
-   ru_elem(ielem)%dr = rto + hz
-   ru_elem(ielem)%dr%flo = 1.
-else if (ru_elem(ielem)%dr_name == "full" .or. "1") then
-   ru_elem(ielem)%dr = 1. + hz
-end if
-```
-
-Three cases:
-
-- `"calc"` or `"0"`: ratio is the square root of the HRU time of concentration over the routing unit time of concentration, capped at 1. Flow itself is delivered in full (`dr%flo = 1`).
-- `"full"` or `"1"`: full delivery, ratio is 1 for everything.
-- A named `dr_db` entry: ratios are read from the corresponding `_om`, `_pest`, `_path`, `_hmet`, and `_salt` files.
-
-Delivery ratios apply only to the mass components (sediment, N, P, pesticide, salt), not to flow.
-
-## Switches and parameters
-
-| Parameter | File | Effect |
-|-----------|------|--------|
-| `recall_db%org_min%name` | `recall.rec` | Organic and mineral data file for this recall object |
-| `recall_db%org_min%units` | `recall.rec` | `mass` or `conc` |
-| `recall_db%org_min%tstep` | `recall.rec` | `sub`, `day`, `mo`, or `yr` |
-| `recall_db%pest%name` | `recall.rec` | Pesticide data file |
-| `recall_db%path%name` | `recall.rec` | Pathogen data file |
-| `recall_db%hmet%name` | `recall.rec` | Heavy metal data file |
-| `recall_db%salt%name` | `recall.rec` | Salt data file |
-| `recall_db%constit%name` | `recall.rec` | Generic constituent data file |
-| `exco_db%om_file` | `exco.exc` | Organic-mineral export coefficient file |
-| `exco_db%pest_file` | `exco.exc` | Pesticide export coefficient file |
-| `exco_db%salts_file` | `exco.exc` | Salt export coefficient file |
-| `dr_db%om_file` | `delratio.del` | Organic-mineral delivery ratio file |
-| `dr_db%pest_file` | `delratio.del` | Pesticide delivery ratio file |
-| `dr_db%salts_file` | `delratio.del` | Salt delivery ratio file |
-| `ru_elem%dr_name` | `rout_unit.def` | Delivery ratio choice: `calc`, `full`, or a named `dr_db` entry |
-
-TODO: verify exact file names and column layouts against the source readers and current refdata.
-
-## Implementation
-
-Source modules in `swatplus/src/`:
-
-- `recall_module.f90` defines `constituent_file_data` and `recall_databases`. The same `recall_db` type is used for recall, exco, and dr objects.
-- `recall_read.f90` reads `recall_db.rec` (the database index) and dispatches per-object reads. For each recall it opens the organic-mineral file, allocates the storage for the selected time step, and stores hydrographs by day, month, or year.
-- `recall_read_salt.f90` reads the salt data file.
-- `recall_read_cs.f90` reads the generic constituent data file.
-- `recall_nut.f90` removes nutrient mass from a source channel for negative-flow recall objects (diversions).
-- `recall_salt.f90` does the same for salts.
-- `recall_cs.f90` does the same for constituents.
-- `recall_output.f90` writes recall object output.
-- `exco_module.f90` defines `export_coefficient_datafiles` and the per-constituent name and number arrays.
-- `exco_db_read.f90` reads `exco.exc`.
-- `exco_read_om.f90`, `exco_read_pest.f90`, `exco_read_path.f90`, `exco_read_hmet.f90`, `exco_read_salt.f90` read the per-constituent export coefficient files.
-- `dr_module.f90` defines `delivery_ratio_datafiles` and the per-constituent name and number arrays.
-- `dr_db_read.f90` reads `delratio.del`.
-- `dr_read_om.f90`, `dr_read_pest.f90`, `dr_path_read.f90`, `dr_read_hmet.f90`, `dr_read_salt.f90` read the per-constituent delivery ratio files.
-- `dr_ru.f90` computes the per-element delivery ratio for `calc` and `full` cases and assigns named delivery ratios at runtime.
+A delivery ratio object placed in the routing network multiplies all of its incoming hydrograph by the ratios of its [`delratio.del`](../input-reference/con.md) record and passes the result on.
 
 ## Related pages
 
-- [Channels](channels.md) for the receiving object.
-- [Decision tables](decision-tables.md) for management triggers that may use recall objects.
-- [Nutrient cycling](nutrient-cycling.md) for the channel and HRU receiving the recalled mass.
-- TODO: link to input pages for `recall.rec`, `exco.exc`, and `delratio.del` once they exist.
+- [Recall inputs](../input-reference/recall.md) and [connection files](../input-reference/con.md)
+- [Channels](channels.md) and [Reservoirs and wetlands](reservoirs-wetlands.md) for receiving objects
+- [Water allocation](../input-reference/water-allocation.md)
+- [Salts and constituents](salts-constituents.md)
+
+??? quote "Sources"
+
+    Code at revision 62.0.1:
+
+    - Recall objects: [`src/recall_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recall_read.f90) (reads `recall.rec`, the data files and `pest.com`); daily release in the `recall` case of [`src/command.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/command.f90); diversions: [`src/recall_nut.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recall_nut.f90), [`src/recall_salt.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recall_salt.f90), [`src/recall_cs.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recall_cs.f90)
+    - Recall database: [`src/recalldb_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recalldb_read.f90), type in [`src/recall_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/recall_module.f90)
+    - Export coefficients: [`src/exco_db_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/exco_db_read.f90), [`src/exco_read_om.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/exco_read_om.f90), type in [`src/exco_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/exco_module.f90)
+    - Delivery ratios: [`src/dr_ru.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/dr_ru.f90), [`src/ru_read_elements.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ru_read_elements.f90), [`src/ru_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ru_control.f90), [`src/dr_db_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/dr_db_read.f90)
+    - Hydrograph fields: `hyd_output` in [`src/hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hydrograph_module.f90)
+
+    Variables:
+
+    | Item | Variable |
+    |---|---|
+    | recall time step code, file, first and last year | `recall%typ`, `%filename`, `%start_yr`, `%end_yr` |
+    | stored values | `recall%hd(day or month or 1, year)`, sub-daily flow in `recall%hyd_flo` |
+    | `exco.exc` row | `exco_db` (`name`, `om_file`, `pest_file`, `path_file`, `hmet_file`, `salts_file`) |
+    | `exco_om.exc` row | `exco_om_name`, `exco` (type `hyd_output`) |
+    | element delivery ratio | `ru_elem%dr_name`, `ru_elem%dr` |

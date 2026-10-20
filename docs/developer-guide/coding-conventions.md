@@ -2,17 +2,20 @@
 title: Fortran coding conventions
 description: Style and quality rules for SWAT+ Fortran 90/95 source contributions.
 status: review
+verified_against:
+  - swatplus/doc/coding_conventions.md
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-Conventions for writing SWAT+ Fortran source. The goal is portable, readable, and robust code that compiles cleanly on every supported compiler and operating system.
+Conventions for writing SWAT+ Fortran source. The goal is portable, readable and reliable code that compiles cleanly on every supported compiler and operating system.
 
 Each item is tagged with one of three levels:
 
-- **Required.** Mandatory. Pull requests that violate these will not be merged.
-- **Recommended.** Strongly preferred. Deviations need justification.
-- **Encouraged.** Optional. Apply for consistency where reasonable.
+- Required: mandatory. Pull requests that violate these will not be merged.
+- Recommended: strongly preferred. Deviations need justification.
+- Encouraged: optional. Apply for consistency where reasonable.
 
-The list below is ordered by decreasing impact on code quality. Most subjective style items (indent width, capitalization) sit in the lower tiers.
+The list below is ordered by decreasing impact on code quality. Most subjective style items (indent width, capitalization) are in the lower tiers.
 
 ## Interoperability and portability
 
@@ -42,7 +45,7 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 - Organize source into modules.
 - Do not use Fortran keywords (`DATA`, etc.) as variable names.
 - Use meaningful names for variables and parameters. Recognized abbreviations are fine when full names would be unwieldy.
-- Every externally-called function or subroutine carries a header describing what it does, its arguments, and the author. Small internal routines can use a few descriptive comments instead.
+- Every externally-called function or subroutine has a header describing what it does, its arguments, and the author. Small internal routines can use a few descriptive comments instead.
 - No magic numbers. Physical constants (pi, gas constants) go in `PARAMETER` statements, not hard-coded into expressions.
 - Do not hard-code numeric literals in argument lists. The compiler's default precision for literals is not guaranteed.
 - No `GOTO`. If you must use one, document why.
@@ -57,7 +60,7 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 
 ### Encouraged
 
-- In new code, follow your own consistent style. When editing existing code, match the style around you.
+- In new code, follow a consistent style. When editing existing code, match the style around you.
 - Indent comments the same way as code.
 - Group related procedures and data into modules.
 - Keep lines to 132 characters or fewer.
@@ -69,7 +72,7 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 - Remove unused variables.
 - Remove debug code once the bug is fixed.
 
-## Robustness
+## Reliability
 
 ### Required
 
@@ -83,9 +86,9 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 - Do not use `==` or `/=` on floating-point values. Compare against an explicit tolerance instead (an epsilon check).
 - In mixed-type expressions and assignments, write the type conversion explicitly. Do not let the compiler do it implicitly.
 - No `INCLUDE` files. Use `USE` with modules.
-- Derived types belong in their own module, together with the procedures that operate on them.
+- Derived types belong in a separate module, together with the procedures that operate on them.
 - Each procedure should do one thing.
-- Module-level (global) public variables should hold only static or rarely-changing data.
+- Module-level (global) public variables should contain only static or rarely-changing data.
 
 ### Encouraged
 
@@ -142,16 +145,16 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 
 ### Required
 
-- Avoid `SAVE`. Hold state in module variables instead.
+- Avoid `SAVE`. Keep state in module variables instead.
 - No `ENTRY` statements in functions.
 - Functions must not return pointers.
 - Do not name a user function the same as an intrinsic (`SUM`, etc.).
 - A procedure that returns a single value should be a function. The value can be a derived type.
-- Communicate through arguments or through the procedure's own module variables.
+- Communicate through arguments or through the variables of the procedure's module.
 
 ### Recommended
 
-- Every dummy argument that is not a pointer carries an `INTENT`.
+- Every dummy argument that is not a pointer has an `INTENT`.
 - Avoid type-specific intrinsics (`AMAX`, `DMAX`). Use the generic (`MAX`).
 - Do not declare static-dimensioned array arguments.
 - Validate argument values where it matters.
@@ -167,13 +170,13 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 
 ### Required
 
-- External-file I/O statements carry `err=`, `end=`, and `iostat=` as appropriate.
+- External-file I/O statements include `err=`, `end=`, and `iostat=` as appropriate.
 - All global variables, if any, are initialized at startup.
 
 ### Recommended
 
 - Avoid `NAMELIST` I/O.
-- Use `WRITE` rather than `PRINT` for non-terminal I/O.
+- Use `WRITE` instead of `PRINT` for non-terminal I/O.
 - Use character parameters or in-line format specifiers in `READ` and `WRITE`. Do not use labeled `FORMAT` statements.
 
 ## Obsolescent features to avoid
@@ -226,3 +229,7 @@ The list below is ordered by decreasing impact on code quality. Most subjective 
 - [SAS Coding Conventions](http://xmm.vilspa.esa.es/sas/current/doc/devel/coding.html)
 - [WRF Coding Conventions](http://box.mmm.ucar.edu/wrf/WG2/WRF_conventions.html)
 - [USGS Coding Standards](http://water.usgs.gov/software/code/general/sysdoc/doc/coding.pdf)
+
+??? quote "Sources"
+
+    - [`doc/coding_conventions.md`](https://github.com/swat-model/swatplus/blob/62.0.1/doc/coding_conventions.md) in the source repository.

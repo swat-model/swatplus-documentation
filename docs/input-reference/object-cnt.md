@@ -1,71 +1,80 @@
 ---
 title: object.cnt
-description: Basin name, areas, and the count of every spatial object type in the project.
+description: Basin name, basin areas and the number of spatial objects of each type in the project.
 status: review
 verified_against:
   - src/basin_read_objs.f90
   - src/basin_module.f90
   - src/hydrograph_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/hyd_connect.f90
+  - src/proc_bsn.f90
+  - src/hru_fr_change.f90
+  - src/lcu_read_softcal.f90
+  - src/basin_aquifer_output.f90
+  - src/gwflow_output.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-`object.cnt` declares the basin name, the landscape and total areas, and how many of each spatial object type (HRU, channel, aquifer, reservoir, and so on) the project contains. The model uses these counts to allocate the `ob`, `obcs`, `obcs_alloc`, and `obom` arrays before any object data is read.
-
-If `object.cnt` is missing or set to `null` in `file.cio`, the model prints `Cannot find object.cnt input file` and stops.
-
-## Source
-
-- Reader: [`src/basin_read_objs.f90`](https://github.com/swat-model/swatplus/blob/main/src/basin_read_objs.f90)
-- Type definitions:
-  - [`src/basin_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/basin_module.f90), `type basin_inputs` (`bsn`)
-  - [`src/hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/hydrograph_module.f90), `type spatial_objects` (`sp_ob`)
+`object.cnt` gives the basin name, the basin areas and the number of spatial objects of each type: HRUs, routing units, aquifers, channels, reservoirs, point sources and the others listed below. SWAT+ uses the counts to set up its list of objects before any connection file is read. The file is named in slot 4 of the `simulation` line of [`file.cio`](file-cio.md) (default `object.cnt`). It is required: if it is missing or `null`, SWAT+ prints `Cannot find object.cnt input file` and stops.
 
 ## Format
 
-- Line 1: title line. Skipped.
-- Line 2: header line. Skipped.
-- Line 3: 21 values read into `bsn` and `sp_ob`, list-directed.
+Free format, whitespace-separated. Line 1 is a title and line 2 is the column header; both are skipped. Line 3 contains 21 values in the order below. The reader does not match columns by header name.
 
-| # | Field | Maps to | Type | Description |
-|---|-------|---------|------|-------------|
-| 1 | name | `bsn%name` | char(25) | basin name (free-form) |
-| 2 | ls_area | `bsn%area_ls_ha` | real | landscape area, hectares |
-| 3 | tot_area | `bsn%area_tot_ha` | real | total area, hectares |
-| 4 | objs | `sp_ob%objs` | int | total object count (sum of all object types) |
-| 5 | hru | `sp_ob%hru` | int | number of HRUs |
-| 6 | hru_lte | `sp_ob%hru_lte` | int | number of HRU-lte objects |
-| 7 | ru | `sp_ob%ru` | int | number of routing units |
-| 8 | gwflow | `sp_ob%gwflow` | int | number of gwflow cells |
-| 9 | aqu | `sp_ob%aqu` | int | number of aquifer objects |
-| 10 | chan | `sp_ob%chan` | int | number of legacy channels |
-| 11 | res | `sp_ob%res` | int | number of reservoirs |
-| 12 | recall | `sp_ob%recall` | int | number of recall objects |
-| 13 | exco | `sp_ob%exco` | int | number of export-coefficient objects |
-| 14 | dr | `sp_ob%dr` | int | number of delivery-ratio objects |
-| 15 | canal | `sp_ob%canal` | int | number of canals |
-| 16 | pump | `sp_ob%pump` | int | number of pumps |
-| 17 | outlet | `sp_ob%outlet` | int | number of outlets |
-| 18 | chandeg | `sp_ob%chandeg` | int | number of SWAT-deg channels (SWAT+ routing) |
-| 19 | aqu2d | `sp_ob%aqu2d` | int | 2D aquifer count (currently not used per the type comment) |
-| 20 | herd | `sp_ob%herd` | int | herd count (currently not used per the type comment) |
-| 21 | wro | `sp_ob%wro` | int | water-rights object count (currently not used per the type comment) |
+| # | Column | Units | Default | Description |
+|---|--------|-------|---------|-------------|
+| 1 | `name` | - | blank | Basin name, up to 25 characters. It appears in the name column of the basin output files. |
+| 2 | `ls_area` | ha | 0 | Land area of the basin. |
+| 3 | `tot_area` | ha | 0 | Total area of the basin, including reservoirs and other water bodies. |
+| 4 | `obj` | count | 0 | Total number of spatial objects. Must equal the sum of columns 5 to 18. |
+| 5 | `hru` | count | 0 | Number of HRUs ([`hru.con`](con.md)). |
+| 6 | `lhru` | count | 0 | Number of HRU-lte objects ([`hru-lte.con`](../input-reference/con.md)). |
+| 7 | `rtu` | count | 0 | Number of routing units ([`rout_unit.con`](../input-reference/con.md)). |
+| 8 | `mfl` | count | 0 | Number of gwflow objects ([`gwflow.con`](../input-reference/gwflow.md#gwflowcon)). See [gwflow](#gwflow). |
+| 9 | `aqu` | count | 0 | Number of aquifers ([`aquifer.con`](../input-reference/con.md)). |
+| 10 | `cha` | count | 0 | Number of legacy channels ([`channel.con`](../input-reference/con.md)). |
+| 11 | `res` | count | 0 | Number of reservoirs ([`reservoir.con`](../input-reference/con.md)). |
+| 12 | `rec` | count | 0 | Number of recall objects: point sources and inlets ([`recall.con`](../input-reference/con.md)). |
+| 13 | `exco` | count | 0 | Number of export coefficient objects ([`exco.con`](../input-reference/con.md)). |
+| 14 | `dlr` | count | 0 | Number of delivery ratio objects ([`delratio.con`](../input-reference/con.md)). |
+| 15 | `can` | count | 0 | Number of canals. No connection file is read for canals in 62.0.1. |
+| 16 | `pmp` | count | 0 | Number of pumps. No connection file is read for pumps in 62.0.1. |
+| 17 | `out` | count | 0 | Number of outlets ([`outlet.con`](../input-reference/con.md)). |
+| 18 | `lcha` | count | 0 | Number of channels routed with the SWAT+ channel method ([`chandeg.con`](../input-reference/con.md)). |
+| 19 | `aqu2d` | count | 0 | Number of 2D aquifers. Read and not used. |
+| 20 | `hrd` | count | 0 | Number of herds. Read and not used. |
+| 21 | `wro` | count | 0 | Number of water rights objects. Read and not used. |
 
-### gwflow side effect
+The column headers are the ones the SWAT+ Editor writes. The old GitBook documentation calls column 8 `gwfl`. Only the order matters to SWAT+.
 
-After reading, if `bsn_cc%gwflow == 1` (set via `codes.bsn`), the reader looks for `gwflow.chancells`. If that file exists and contains river cells, the reader:
+## Object counts
 
-- sets `sp_ob%gwflow` to the number of river cells,
-- recomputes `sp_ob%objs` to `sp_ob%objs + nriv - sp_ob%aqu`,
-- sets `in_con%gwflow_con` to `gwflow.con`,
-- sets `sp_ob%aqu` to 0 and `in_con%aqu_con` to `null`.
+Each count must match the number of objects in the corresponding connection file named on the `connect` line of [`file.cio`](file-cio.md). SWAT+ numbers all objects in one list, in this order: HRUs, HRU-lte objects, routing units, gwflow objects, aquifers, legacy channels, reservoirs, recall objects, export coefficient objects, delivery ratio objects, canals, pumps, outlets and SWAT+ channels. The object list has `obj` entries, so `obj` must equal the sum of these counts. Counts for canals and pumps reserve places in the list, but no objects are read into them.
 
-If `bsn_cc%gwflow == 1` but `gwflow.chancells` is missing or empty, gwflow is silently turned off.
+If line 3 ends early, the reader reaches the end of the file and the missing counts stay at zero. The `refdata/Osu_1hru` example uses this and leaves out `hrd` and `wro`. If the file has more lines after line 3, SWAT+ keeps reading them in groups of title, header and values, and the last complete group is the one used. A file with a single data line avoids this.
+
+## Basin areas
+
+`ls_area` and `tot_area` are not used to compute HRU or object areas; those come from the connection files. They are used in these places:
+
+- `ls_area`: the HRU area when a decision table changes the fraction of the basin an HRU covers, and the HRU areas of the regions in soft calibration ([`water_balance.sft`](../calibration/soft-calibration.md), see [soft calibration](../calibration/soft-calibration.md)).
+- `tot_area`: the area weights for the basin aquifer output (`basin_aqu_*` files), and the conversion of gwflow basin water balance volumes to depths.
+
+## gwflow
+
+When `gwflow = 1` in [`codes.bsn`](codes-bsn.md), SWAT+ looks for [`chancell.gw`](../input-reference/gwflow.md#chancellgw) in the run folder after reading `object.cnt`:
+
+- If [`chancell.gw`](../input-reference/gwflow.md#chancellgw) exists and `mfl` is 0, SWAT+ counts the channel cell rows in [`chancell.gw`](../input-reference/gwflow.md#chancellgw) and uses that count as the number of gwflow objects. It adds that count to `obj`, removes the aquifers from `obj`, sets the aquifer count to 0 and reads the gwflow connections from [`gwflow.con`](../input-reference/gwflow.md#gwflowcon) in place of [`aquifer.con`](../input-reference/con.md).
+- If [`chancell.gw`](../input-reference/gwflow.md#chancellgw) exists and `mfl` is already above 0, SWAT+ keeps `mfl` and `obj` as given and sets the aquifer count to 0. In that case `obj` should already leave out the aquifers.
+- If [`chancell.gw`](../input-reference/gwflow.md#chancellgw) is missing or has no data after its header, SWAT+ turns gwflow off and the run uses the lumped aquifers.
+
+In all three cases SWAT+ opens the `gwflow_record` log file. See [gwflow](gwflow.md) for the gwflow input files.
 
 ## Example
 
-`refdata/Ames_sub1/object.cnt`:
+`refdata/Ames_sub1/object.cnt` in the SWAT+ repository:
 
 ```
 object.cnt:
@@ -73,14 +82,45 @@ name                   ls_area      tot_area       obj       hru      lhru      
 demo                      1.          1            12         12         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0         0
 ```
 
-Notes on the example:
+The basin is named `demo` and both areas are 1 ha. The project has 12 objects, all of them HRUs, so `obj` equals `hru`. There are no routing units, aquifers or channels.
 
-- `name = demo`, `ls_area = 1` ha, `tot_area = 1` ha. The fields are floats; the trailing `.` makes that explicit in this dataset.
-- `objs = 12` and `hru = 12`. Every spatial object in this project is an HRU.
-- The header uses shortened labels (`obj`, `lhru`, `rtu`, `mfl`, `dlr`, `can`, `pmp`, `out`, `lcha`, `hrd`). These are tool conventions; the reader does not parse the header.
+`refdata/Osu_1hru/object.cnt` has 4 objects: one HRU, one routing unit, one aquifer and one SWAT+ channel (`lcha`). Its data line stops after `aqu2d`, and the `hrd` and `wro` counts are taken as zero.
 
 ## Related files
 
-- [`codes.bsn`](../input-reference/codes-bsn.md). Sets `bsn_cc%gwflow`, which triggers the gwflow side effect above.
-- [`file.cio`](../input-reference/file-cio.md). The `simulation` category points to `object.cnt`.
-- Object-specific connectivity files (`hru.con`, `chandeg.con`, `aquifer.con`, `reservoir.con`, ...). These must agree with the counts in `object.cnt`.
+- [`file.cio`](file-cio.md): names this file and the connection files.
+- [Connection files](con.md): one row per object; the number of rows must match the counts here.
+- [`codes.bsn`](codes-bsn.md): its `gwflow` code starts the gwflow check above.
+- [gwflow](gwflow.md): [`chancell.gw`](../input-reference/gwflow.md#chancellgw) and the other gwflow inputs.
+
+??? quote "Sources"
+
+    - Reader: [`basin_read_objs.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_read_objs.f90), called from [`proc_bsn.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_bsn.f90) after `codes.bsn`
+    - Type definitions: `type basin_inputs` in [`basin_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_module.f90), `type spatial_objects` in [`hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hydrograph_module.f90)
+    - Object numbering and connection files: [`hyd_connect.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hyd_connect.f90)
+    - Uses of the areas: [`hru_fr_change.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_fr_change.f90), [`lcu_read_softcal.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/lcu_read_softcal.f90), [`basin_aquifer_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_aquifer_output.f90), [`gwflow_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/gwflow_output.f90)
+    - File name slot: `in_sim%object_cnt` in [`input_file_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90)
+
+    | Column | Fortran variable |
+    |--------|------------------|
+    | `name` | `bsn%name` |
+    | `ls_area` | `bsn%area_ls_ha` |
+    | `tot_area` | `bsn%area_tot_ha` |
+    | `obj` | `sp_ob%objs` |
+    | `hru` | `sp_ob%hru` |
+    | `lhru` | `sp_ob%hru_lte` |
+    | `rtu` | `sp_ob%ru` |
+    | `mfl` | `sp_ob%gwflow` |
+    | `aqu` | `sp_ob%aqu` |
+    | `cha` | `sp_ob%chan` |
+    | `res` | `sp_ob%res` |
+    | `rec` | `sp_ob%recall` |
+    | `exco` | `sp_ob%exco` |
+    | `dlr` | `sp_ob%dr` |
+    | `can` | `sp_ob%canal` |
+    | `pmp` | `sp_ob%pump` |
+    | `out` | `sp_ob%outlet` |
+    | `lcha` | `sp_ob%chandeg` |
+    | `aqu2d` | `sp_ob%aqu2d` |
+    | `hrd` | `sp_ob%herd` |
+    | `wro` | `sp_ob%wro` |

@@ -1,44 +1,35 @@
 ---
 title: treatment.trt
-description: Legacy treatment operation database. Not read by SWAT+.
+description: Placeholder file left by project setup tools. SWAT+ does not read it.
 status: review
 verified_against:
-  - src/main.f90
+  - src/input_file_module.f90
+  - src/readcio_read.f90
   - src/water_treatment_read.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/om_treat_read.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-`treatment.trt` is a legacy file name carried over from the SWAT2012 treatment operation table. It is written by external setup tools (QSWAT+, SWAT+ Editor) into project directories, but no SWAT+ Fortran reader consumes it. The file plays no part in a SWAT+ run.
+`treatment.trt` is a file name kept from the SWAT2012 treatment table. Project setup tools can still write it into a project folder, but SWAT+ 62.0.1 does not open it, and [`file.cio`](file-cio.md) has no slot for it. Its contents have no effect on a run, and the file can be left empty or deleted.
 
-The current treatment functionality in SWAT+ lives in the water allocation module and uses [`water_treat.wal`](https://github.com/swat-model/swatplus/blob/main/src/water_treatment_read.f90), not `treatment.trt`. See `src/water_treatment_read.f90`.
-
-## Source
-
-A search of the SWAT+ Fortran tree at commit `8a1edd4a23915a2cac1cd90c788f0d521404700e` finds no `open`, `inquire`, or filename string referencing `treatment.trt` or any `.trt` extension. `file.cio` does not list it.
-
-```bash
-grep -rn "treatment.trt\|\\.trt" swatplus/src/
-# no matches
-```
+Water treatment in SWAT+ is part of [water allocation](water-allocation.md). Treatment plants are defined in [`water_treat.wal`](../input-reference/water-allocation.md#water_treatwal), and the composition of treated water in `om_treat.wal`.
 
 ## Format
 
-There is no defined format. The file is not parsed.
+None. The file is not read.
 
 ## Example
 
-Both reference datasets ship an empty `treatment.trt`:
-
-```
-$ wc -l refdata/Ames_sub1/treatment.trt refdata/Osu_1hru/treatment.trt
-0 refdata/Ames_sub1/treatment.trt
-0 refdata/Osu_1hru/treatment.trt
-```
-
-The file exists only as a placeholder.
+Both reference datasets in the SWAT+ repository, `refdata/Ames_sub1` and `refdata/Osu_1hru`, contain an empty `treatment.trt`.
 
 ## Related files
 
-- [`water_treat.wal`](https://github.com/swat-model/swatplus/blob/main/src/water_treatment_read.f90). The active treatment input, read by `water_treatment_read`. Defines water treatment objects with storage, lag, loss fraction, and constituent links used by water allocation.
+- [Water allocation](water-allocation.md): [`water_treat.wal`](../input-reference/water-allocation.md#water_treatwal) and `om_treat.wal`, the treatment inputs SWAT+ reads.
+- [`file.cio`](file-cio.md): lists the input files SWAT+ reads.
+
+??? quote "Sources"
+
+    - File name slots read from `file.cio`: [`input_file_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90), [`readcio_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/readcio_read.f90)
+    - Treatment inputs: [`water_treatment_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_treatment_read.f90) (`water_treat.wal`), [`om_treat_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/om_treat_read.f90) (`om_treat.wal`)

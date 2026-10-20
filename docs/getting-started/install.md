@@ -4,84 +4,105 @@ status: review
 verified_against:
   - swatplus/CMakeLists.txt
   - swatplus/doc/Building.md
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - https://github.com/swat-model/swatplus/releases/tag/62.0.1
+  - https://install.swat.tamu.edu
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-You have two options.
+SWAT+ has two parts: the model itself, a command-line program, and the tools used to build and edit projects (QSWAT+, SWAT+ Editor and SWAT+ Toolbox). Most users install the tools and let SWAT+ Editor run the model. The model can also be downloaded or built without the tools.
 
-1. **Download a prebuilt executable** if you only want to run SWAT+.
-2. **Build from source** if you want to modify the model or use a development version.
+## SWAT+ tools
 
-## Option 1: Prebuilt executable
+[install.swat.tamu.edu](https://install.swat.tamu.edu) has one-line installers for Windows, Linux and macOS. Each installer can be run again at any time to update.
 
-Prebuilt binaries for Windows, Linux, and macOS are attached to each GitHub release.
-
-1. Go to https://github.com/swat-model/swatplus/releases.
-2. Pick the latest release (or a specific tagged version).
-3. Under **Assets**, download the file that matches your operating system and architecture.
-
-Binaries are named `swatplus-<version>-<compiler>-<os>_<arch>` with an optional `-Rel` or `-Dbg` suffix and a `.exe` extension on Windows. The compiler tag is `gnu` (gfortran), `ifo` (Intel `ifort`), or `ifx` (Intel `ifx`). Examples:
-
-- Linux x86_64, gfortran: `swatplus-3.0.4-gnu-lin_x86_64`
-- Windows AMD64, gfortran: `swatplus-3.0.4-gnu-win_amd64.exe`
-- macOS arm64, gfortran: `swatplus-3.0.4-gnu-mac_arm64`
-
-Put the file somewhere on your `PATH`, or keep it next to your project folder. On Linux and macOS, make it executable:
+Install all three tools at once:
 
 ```bash
-chmod +x swatplus-3.0.4-gnu-lin_x86_64
+# Linux and macOS
+curl -fsSL https://install.swat.tamu.edu/all.sh | bash
 ```
 
-Run it once with no arguments to confirm it starts:
+```powershell
+# Windows (PowerShell)
+irm https://install.swat.tamu.edu/all.ps1 | iex
+```
+
+Or one at a time:
+
+| Tool | Purpose | Linux and macOS | Windows (PowerShell) |
+|------|---------|-----------------|----------------------|
+| QSWAT+ | QGIS plugin that delineates the watershed, creates HRUs and writes the project database. Also installs the SWAT+ support data and TauDEM. Needs QGIS. | `curl -fsSL https://install.swat.tamu.edu/qsp.sh \| bash` | `irm https://install.swat.tamu.edu/qsp.ps1 \| iex` |
+| SWAT+ Editor | Edits project inputs, writes the input files and runs the model. | `curl -fsSL https://install.swat.tamu.edu/spe.sh \| bash` | `irm https://install.swat.tamu.edu/spe.ps1 \| iex` |
+| SWAT+ Toolbox | Sensitivity analysis, calibration and other tasks on a finished project. | `curl -fsSL https://install.swat.tamu.edu/spt.sh \| bash` | `irm https://install.swat.tamu.edu/spt.ps1 \| iex` |
+
+On Linux and macOS the tools go to `~/.local/share/SWATPlus/`, and on Windows to `%USERPROFILE%\SWATPlus\`.
+
+## Model executable
+
+Every release on the [GitHub releases page](https://github.com/swat-model/swatplus/releases) has prebuilt executables. For 62.0.1:
+
+| File | System |
+|------|--------|
+| `swatplus-62.0.1-gnu-win_amd64-Rel.zip` | Windows, 64-bit (gfortran build) |
+| `swatplus-62.0.1-ifo-win_amd64-Rel.zip` | Windows, 64-bit (Intel Fortran build) |
+| `swatplus-62.0.1-gnu-lin_x86_64-Rel.zip` | Linux, x86-64 (gfortran build) |
+| `swatplus-62.0.1-ifx-lin_x86_64-Rel.zip` | Linux, x86-64 (Intel Fortran build) |
+| `swatplus-62.0.1-gnu-lin_aarch64-Rel.zip` | Linux, ARM64 |
+| `swatplus-62.0.1-gnu-mac_arm64-Rel.zip` | macOS, Apple silicon |
+| `swatplus-62.0.1-ifo-mac_x86_64-Rel.zip` | macOS, Intel |
+
+Each zip contains a single executable with the same name (plus `.exe` on Windows). The name tells you the version, the compiler (`gnu` for gfortran, `ifo` for Intel Fortran Classic, `ifx` for Intel Fortran), the system and architecture, and `Rel` for an optimized release build. The gfortran and Intel builds give results that can differ slightly in the last digits.
+
+Unzip the file and put the executable next to your project folder or in a folder on your `PATH`. On Linux and macOS, make it executable:
 
 ```bash
-./swatplus-3.0.4-gnu-lin_x86_64
+chmod +x swatplus-62.0.1-gnu-lin_x86_64-Rel
 ```
 
-It will look for input files in the current directory and exit if it does not find them. That is the expected behavior outside of a project folder.
+On macOS the first start of a downloaded program may be blocked; allow it under System Settings, Privacy and Security, or remove the quarantine flag with `xattr -d com.apple.quarantine <file>`.
 
-## Option 2: Build from source
+To check the download, run it in an empty folder:
 
-You need:
+```bash
+mkdir empty && cd empty
+../swatplus-62.0.1-gnu-lin_x86_64-Rel
+```
 
-- `git`
-- `cmake` (3.22 or newer)
-- a Fortran compiler: `gfortran`, Intel `ifort`, or Intel `ifx`
-- `make` or `ninja`
+It prints a banner with the revision number and stops because there is no project:
 
-Clone the source:
+```
+                   SWAT+
+             Revision 62.0.1
+      Soil & Water Assessment Tool
+GNU (13.3.0), 2026-10-19 22:51:37, Linux
+    Program reading . . . executing
+
+ Cannot find object.cnt input file
+```
+
+It also writes a few files (`diagnostics.out`, `simulation.out`, [`codes.bsn`](../input-reference/codes-bsn.md) and others) into the folder. Run the model from inside a project folder; it reads its inputs from the current folder and writes the outputs there.
+
+## Building from source
+
+Build from source to change the model or to use a development version. You need `git`, CMake 3.22 or newer, a Fortran compiler (gfortran, Intel `ifx` or `ifort`) and `make` or `ninja`.
 
 ```bash
 git clone https://github.com/swat-model/swatplus.git
 cd swatplus
-```
-
-Configure and build:
-
-```bash
-cmake -B build
+git checkout 62.0.1
+cmake -B build -D CMAKE_BUILD_TYPE=Release
 cmake --build build -j 8
 ```
 
-The executable is written to `build/` using the `swatplus-<version>-<compiler>-<os>_<arch>` pattern (with `.exe` on Windows). To pick a specific compiler at configure time, pass `-D CMAKE_Fortran_COMPILER=gfortran` (or `ifort`, `ifx`).
+The executable is written to `build/` with a name of the form `swatplus-<version>-<compiler>-<system>_<arch>-Rel` (`-Dbg` for a `Debug` build, no suffix when no build type is given). Builds from a commit between tags have a version such as `62.0.1-3-g1a2b3c4`. The [Developer Guide](../developer-guide/index.md) has instructions for Visual Studio, VS Code and Codespaces.
 
-To install it system-wide:
+## Next
 
-```bash
-cmake --install build --prefix ~/bin
-```
+Run the reference dataset to check the executable from start to finish: [Quick start: Ames_sub1](quick-start-ames.md).
 
-For platform-specific build instructions (Visual Studio on Windows, VS Code Codespaces, Intel compilers), see the [Developer guide](../developer-guide/index.md).
+??? quote "Sources"
 
-## Supporting tools
-
-To build SWAT+ inputs from a DEM, soil map, and land use map, install:
-
-- **QSWAT+** (QGIS plugin): https://swat.tamu.edu/software/plus/. Delineates the watershed, defines HRUs, and writes the input files.
-- **SWAT+ Editor** (desktop app): edits parameters in an existing project. Distributed from the same page.
-
-The SWAT+ executable itself does not need either of these to run. They produce the input files that the executable reads.
-
-## Verifying the install
-
-Use the reference dataset in `swatplus/refdata/Ames_sub1` to confirm the executable runs end-to-end. See [Quick start: Ames_sub1](quick-start-ames.md).
+    - Release files: [SWAT+ 62.0.1 on GitHub](https://github.com/swat-model/swatplus/releases/tag/62.0.1), checked 20 October 2026; the banner above is from the `gnu-lin_x86_64` executable.
+    - Installers: [install.swat.tamu.edu](https://install.swat.tamu.edu), checked 20 October 2026.
+    - Executable naming: `set(SWATPLUS_EXE "swatplus-${SWAT_VERSION}-${FFC}-${AR}${TY}")` in [`CMakeLists.txt`](https://github.com/swat-model/swatplus/blob/62.0.1/CMakeLists.txt), with `SWAT_VERSION` from `git describe --tags`.
+    - Build instructions: [`doc/Building.md`](https://github.com/swat-model/swatplus/blob/62.0.1/doc/Building.md).

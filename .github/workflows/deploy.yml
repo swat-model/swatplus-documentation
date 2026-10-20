@@ -1,24 +1,50 @@
 name: Deploy docs
 
+# Each tag publishes one documentation version with mike, named after the
+# SWAT+ revision it describes (for example 62.0.1). The newest tag also takes
+# the "latest" alias, which the site root redirects to.
 on:
   push:
-    branches: [main]
+    tags: ["*"]
   workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to publish (an existing tag, e.g. 62.0.1)"
+        required: true
+      latest:
+        description: "Point the latest alias at this version"
+        type: boolean
+        default: true
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: gh-pages
+  cancel-in-progress: false
+
+env:
+  SITE_URL: https://docs.swat.tamu.edu
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve version
+        id: v
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "latest=${{ inputs.latest }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "latest=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.v.outputs.version }}
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -32,34 +58,63 @@ jobs:
             lmodern poppler-utils
 
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt mike
 
-      - uses: actions/configure-pages@v5
+      # Tags made before the site was versioned have no mike settings in
+      # mkdocs.yml; add them for the build so every version gets the selector.
+      - name: Add versioning to older trees
+        run: |
+          python3 - <<'PY'
+          import pathlib
+          p = pathlib.Path("mkdocs.yml")
+          s = p.read_text()
+          if "mike" not in s:
+              s = s.replace("plugins:\n  - search\n",
+                            "plugins:\n  - search\n  - mike:\n      alias_type: redirect\n      canonical_version: latest\n", 1)
+              if "\nextra:\n" not in s:
+                  s += "\nextra:\n  version:\n    provider: mike\n    default: latest\n    alias: true\n"
+              p.write_text(s)
+          PY
 
-      - name: Build site
-        run: mkdocs build
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages:gh-pages || true
 
       - name: Cache PDF renders
         uses: actions/cache@v4
         with:
           path: .pdf-cache
-          key: pdf-cache-${{ hashFiles('docs/**', 'pdf/**', 'mkdocs.yml') }}
+          key: pdf-cache-${{ steps.v.outputs.version }}-${{ hashFiles('docs/**', 'pdf/**', 'mkdocs.yml') }}
           restore-keys: |
+            pdf-cache-${{ steps.v.outputs.version }}-
             pdf-cache-
 
       - name: Build per-section PDFs
-        run: python3 pdf/build.py --repo . --out site --cache .pdf-cache
+        run: |
+          python3 pdf/build.py --repo . --out pdf-out --cache .pdf-cache \
+            --site-url "$SITE_URL/${{ steps.v.outputs.version }}/"
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
+      - name: Build site version
+        run: |
+          VERSION="${{ steps.v.outputs.version }}"
+          if [ "${{ steps.v.outputs.latest }}" = "true" ]; then
+            mike deploy --update-aliases "$VERSION" latest
+            mike set-default latest
+          else
+            mike deploy "$VERSION"
+          fi
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/deploy-pages@v4
-        id: deployment
+      - name: Add PDFs and custom domain to gh-pages
+        run: |
+          VERSION="${{ steps.v.outputs.version }}"
+          git checkout -- mkdocs.yml
+          git checkout gh-pages
+          rm -rf "$VERSION/pdf"
+          cp -r pdf-out/pdf "$VERSION/pdf"
+          echo "docs.swat.tamu.edu" > CNAME
+          touch .nojekyll
+          git add "$VERSION/pdf" CNAME .nojekyll
+          git commit -m "Add PDFs for $VERSION" || true
+          git push origin gh-pages

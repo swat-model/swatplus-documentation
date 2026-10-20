@@ -2,11 +2,16 @@
 title: Visual Studio on Windows
 description: Build, run, and debug SWAT+ in Visual Studio 2022 with the Intel Fortran compiler.
 status: review
+verified_against:
+  - swatplus/doc/VS-Win.md
+  - swatplus/CMakeSettings.json
+  - swatplus/CMakePresets.json
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-This page covers the full workflow for working on SWAT+ in Visual Studio 2022 on Windows: installing the required tools, cloning the repository, configuring the CMake build, and running a debug session against an input dataset.
+Visual Studio 2022 on Windows can build, run and debug SWAT+ with the Intel Fortran compiler. The steps are: install the tools, clone the repository, configure the CMake build, and run a debug session against an input dataset.
 
-Screenshots referenced below live in the SWAT+ source repo's `doc/` folder.
+The screenshots for these steps are in the `doc/` folder of the SWAT+ source repository.
 
 ## Required software
 
@@ -14,7 +19,7 @@ Install in this order. The Intel compiler requires Visual Studio to be present f
 
 1. [Visual Studio Community 2022](https://visualstudio.microsoft.com/free-developer-offers/). During install, in the **Workloads** panel, check **Desktop development with C++**. That workload pulls in the CMake integration that SWAT+ needs.
 2. [Intel Fortran Compiler for Windows](https://www.intel.com/content/www/us/en/developer/tools/oneapi/fortran-compiler-download.html). Use the standalone installer. The current Intel oneAPI release ships `ifx`. The older `ifort` was deprecated in 2024 and is gone from the 2025 release. SWAT+ produces the same results with either Intel compiler.
-3. [Git for Windows](https://git-scm.com/downloads/win). Visual Studio bundles its own Git, but SWAT+ uses the standalone `git` during the CMake build to read the current tag for the version string.
+3. [Git for Windows](https://git-scm.com/downloads/win). Visual Studio includes a copy of Git, but SWAT+ uses the standalone `git` during the CMake build to read the current tag for the version string.
 
 Reboot after the three installs finish.
 
@@ -60,7 +65,7 @@ Visual Studio can clone the SWAT+ repository and open it as a CMake project in o
 
 ### Configure
 
-SWAT+ is a CMake project. The Visual Studio toolbar exposes the available compiler and build-type combinations through a drop-down. Switching the selection triggers a reconfigure. The Output window prints the CMake settings used, which is the place to verify which compiler picked up.
+SWAT+ is a CMake project. The Visual Studio toolbar exposes the available compiler and build-type combinations through a drop-down. Switching the selection triggers a reconfigure. The Output window prints the CMake settings used; check there which compiler was picked up.
 
 To force a fresh configure, right-click `CMakeLists.txt` in Solution Explorer and select **Delete Cache and Reconfigure**.
 
@@ -123,3 +128,7 @@ Pick your configuration from the toolbar drop-down and run **Debug > Start Debug
 - [Intel Fortran Compiler for oneAPI release notes](https://www.intel.com/content/www/us/en/developer/articles/release-notes/oneapi-fortran-compiler-release-notes.html)
 - [Visual Studio documentation](https://learn.microsoft.com/en-us/visualstudio/windows/?view=vs-2022)
 - [CMake](https://cmake.org)
+
+??? quote "Sources"
+
+    - [`doc/VS-Win.md`](https://github.com/swat-model/swatplus/blob/62.0.1/doc/VS-Win.md) and its screenshots in the source repository, with [`CMakeSettings.json`](https://github.com/swat-model/swatplus/blob/62.0.1/CMakeSettings.json) for the Visual Studio configurations.

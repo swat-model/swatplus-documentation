@@ -1,20 +1,35 @@
 ---
-title: FAQ and Troubleshooting
-description: Answers to common SWAT+ problems. Runtime errors, water balance issues, performance tips.
+title: FAQ and troubleshooting
+description: Finding the cause when a SWAT+ 62.0.1 run stops, gives implausible results or takes too long.
 status: review
+verified_against:
+  - src/proc_bsn.f90
+  - src/main.f90.in
+  - src/hru_read.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-When a SWAT+ run does not produce what you expect, the first three files to read are `simulation.out`, `diagnostics.out`, and `checker.out`. Their format is described in [Checker and diagnostics](../output-reference/checker-diagnostics.md).
+## Purpose
+
+These pages help when a SWAT+ run stops, completes with results that do not make sense, or takes too long. First runs and installation problems are covered in [Getting started](../getting-started/index.md), and adjusting parameters to observations in [Calibration](../calibration/index.md).
 
 ## Pages
 
-- [Common runtime errors](../faq-troubleshooting/common-runtime-errors.md). The error strings the model writes to its diagnostic files, what they mean, and what to change.
-- [Water balance and mass balance issues](../faq-troubleshooting/water-balance-issues.md). When `basin_wb_aa.txt` looks wrong: climate mapping, curve numbers, missing management, bad soils.
-- [Performance tips](../faq-troubleshooting/performance-tips.md). Build flags, daily versus sub-daily routing, the cost of enabling many outputs.
+- [Common runtime errors](common-runtime-errors.md): the messages SWAT+ prints when a run stops or a name in the inputs is not matched, the names it matches without a message, files it creates when they are missing, and inputs in an older format.
+- [Water balance issues](water-balance-issues.md): implausible precipitation, runoff, ET, percolation, lateral and tile flow, and basin totals that do not match the HRUs.
+- [Performance tips](performance-tips.md): build type, time step, output volume and the size of the carbon output files.
 
-## When in doubt
+## Checks after every run
 
-1. Confirm the executable matches the input format. Use the SWAT+ revision printed on the first line of `simulation.out`.
-2. Read `diagnostics.out` end to end. Every line is a missing reference that SWAT+ replaced with a default or skipped.
-3. Read `checker.out`. The per-HRU `zmx`, `sumfc`, `sumul`, `tiledrain` columns are the fastest way to spot a soil or option that did not load.
-4. Confirm `success.fin` exists. If it does not, the run aborted.
+1. `simulation.out` ends with `Execution successfully completed`, and `success.fin` exists. If not, the run stopped early: keep the screen output, since stop messages are not copied to the log files.
+2. Read `diagnostics.out` to the end. Every line after the first is a name that was not matched, and SWAT+ used a default or left the feature off.
+3. Check the names that are not reported when they do not match, above all the names in [`hru-data.hru`](../input-reference/hru.md), which fall back to the first record of each file. See [Names matched without a message](common-runtime-errors.md#names-matched-without-a-message).
+4. Read `checker.out`: the soil group, rooting depth, field capacity, `perco`, `latq_co` and tile flag of each HRU show whether the intended soil and parameters were used.
+5. Compare the average annual water balance with regional estimates before calibrating.
+
+The file layouts are in [Checker and diagnostics](../output-reference/checker-diagnostics.md). The revision of the executable is in the banner at the top of `simulation.out` (`Revision 62.0.1`); inputs written for an earlier revision can be misread without a message (see [Old-format inputs](common-runtime-errors.md#old-format-inputs)).
+
+??? quote "Sources"
+
+    - `diagnostics.out` and `files_out.out` are opened in [`proc_bsn.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_bsn.f90); the banner and the completion message are written by [`main.f90.in`](https://github.com/swat-model/swatplus/blob/62.0.1/src/main.f90.in).
+    - Name lookup for HRUs: [`hru_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_read.f90).

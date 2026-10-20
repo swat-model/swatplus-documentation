@@ -1,96 +1,112 @@
 ---
 title: manure_allo.mnu
-description: Manure allocation module. Defines named manure sources and routes them to HRUs and other receivers.
+description: Manure allocation. Manure sources with monthly production, and the HRUs that draw manure from them. Applies no manure in 62.0.1.
 status: review
 verified_against:
   - src/manure_allocation_read.f90
   - src/manure_allocation_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/mallo_control.f90
+  - src/actions.f90
+  - src/dtbl_lum_read.f90
+  - src/hru_dtbl_actions_init.f90
+  - src/time_control.f90
+  - src/command.f90
+  - src/manure_source_output.f90
+  - src/manure_demand_output.f90
+  - src/main.f90.in
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-`manure_allo.mnu` defines manure-allocation objects. Each object names one or more source locations (manure storage on a farm, a feedlot, a lagoon) and one or more demand locations (HRUs, municipal treatment, inter-basin diversion). At runtime, manure produced at the sources is distributed to the demand objects under a named rule. Each allocation object holds its own source list, demand list, monthly production, storage, and per-source withdrawal history.
+`manure_allo.mnu` sets up manure allocation: manure sources with a monthly production, and HRUs that receive manure from them when a decision table in [`lum.dtl`](dtl.md) asks for it. The file name is fixed. If the file is missing, manure allocation is off.
 
-The allocation file ties three databases together:
-
-- [`fertilizer.frt`](../input-reference/frt.md). Each source's `manure_typ` is a key into `fertdb` (cross-walked at read time into `src%fertdb`).
-- [`lum.dtl`](../input-reference/dtl.md). For HRU demands, the rule name is a key into `dtbl_lum` (cross-walked into `trn%dtbl_num`).
-- `chem_app.ops`. The first action of the matched lum decision table names a chemical-application profile in `chemapp_db`, cross-walked into `manure_amt%app_method`.
-
-## Source
-
-- Reader: [`src/manure_allocation_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/manure_allocation_read.f90)
-- Types: [`src/manure_allocation_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/manure_allocation_module.f90)
-  - `type manure_allocation` (variable `mallo`)
-  - `type manure_source_objects` (`mallo(i)%src(j)`)
-  - `type manure_demand_objects` (`mallo(i)%trn(j)`)
+SWAT+ 62.0.1 reads this file and checks the decision tables every day, but applies no manure to any HRU. To apply manure, use a `fertilize` action in [`lum.dtl`](../input-reference/dtl.md) or a `manu` operation in [`management.sch`](management.md).
 
 ## Format
 
+Free format, whitespace-separated.
+
 - Line 1: title (skipped).
-- Line 2: number of allocation objects, `imax`. Stored in `db_mx%mallo_db`.
-- Per allocation object, in order:
-  1. Header line (skipped).
-  2. Object header record: `name`, `rule_typ`, `src_obs`, `trn_obs`.
-  3. Header line (skipped).
-  4. `src_obs` source records.
-  5. Header line (skipped).
-  6. `trn_obs` demand records.
+- Line 2: number of allocation objects.
+- Then, for each allocation object:
+    1. header line (skipped);
+    2. object line: `name`, `rule_typ`, `src_obs`, `trn_obs`;
+    3. header line (skipped);
+    4. `src_obs` source lines;
+    5. header line (skipped);
+    6. `trn_obs` demand lines.
 
-### Object header
+### Object line
 
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | name | char(25) | Allocation-object name. |
-| 2 | rule_typ | char(25) | Allocation rule. Selects how unmet demand is split across sources. |
-| 3 | src_obs | int | Number of source objects in this allocation. |
-| 4 | trn_obs | int | Number of demand objects in this allocation. |
+| # | Column | Description |
+|---|--------|-------------|
+| 1 | `name` | Allocation object name. |
+| 2 | `rule_typ` | Allocation rule. Read but not used. |
+| 3 | `src_obs` | Number of source lines. |
+| 4 | `trn_obs` | Number of demand lines. |
 
-### Source record (one per source)
+### Source lines
 
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | num | int | none | Sequential source id. Used as the array index. |
-| 2 | mois_typ | char(3) | none | Moisture class: `wet` or `dry`. |
-| 3 | manure_typ | char(25) | none | Manure-product name. Cross-walked against `fertdb(:)%fertnm` and stored in `fertdb`. |
-| 4 | lat | real | degrees | Latitude of the source. |
-| 5 | long | real | degrees | Longitude of the source. |
-| 6 | stor_init | real | t | Initial manure in storage. |
-| 7 | stor_max | real | t | Storage capacity. |
-| 8..19 | prod_mon(1..12) | real | t/month | Average monthly manure production. Twelve values, January through December. |
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `num` | - | Source number, 1 to `src_obs`. The line is stored at this position. |
+| 2 | `mois_typ` | - | Moisture class, `wet` or `dry`. |
+| 3 | `manure_typ` | - | Manure name in [`fertilizer.frt`](frt.md). |
+| 4 | `lat` | degrees | Latitude of the source. |
+| 5 | `long` | degrees | Longitude of the source. |
+| 6 | `stor_init` | t | Manure in storage at the start of the simulation. |
+| 7 | `stor_max` | t | Storage capacity. |
+| 8 to 19 | `prod_jan` ... `prod_dec` | t/month | Manure produced in each month, January to December. |
 
-### Demand record (one per demand)
+### Demand lines
 
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | num | int | Sequential demand id. Used as the array index. |
-| 2 | ob_typ | char(10) | Receiver type: `hru` (apply to an HRU), `muni` (municipal treatment), or `divert` (inter-basin diversion). |
-| 3 | ob_num | int | Number of the receiving object of `ob_typ`. |
-| 4 | dtbl | char(25) | Decision-table name. For `hru`, matched against `dtbl_lum`. |
-| 5 | right | char(2) | Allocation right. `sr` for senior, `jr` for junior. |
+| # | Column | Description |
+|---|--------|-------------|
+| 1 | `num` | Demand number, 1 to `trn_obs`. The line is stored at this position. |
+| 2 | `ob_typ` | Receiving object type: `hru`, `muni` (treatment) or `divert` (diversion out of the basin). Only `hru` demands are linked to a decision table. |
+| 3 | `ob_num` | Number of the receiving object. |
+| 4 | `dtbl` | Name of the decision table in [`lum.dtl`](../input-reference/dtl.md) that requests manure for this HRU, or `null`. |
+| 5 | `right` | Manure right, `sr` (senior) or `jr` (junior). |
 
-For an HRU demand, the reader sets `hru(ihru)%man_trn_dtbl` to the resolved decision-table index, and looks up the first action's `option` against `chemapp_db(:)%name` to set the application method on `mallo(imro)%trn(itrn)%manure_amt%app_method`.
+The decision table requests manure with a `manure_demand` action: `obj_num` is the source number, `option` the application method in [`chem_app.ops`](ops.md#chem_appops), `const` the amount in t/ha and `const2` the maximum number of requests per year (see [`*.dtl`](dtl.md#land-use-and-management-actions)).
 
 ## Example
 
-A two-line skeleton with one source and one HRU demand:
+One allocation object with one source and one HRU demand:
 
 ```
 manure_allo.mnu: example
 1
 name            rule_typ    src_obs  trn_obs
 farm_a          fixed             1        1
-num  mois_typ  manure_typ  lat       long      stor_init  stor_max   prod_mon(1..12)
-  1  wet       beef_salt   41.99   -93.62          0.0       500.0    5.0  5.0  6.0  6.0  7.0  7.0  7.0  7.0  6.0  6.0  5.0  5.0
+num  mois_typ  manure_typ  lat       long      stor_init  stor_max   prod_jan  feb  mar  apr  may  jun  jul  aug  sep  oct  nov  dec
+  1  wet       beef_fr     41.99   -93.62          0.0       500.0    5.0  5.0  6.0  6.0  7.0  7.0  7.0  7.0  6.0  6.0  5.0  5.0
 num  ob_typ    ob_num  dtbl                 right
-  1  hru            1  apply_manure_dtbl       sr
+  1  hru            1  apply_manure          sr
 ```
 
-The decision-table named `apply_manure_dtbl` must exist in [`lum.dtl`](../input-reference/dtl.md) and its first action must name an entry in `chem_app.ops` for the cross-walks to resolve.
+With a table `apply_manure` in [`lum.dtl`](../input-reference/dtl.md) whose first action is `manure_demand` with source 1, method `broadcast` and 2 t/ha, the intent is to apply 2 t/ha of `beef_fr` from the source whenever the table's conditions are met. In 62.0.1 the request is recorded but nothing is applied.
 
 ## Related files
 
-- [`fertilizer.frt`](../input-reference/frt.md). Defines the manure-product names that source records reference, and the manure organic-matter database (`manure_db.frt`, `manure_om.frt`).
-- [`lum.dtl`](../input-reference/dtl.md). Decision tables that fire manure applications at each demand HRU.
-- `chem_app.ops`. Chemical-application profiles (rate, method) selected by the decision-table action.
+- [`fertilizer.frt`](frt.md): the manure named in `manure_typ`.
+- [`*.dtl`](dtl.md): the decision tables named on demand lines and the `manure_demand` action.
+- [`chem_app.ops`](ops.md#chem_appops): application methods.
+
+??? quote "Sources"
+
+    - Reader: [`manure_allocation_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/manure_allocation_read.f90), called from [`main.f90.in`](https://github.com/swat-model/swatplus/blob/62.0.1/src/main.f90.in) after `dtbl_lum_read`
+    - Types: [`manure_allocation_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/manure_allocation_module.f90) (`manure_allocation`, `manure_source_objects`, `manure_demand_objects`)
+    - Daily calculation: [`mallo_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mallo_control.f90), called from [`time_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/time_control.f90)
+    - `manure_demand` action: [`actions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/actions.f90), cross-walk in [`dtbl_lum_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/dtbl_lum_read.f90)
+    - HRU decision table slot: [`hru_dtbl_actions_init.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_dtbl_actions_init.f90)
+    - Output: [`manure_source_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/manure_source_output.f90), [`manure_demand_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/manure_demand_output.f90), called from [`command.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/command.f90)
+
+    | Column | Fortran variable |
+    |--------|------------------|
+    | object line | `mallo%name`, `%rule_typ`, `%src_obs`, `%trn_obs` |
+    | source `manure_typ` | `mallo%src%manure_typ` (index in `mallo%src%fertdb`) |
+    | source `prod_jan` ... `prod_dec` | `mallo%src%prod_mon(1:12)` |
+    | demand `dtbl` | `mallo%trn%dtbl` (index in `mallo%trn%dtbl_num` and `hru%man_trn_dtbl`) |
+    | `manure_demand` `obj_num`, `const`, `option` | `manure_amt%src_obj`, `%app_t_ha`, `%app_method` |

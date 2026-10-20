@@ -1,38 +1,34 @@
 ---
-title: "*.tem (temperature data, alternate extension)"
-description: Temperature time-series file using the .tem extension. Same record layout as a .tmp file.
+title: "*.tem (temperature data, older extension)"
+description: Temperature data file with the .tem extension. Same format and handling as a .tmp file.
 status: review
 verified_against:
   - src/cli_tmeas.f90
+  - src/cli_staread.f90
+  - src/search.f90
+  - src/climate_control.f90
   - src/climate_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-A `*.tem` file is a temperature time-series file with the same record layout as a [`*.tmp`](../input-reference/tmp.md). The `.tem` extension is used by the reference datasets shipped with SWAT+ (for example `refdata/Ames_sub1/ames.tem`) and by some external preprocessors. There is no separate reader for `.tem`. The temperature reader at `src/cli_tmeas.f90` opens whatever filename is supplied; the extension is not inspected.
+`.tem` is an older extension for temperature data files, used by some data sets and preprocessing tools. SWAT+ opens a temperature file by the name given in [`tmp.cli`](cli.md#observed-data-lists) and does not look at the extension, so a `.tem` file is read in the same way as a [`.tmp`](tmp.md) file. SWAT+ Editor writes `.tmp`.
 
-## Source
+The name has to be the same, extension included, in two places:
 
-- Reader: [`src/cli_tmeas.f90`](https://github.com/swat-model/swatplus/blob/main/src/cli_tmeas.f90)
-- Type definition: [`src/climate_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/climate_module.f90), `type climate_measured_data`
+- a line of [`tmp.cli`](../input-reference/cli.md#observed-data-lists), which tells SWAT+ to read the file, and
+- the `tmp` column of [`weather-sta.cli`](cli.md#weather-stacli), which assigns it to a weather station.
 
-The reader is reached only when the filename appears in [`tmp.cli`](../input-reference/cli.md#tmpcli). The `tgage` slot in [`weather-sta.cli`](../input-reference/cli.md#weather-stacli) is matched against the filename listed in `tmp.cli` via the `tmp_n` lookup array, so both files must agree on the string (including the `.tem` extension if used).
+If the `tmp` column names a file that is not listed in [`tmp.cli`](../input-reference/cli.md#observed-data-lists), SWAT+ writes `<name> file not found (tgage)` to `diagnostics.out` and generates the temperatures of that station for the whole run.
 
 ## Format
 
-Identical to a daily `*.tmp` file. List-directed reads, whitespace-separated.
-
-- Line 1: title (skipped).
-- Line 2: column header (skipped). Conventionally `NBYR    TSTEP      LAT     LONG     ELEV`.
-- Line 3: station header (`nbyr`, `tstep`, `lat`, `long`, `elev`).
-- Line 4 onward: one record per day with year, Julian day, daily maximum temperature, daily minimum temperature.
-
-See [`*.tmp`](../input-reference/tmp.md#format) for the field tables.
+The format is that of a [`.tmp` file](tmp.md#format): a title line, a header line, a gauge line with `nbyr`, `tstep`, `lat`, `lon` and `elev`, and one record per day with year, day of year, maximum and minimum temperature in °C. Values of -97 or less mark missing data.
 
 ## Example
 
-`refdata/Ames_sub1/ames.tem` (excerpt):
+`refdata/Ames_sub1/ames.tem` in the SWAT+ repository:
 
 ```
 AME.Tmp
@@ -41,12 +37,24 @@ AME.Tmp
 1900	1	-99	-99
 1900	2	-99	-99
 ...
-1983	185	32.2	10.6
-1983	186	26.7	11.1
+1975	1	4.4	-7.2
+1975	2	5	-7.8
+...
+2020	365	-1.7	-7.8
+2020	366	-2.8	-8.9
 ```
+
+A daily record of 121 years, 1900 to 2020, separated by tabs, which free-format reading accepts. In this data set the `tmp` column of [`weather-sta.cli`](../input-reference/cli.md#weather-stacli) names `ames.tem`, while [`tmp.cli`](../input-reference/cli.md#observed-data-lists) lists `ames.tmp`, which is an empty file. SWAT+ therefore does not find `ames.tem`, never reads it, and generates the temperatures of the Ames run. Listing `ames.tem` in [`tmp.cli`](../input-reference/cli.md#observed-data-lists) instead of `ames.tmp` makes the run use the measured record.
 
 ## Related files
 
-- [`*.tmp`](../input-reference/tmp.md). Same content, alternate extension. The reader is shared.
-- [`tmp.cli`](../input-reference/cli.md#tmpcli). Lists each temperature filename (with whatever extension).
-- [`weather-sta.cli`](../input-reference/cli.md#weather-stacli). The `tgage` column must match a filename entry in `tmp.cli`.
+- [`*.tmp`](tmp.md): the same format; missing values, elevation adjustment and storage are described there.
+- [`tmp.cli`](cli.md#observed-data-lists): lists the temperature files to read.
+- [`weather-sta.cli`](cli.md#weather-stacli): assigns a temperature file to each weather station.
+
+??? quote "Sources"
+
+    - Reader: [`cli_tmeas.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cli_tmeas.f90)
+    - Type definition: `type climate_measured_data` in [`climate_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/climate_module.f90)
+    - Name lookup and the `file not found (tgage)` message: [`cli_staread.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cli_staread.f90), [`search.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/search.f90)
+    - Daily use: [`climate_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/climate_control.f90)

@@ -1,51 +1,59 @@
 ---
 title: Contributing
-description: How to contribute code, bug reports, and documentation to SWAT+.
+description: How to report problems and contribute code or documentation to SWAT+.
 status: review
+verified_against:
+  - swatplus/.github/workflows/test.yml
+  - swatplus/.github/workflows/build.yml
+  - swatplus/CODE_OF_CONDUCT.md
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-## Where work happens
+## Repositories
 
-- **Code**: https://github.com/swat-model/swatplus
-- **Issues**: https://github.com/swat-model/swatplus/issues
-- **Pull requests**: https://github.com/swat-model/swatplus/pulls
-- **Release notes**: https://github.com/swat-model/swatplus/releases
+- Model source: [github.com/swat-model/swatplus](https://github.com/swat-model/swatplus), with [issues](https://github.com/swat-model/swatplus/issues), [pull requests](https://github.com/swat-model/swatplus/pulls) and [releases](https://github.com/swat-model/swatplus/releases).
+- This documentation: [github.com/swat-model/swatplus-documentation](https://github.com/swat-model/swatplus-documentation).
 
-## Reporting a bug
+Questions about using the model are best asked through the [SWAT support page](https://swat.tamu.edu/support/).
+
+## Reporting a problem
 
 Open an issue with:
 
-- the SWAT+ version (`swatplus -v` or the executable filename)
-- the operating system and compiler
-- a minimal project that reproduces the problem (or, if possible, a pointer to one of the reference datasets in `refdata/` plus the changes that trigger the bug)
-- the contents of `simulation.out`, `diagnostics.out`, and `checker.out` from the failed run.
+- the SWAT+ version (shown in the banner at start-up and in the executable name);
+- the operating system and, for your own builds, the compiler;
+- a project that shows the problem, as small as possible (one of the `refdata` datasets with the changes that cause it is ideal);
+- `simulation.out` and `diagnostics.out` from the run.
 
-Bugs that affect water or mass balance, output formats, or input parsing are highest priority.
+## Contributing code
 
-## Submitting a change
+1. Fork `swat-model/swatplus` and create a branch from `main` with a descriptive name (`fix-aquifer-init`, `add-soil-temp-output`).
+2. Build and run your change on the reference datasets before opening a pull request. See [Build with CMake](build-cmake.md) and [Testing](testing.md).
+3. Open a pull request against `main`. Describe what the change does and why, which datasets you ran and how their outputs changed, and any change to input or output files.
+4. Answer review comments on the same branch.
 
-1. **Fork** `swat-model/swatplus` on GitHub.
-2. **Branch** from `main`. Use a descriptive name (`fix-aquifer-init`, `add-soil-temp-output`).
-3. **Build and test locally** before pushing. See [Build from source (CMake)](../developer-guide/build-cmake.md) and [Testing](../developer-guide/testing.md).
-4. **Open a pull request** against `swat-model/swatplus:main`. The PR description should state:
-   - what the change does
-   - why it is needed (link an issue if there is one)
-   - which reference datasets you ran and what changed in their outputs
-   - any new input or output fields and how existing input files should be updated
-5. **Address review comments**. Force-push is acceptable on your branch during review.
+Reviewers look for:
 
-## What reviewers look for
+- a clean build with gfortran and the Intel compilers;
+- unchanged outputs for parts of the model the change does not touch;
+- defaults for new parameters that keep existing results when the parameter is not set;
+- input file changes matched by a SWAT+ Editor change or a note on how to update existing projects;
+- code that follows the [coding conventions](coding-conventions.md).
 
-- Code compiles with both gfortran and ifx (the CI matrix).
-- Reference-dataset outputs are unchanged for unrelated runs (no regression).
-- New parameters have defaults that preserve existing behaviour when not set.
-- Input-file changes are accompanied by SWAT+ Editor changes or a migration note.
-- Style follows [Coding conventions](../developer-guide/coding-conventions.md).
+## Contributing to the documentation
 
-## CI
+The documentation is a MkDocs site in the `swatplus-documentation` repository. Each page states the SWAT+ commit it was checked against in its front matter (`verified_at_commit`), and every statement about model behaviour should come from the source at that commit. Page bodies are written for model users; source file names and variable names go in the collapsed Sources block at the end of each page (`??? quote "Sources"`).
 
-The repository runs GitHub Actions on every pull request. The matrix builds with multiple compilers and runs the scenario tests in `test/`. See `.github/workflows/` for the exact configuration. A red check blocks merging.
+To check a change locally:
 
-## Documentation changes
+```bash
+pip install -r requirements.txt
+mkdocs serve
+```
 
-This documentation site lives at https://github.com/swat-model/swatplus-documentation. Documentation pull requests follow the same workflow as code. Every input-reference and output-reference page is verified against the SWAT+ Fortran source; see [`SOURCE-OF-TRUTH.md`](https://github.com/swat-model/swatplus-documentation/blob/main/wd/SOURCE-OF-TRUTH.md) for the procedure if you are touching one of those pages.
+The site is versioned with [mike](https://github.com/jimporter/mike). Pushing a tag to the documentation repository, named after the SWAT+ version the pages describe (for example `62.0.1`), publishes that version and moves the `latest` alias to it. Earlier versions stay available from the version selector.
+
+??? quote "Sources"
+
+    - CI: [`.github/workflows/test.yml`](https://github.com/swat-model/swatplus/blob/62.0.1/.github/workflows/test.yml) and [`.github/workflows/build.yml`](https://github.com/swat-model/swatplus/blob/62.0.1/.github/workflows/build.yml) in the source repository.
+    - Documentation build and deployment: `mkdocs.yml`, `requirements.txt` and `.github/workflows/deploy.yml` in the documentation repository.

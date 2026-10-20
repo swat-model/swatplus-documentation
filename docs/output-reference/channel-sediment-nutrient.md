@@ -1,193 +1,301 @@
 ---
 title: Channel and sediment outputs
-description: The channel_*.txt (legacy) and channel_sd_*.txt (sd_channel) files. Columns for routed flow, sediment, and nutrients.
+description: Channel flow, sediment and nutrient files (channel_sd, channel_sdmorph, sd_chanbud), the sediment budget files new in 62.0.1 (ch_sedbud, chanbud_order, sedbud), their basin sums, and the legacy channel files.
 status: review
 verified_against:
-  - src/channel_output.f90
+  - src/header_sd_channel.f90
+  - src/header_write.f90
+  - src/header_channel.f90
   - src/sd_channel_output.f90
-  - src/basin_channel_output.f90
+  - src/sd_chanmorph_output.f90
+  - src/sd_chanbud_output.f90
+  - src/ch_sedbud_output.f90
+  - src/chord_sedbud_output.f90
+  - src/basin_sedbud_output.f90
   - src/basin_sdchannel_output.f90
-  - src/channel_module.f90
-  - src/water_body_module.f90
+  - src/basin_chanmorph_output.f90
+  - src/basin_chanbud_output.f90
+  - src/basin_channel_output.f90
+  - src/channel_output.f90
+  - src/sd_channel_module.f90
   - src/hydrograph_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/water_body_module.f90
+  - src/channel_module.f90
+  - src/basin_module.f90
+  - src/sd_channel_control3.f90
+  - src/sd_channel_sediment3.f90
+  - src/ch_temp.f90
+  - src/hru_control.f90
+  - src/res_control.f90
+  - src/wetland_control.f90
+  - src/command.f90
+  - src/time_control.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-SWAT+ supports two channel-routing implementations, each with its own output set.
+These files report what happens in the channel network: flow, sediment and nutrients entering, leaving and stored in each channel, channel geometry and erosion, and sediment budgets for each channel, each stream order and the whole basin.
 
-- **Legacy channel** (`channel_*.txt`, `basin_cha_*.txt`). One row per channel object, holding inflow / outflow of water, sediment, sediment by particle size, nutrients, pesticides, bacteria, and conservative metals.
-- **sd_channel** (`channel_sd_*.txt`, `basin_sd_cha_*.txt`). Storage-and-discharge routing. Three blocks of columns: a `water_body` block (area, precip, evap, seep, storage), followed by an inflow `hyd_output` record and an outflow `hyd_output` record.
+SWAT+ routes channels defined in the channel files of the SWAT+ Editor (see [Channels](../input-reference/cha.md) and [channel-lte](../input-reference/sd-channel.md)). Two rows of [`print.prt`](../input-reference/print-prt.md) control all of the channel files:
 
-The channel sediment budget and morphology have their own writers (`sd_chanbud_output.f90`, `sd_chanmorph_output.f90`) and produce `*_chanbud_*.txt` and `*_chamorph_*.txt`.
+| [`print.prt`](../input-reference/print-prt.md) row | Files opened |
+|-----------------|--------------|
+| `channel_sd` | `channel_sd_*`, `channel_sdmorph_*`, `sd_chanbud_*`, and the sediment budget files `ch_sedbud_*`, `chanbud_order_*` and `sedbud_*`. With a sub-daily time step and `daily` set to `y`, also `channel_sd_subday.txt`. |
+| `basin_sd_cha` | `basin_sd_cha_*`, `basin_sd_chamorph_*`, `basin_sd_chanbud_*` |
+
+Each `y` in the `daily`, `monthly`, `yearly` or `avann` column of a row opens the matching file. Most files use the suffixes `_day`, `_mon`, `_yr` and `_aa`. The `ch_sedbud` and `chanbud_order` files use `_d`, `_m`, `_y` and `_a`. With `csvout` set to `y`, a `.csv` copy of each file is written as well.
+
+The channel files are opened only when the project has at least one channel, except `sd_chanbud_*`, which is opened whenever its switch is on.
+
+The `channel` and `basin_cha` rows open the legacy channel files described at the end of this page.
+
+## Files at a glance
+
+| File | One row per | Content |
+|------|-------------|---------|
+| `channel_sd_*` | channel | Water surface, storage, inflow and outflow of water, sediment and nutrients, and stream temperature. |
+| `channel_sdmorph_*` | channel | Flow rates, sediment transport and erosion, and channel width, depth and slope. |
+| `sd_chanbud_*` | channel | Sediment and nutrient budget: inflow, outflow, deposition and erosion. |
+| `ch_sedbud_*` | channel | Bank and bed erosion, floodplain deposition, channel size. |
+| `chanbud_order_*` | stream order (1 to 12) | The `ch_sedbud` values summed over all channels of each stream order. |
+| `sedbud_*` | basin (one row) | Basin sediment budget: upland yield, bank and bed erosion, floodplain, reservoir and wetland deposition. |
+| `basin_sd_cha_*` | basin | `channel_sd` summed over all channels. |
+| `basin_sd_chamorph_*` | basin | `channel_sdmorph` summed over all channels. |
+| `basin_sd_chanbud_*` | basin | `sd_chanbud` summed over all channels. |
+| `channel_sd_subday.txt` | channel and time step | Outflow for each sub-daily time step. |
+
+## Leading columns
+
+Files with one row per channel start with seven columns:
+
+| # | Column | Description |
+|---|--------|-------------|
+| 1 | `jday` | Day of the year of the last day in the print step. |
+| 2 | `mon` | Month. |
+| 3 | `day` | Day of the month. |
+| 4 | `yr` | Calendar year. |
+| 5 | `unit` | Channel number. |
+| 6 | `gis_id` | GIS identifier of the channel. |
+| 7 | `name` | Channel name. |
+
+The basin files have the same seven columns with `unit` and `gis_id` set to 1 and the project name in `name`. In `ch_sedbud_*` the same three columns are labelled `ichan`, `ob` and `name`. `chanbud_order_*` has `iord` (the stream order) in place of all three, and `sedbud_*` has only the four date columns.
+
+## channel_sd files
+
+After the leading columns come four values for the water surface, then three blocks of 18 values (storage, inflow, outflow) and a final stream temperature.
+
+| Column | Units | Description |
+|--------|-------|-------------|
+| `area` | ha | Water surface area of the channel. |
+| `precip` | m³ | Precipitation falling on the water surface. |
+| `evap` | m³ | Evaporation from the water surface. |
+| `seep` | m³ | Seepage through the channel bed. |
+
+Each block has the same 18 quantities. The column names end in `_stor`, `_in` or `_out`:
+
+| Quantity | Storage units | Inflow and outflow units | Description |
+|----------|---------------|--------------------------|-------------|
+| `flo` | m³ | m³/s | Water: volume stored, or average flow rate. |
+| `sed` | tons | tons | Sediment. |
+| `orgn` | kg N | kg N | Organic nitrogen. |
+| `sedp` | kg P | kg P | Organic (sediment-attached) phosphorus. |
+| `no3` | kg N | kg N | Nitrate. |
+| `solp` | kg P | kg P | Soluble mineral phosphorus. |
+| `chla` | kg | kg | Chlorophyll a. |
+| `nh3` | kg N | kg N | Ammonium. |
+| `no2` | kg N | kg N | Nitrite. |
+| `cbod` | kg | kg | Carbonaceous biochemical oxygen demand. |
+| `dox` | kg | kg | Dissolved oxygen. |
+| `san` | tons | tons | Sand. |
+| `sil` | tons | tons | Silt. |
+| `cla` | tons | tons | Clay. |
+| `sag` | tons | tons | Small aggregates. |
+| `lag` | tons | tons | Large aggregates. |
+| `grv` | tons | tons | Gravel. |
+| `null` | °C | °C | Water temperature. |
+
+The 18th column of each block is headed `null` and has no unit in the units row. It is the water temperature of the stored water, the inflow and the outflow. The outflow temperature is the stream temperature from the heat balance calculation.
+
+The last column, `water_temp` (°C), is not the heat balance temperature. It is $5 + 0.75\,\bar{T}$, where $\bar{T}$ is the mean air temperature of the day at the weather station of the channel that was routed last. All channels therefore show the same value for a given day. Use the `null` column of the outflow block for the stream temperature of each channel.
+
+### Aggregation
+
+- The storage block is the storage at the end of the print step, also in the monthly, yearly and average annual files.
+- Inflow and outflow rates (`flo_in`, `flo_out`) are averaged over the days of the step. All other inflow and outflow quantities are totals for the step; the average annual file gives the average yearly total.
+- Water temperatures in the inflow and outflow blocks are flow-weighted averages.
+- `precip`, `evap` and `seep` are totals for the step. `area` is the average daily area in the monthly and yearly files.
+
+## channel_sdmorph files
+
+| Column | Units | Description |
+|--------|-------|-------------|
+| `flo_in` | m³/s | Inflow rate. |
+| `geo_bf` | m³/s | Base flow from the geomorphic aquifer method. |
+| `flo_out` | m³/s | Outflow rate. |
+| `peakr` | m³/s | Peak flow rate. |
+| `sed_in` | tons | Sediment entering the channel. |
+| `sed_out` | tons | Sediment leaving the channel. |
+| `washld` | tons | Wash load (suspended sediment) leaving the channel. |
+| `bedld` | tons | Sediment deposited in the channel. |
+| `dep` | tons | Sediment deposited on the floodplain. |
+| `deg_btm` | tons | Bed erosion. |
+| `deg_bank` | tons | Bank erosion. |
+| `hc_sed` | tons | Sediment from gully headcut erosion. |
+| `width` | m | Bankfull top width at the end of the step. |
+| `depth` | m | Bankfull depth at the end of the step. |
+| `slope` | m/m | Channel slope at the end of the step. |
+| `deg_btm` | m | Bed downcutting. |
+| `deg_bank` | m | Bank widening. |
+| `hc_len` | m | Headcut retreat. |
+| `flo_in_mm` | mm | Inflow as a depth over the channel's drainage area. |
+| `aqu_in_mm` | mm | Geomorphic base flow as a depth over the drainage area. |
+| `flo_out_mm` | mm | Outflow as a depth over the drainage area. |
+| `sed_stor` | tons | Sediment stored in the channel. |
+| `n_tot` | kg N | Total nitrogen leaving the channel (organic N, nitrate, ammonium and nitrite). |
+| `p_tot` | kg P | Total phosphorus leaving the channel (organic and soluble P). |
+| `dep_bf` | m | Flow depth at bankfull. |
+| `velav_bf` | m/s | Average velocity at bankfull. |
+
+`deg_btm` and `deg_bank` each appear twice, first in tons and then in m; read them by position. The units row labels `n_tot` as kg_N, `p_tot` as kg_P and `dep_bf` as m/s; `dep_bf` is a depth in m.
+
+In the monthly and yearly files, the flow rates, `sed_stor`, `n_tot`, `p_tot`, `dep_bf` and `velav_bf` are daily averages; the tons, mm and m erosion columns are totals; and `width`, `depth` and `slope` are the values at the end of the step. The average annual file gives daily averages for the first group and average yearly totals for the second.
+
+## sd_chanbud files
+
+| Column | Description |
+|--------|-------------|
+| `in_sed`, `out_sed` | Sediment entering and leaving the channel. |
+| `fp_dep` | Sediment deposited on the floodplain. |
+| `ch_dep` | Sediment deposited in the channel. |
+| `bank_ero` | Bank erosion. |
+| `bed_ero` | Bed erosion. |
+| `in_no3`, `in_orgn`, `out_no3`, `out_orgn` | Nitrate and organic nitrogen entering and leaving. |
+| `fp_no3` | Nitrate lost on the floodplain. |
+| `bank_no3`, `bed_no3` | Nitrate gained from bank and bed erosion. |
+| `fp_orgn`, `ch_orgn` | Organic nitrogen deposited on the floodplain and in the channel. |
+| `bank_orgn`, `bed_orgn` | Organic nitrogen gained from bank and bed erosion. |
+| `in_solp`, `in_orgp`, `out_solp`, `out_orgp` | Soluble and organic phosphorus entering and leaving. |
+| `fp_solp` | Soluble phosphorus lost on the floodplain. |
+| `bank_solp`, `bed_solp` | Soluble phosphorus gained from bank and bed erosion. |
+| `fp_orgp`, `ch_orgp` | Organic phosphorus deposited on the floodplain and in the channel. |
+| `bank_orgp`, `bed_orgp` | Organic phosphorus gained from bank and bed erosion. |
+| `no3_orgn` | Nitrate converted to organic nitrogen in the channel. |
+| `solp_orgp` | Soluble phosphorus converted to organic phosphorus in the channel. |
+
+The sediment columns (`in_sed` to `bed_ero`) are in tons. The nitrogen and phosphorus columns are in kg, although the units row shows tons for every column. All values are totals for the print step; the average annual file gives the average yearly total.
+
+## Sediment budget files
+
+These three file groups are new in 62.0.1. They use the same channel erosion and deposition values, summed in different ways. Their rows are written in free format (list-directed), so column widths vary.
+
+### ch_sedbud files (per channel)
+
+| Column | Units | Description |
+|--------|-------|-------------|
+| `num` | - | Number of days in the step on which the channel had inflow. |
+| `wid` | m | Bankfull width, summed over those days. |
+| `dep` | m | Bankfull depth, summed over those days. |
+| `fp_km2` | km² | Floodplain area, summed over those days. The floodplain is taken as five times the channel width over the channel length. |
+| `ebank_t` | tons | Bank erosion. |
+| `ebtm_t` | tons | Bed erosion. |
+| `ebank_m` | m | Bank erosion as a width. |
+| `ebtm_m` | m | Bed erosion as a depth. |
+| `fp_t` | tons | Floodplain deposition. |
+| `fp_mm` | mm | Floodplain deposition as a depth over the floodplain, assuming a bulk density of 1 t/m³. |
+
+`wid`, `dep` and `fp_km2` are summed over days, so divide them by `num` to get the average width, depth and floodplain area in the daily, monthly and yearly files. In the average annual file the sums are divided by the number of printed years but `num` is not, so the ratio is too small by that factor.
+
+### chanbud_order files (per stream order)
+
+One row for each stream order from 1 to 12 in every step, with the `ch_sedbud` columns summed over all channels of that order. `num` is then the number of channel-days with inflow, and `wid` / `num` and `dep` / `num` give the average width and depth for the order. `fp_mm` is summed over channels and is not a depth for the order as a whole. The stream order of each channel comes from the `order` column of the channel database.
+
+### sedbud files (basin)
+
+| Column | Units | Description |
+|--------|-------|-------------|
+| `upland_t` | tons | Sediment yield from all HRUs. |
+| `ebank_t` | tons | Bank erosion in all channels. |
+| `ebtm_t` | tons | Bed erosion in all channels. |
+| `fp_t` | tons | Floodplain deposition in all channels. |
+| `res_dep_t` | tons | Net deposition in all reservoirs (sediment in minus sediment out). |
+| `wet_dep_t` | tons | Net deposition in all wetlands. |
+
+Deposition inside the channels themselves is not part of this file; it is in the `ch_dep` column of `sd_chanbud`.
+
+### Print timing
+
+The three sediment budget file groups start after the `nyskip` warm-up years, like the other files. Their daily files have a row for every day after that and do not follow the daily print window (`day_start` to `day_end`, `interval`) in [`print.prt`](../input-reference/print-prt.md).
+
+## Basin files
+
+`basin_sd_cha_*`, `basin_sd_chamorph_*` and `basin_sd_chanbud_*` have the same columns as `channel_sd_*`, `channel_sdmorph_*` and `sd_chanbud_*`, with one row for the basin. Each value is the sum over all channels in the basin. Flows are summed along the whole network, so `flo_out` in `basin_sd_cha` is not the flow leaving the basin; use the outlet channel's row in `channel_sd` for that. `basin_sd_cha` has no `water_temp` column, and in `basin_sd_chamorph` the `width`, `depth` and `slope` columns are those of the last channel.
+
+## Sub-daily outflow
+
+When the simulation uses a sub-daily time step and the `channel_sd` row has `y` in `daily`, `channel_sd_subday.txt` has one row per channel per time step: `jday`, `mon`, `day`, `yr`, `unit`, `gis_id`, `tstep` (time step number), `name` and `flo_out`. `flo_out` is the volume of water (m³) leaving the channel in that time step, although the header gives m³/s. The units row and the header of the `.csv` copy are those of the `channel_sdmorph` file.
 
 ## Legacy channel files
 
-### Source
-
-- Writer: [`src/channel_output.f90`](https://github.com/swat-model/swatplus/blob/main/src/channel_output.f90), units 2480 (day), 2481 (mon), 2482 (yr), 2483 (aa).
-- Basin sum: [`src/basin_channel_output.f90`](https://github.com/swat-model/swatplus/blob/main/src/basin_channel_output.f90).
-- File opening: [`src/header_channel.f90`](https://github.com/swat-model/swatplus/blob/main/src/header_channel.f90).
-- Record type: [`src/channel_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/channel_module.f90), `type ch_output`.
-
-### Format
-
-Each line is the seven leading columns (jday, mon, day, yr, unit, gis_id, name), then the 60 fields of `ch_output` in declaration order.
-
-| # | Column | Units | Description |
-|---|--------|-------|-------------|
-| 1 | flo_in | ha-m | streamflow into reach |
-| 2 | flo_out | ha-m | streamflow out of reach |
-| 3 | evap | m^3/s | rate of water loss by evaporation |
-| 4 | tloss | m^3/s | rate of transmission loss through streambed |
-| 5 | sed_in | tons | sediment transported into reach |
-| 6 | sed_out | tons | sediment transported out of reach |
-| 7 | sed_conc | mg/L | sediment concentration in reach |
-| 8 | orgn_in | kg N | organic nitrogen in |
-| 9 | orgn_out | kg N | organic nitrogen out |
-| 10 | orgp_in | kg P | organic phosphorus in |
-| 11 | orgp_out | kg P | organic phosphorus out |
-| 12 | no3_in | kg N | nitrate in |
-| 13 | no3_out | kg N | nitrate out |
-| 14 | nh4_in | kg | ammonium in |
-| 15 | nh4_out | kg | ammonium out |
-| 16 | no2_in | kg | nitrite in |
-| 17 | no2_out | kg | nitrite out |
-| 18 | solp_in | kg P | soluble phosphorus in |
-| 19 | solp_out | kg P | soluble phosphorus out |
-| 20 | chla_in | kg | chlorophyll-a in |
-| 21 | chla_out | kg | chlorophyll-a out |
-| 22 | cbod_in | kg | carbonaceous BOD in |
-| 23 | cbod_out | kg | carbonaceous BOD out |
-| 24 | dis_in | kg | dissolved oxygen in |
-| 25 | dis_out | kg | dissolved oxygen out |
-| 26 | solpst_in | mg pst | soluble pesticide in |
-| 27 | solpst_out | mg pst | soluble pesticide out |
-| 28 | sorbpst_in | mg pst | sorbed pesticide in |
-| 29 | sorbpst_out | mg pst | sorbed pesticide out |
-| 30 | react | mg pst | pesticide loss by reaction in water |
-| 31 | volat | mg | pesticide loss by volatilization |
-| 32 | setlpst | mg pst | pesticide settling from water to bed |
-| 33 | resuspst | mg | pesticide resuspended from bed |
-| 34 | difus | mg | pesticide diffused from water to bed |
-| 35 | reactb | mg | pesticide reaction loss in bed |
-| 36 | bury | mg | pesticide buried |
-| 37 | sedpest | mg | pesticide in bed sediment |
-| 38 | bacp | # cfu/100mL | persistent bacteria out |
-| 39 | baclp | # cfu/100mL | less persistent bacteria out |
-| 40 | met1 | kg | conservative metal #1 out |
-| 41 | met2 | kg | conservative metal #2 out |
-| 42 | met3 | kg | conservative metal #3 out |
-| 43 | sand_in | tons | sand in |
-| 44 | sand_out | tons | sand out |
-| 45 | silt_in | tons | silt in |
-| 46 | silt_out | tons | silt out |
-| 47 | clay_in | tons | clay in |
-| 48 | clay_out | tons | clay out |
-| 49 | smag_in | tons | small aggregate in |
-| 50 | smag_out | tons | small aggregate out |
-| 51 | lag_in | tons | large aggregate in |
-| 52 | lag_out | tons | large aggregate out |
-| 53 | grvl_in | tons | gravel in |
-| 54 | grvl_out | tons | gravel out |
-| 55 | bnk_ero | tons | bank erosion |
-| 56 | ch_deg | tons | channel degradation |
-| 57 | ch_dep | tons | channel deposition |
-| 58 | fp_dep | tons | floodplain deposition |
-| 59 | tot_ssed | mg/L | total suspended sediments |
-
-### Example header
-
-`refdata/Ames_sub1/basin_cha_aa.txt`:
+The `channel` and `basin_cha` rows of [`print.prt`](../input-reference/print-prt.md) open `channel_*.txt` and `basin_cha_*.txt` for legacy channel objects (`chan` in [`object.cnt`](../input-reference/object-cnt.md)). Their 59 columns cover flow, sediment, nutrients, pesticides, bacteria, metals, sediment size classes and erosion:
 
 ```
- demo                      SWAT+ 2024-08-27        MODULAR Rev 2024.61.0.1-33-g68b1328
-  jday    mon   day   yr    unit  gis_id  name                 flo_in        flo_out            evap        tloss           sed_in        sed_out       sed_conc       orgn_in        orgn_out         orgp_in        orgp_out        no3_in        no3_out          nh4_in        nh4_out         no2_in        no2_out       solp_in       solp_out         chla_in       chla_out        cbod_in       cbod_out         dis_in        dis_out    solpst_in      solpst_out    sorbpst_in     sorbpst_out       react             volat     setlpst          resuspst       difus         reactb          bury            sedpest             bacp          baclp           met1           met2           met3        sand_in       sand_out        silt_in       silt_out        clay_in       clay_out        smag_in       smag_out         lag_in        lag_out        grvl_in       grvl_out        bnk_ero         ch_deg         ch_dep         fp_dep       tot_ssed
-                                                                 ha-m           ha-m            ha-m         ha-m             tons           tons           mg/L           kgN             kgN             kgP             kgP           kgN            kgN              kg             kg             kg             kg           kgP            kgP              kg             kg             kg             kg             kg             kg       mg_pst          mg_pst        mg_pst          mg_pst      mg_pst                mg      mg_pst                mg      mg_pst             mg            mg                 mg
+flo_in flo_out evap tloss sed_in sed_out sed_conc orgn_in orgn_out orgp_in orgp_out
+no3_in no3_out nh4_in nh4_out no2_in no2_out solp_in solp_out chla_in chla_out
+cbod_in cbod_out dis_in dis_out solpst_in solpst_out sorbpst_in sorbpst_out react
+volat setlpst resuspst difus reactb bury sedpest bacp baclp met1 met2 met3 sand_in
+sand_out silt_in silt_out clay_in clay_out smag_in smag_out lag_in lag_out grvl_in
+grvl_out bnk_ero ch_deg ch_dep fp_dep tot_ssed
 ```
 
-The header reports `evap` and `tloss` units as `ha-m`, but `ch_output` carries them as `m^3/s` (rate). The unit row in the file does not match the source comment.
+SWAT+ 62.0.1 does not route legacy channels (the routing call is disabled), so these files contain only zeros. Projects built with the SWAT+ Editor use the channels described above.
 
-## sd_channel files
+## Example
 
-### Source
-
-- Writer: [`src/sd_channel_output.f90`](https://github.com/swat-model/swatplus/blob/main/src/sd_channel_output.f90), units 2500 (day), 2501 (mon), 2502 (yr), 2503 (aa); subdaily on unit 2508.
-- Basin sum: [`src/basin_sdchannel_output.f90`](https://github.com/swat-model/swatplus/blob/main/src/basin_sdchannel_output.f90).
-- File opening: [`src/header_sd_channel.f90`](https://github.com/swat-model/swatplus/blob/main/src/header_sd_channel.f90).
-- Record types: [`src/water_body_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_body_module.f90), `type water_body`, and [`src/hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/hydrograph_module.f90), `type hyd_output`.
-
-### Format
-
-Each record is the seven leading columns, then four blocks of fields written in this order by `sd_channel_output.f90`:
-
-```fortran
-write (2500,100) time%day, time%mo, time%day_mo, time%yrc, ichan, ob(iob)%gis_id, ob(iob)%name, &
-  ch_wat_d(ichan)%area_ha, ch_wat_d(ichan)%precip, ch_wat_d(ichan)%evap, ch_wat_d(ichan)%seep, &
-  ch_stor(ichan), ch_in_d(ichan), ch_out_d(ichan), wtemp
-```
-
-**Block 1: water body status (4 fields).**
-
-| # | Column | Units | Description |
-|---|--------|-------|-------------|
-| 1 | area | ha | channel water surface area |
-| 2 | precip | m^3 | precipitation on water surface |
-| 3 | evap | m^3 | evaporation from water surface |
-| 4 | seep | m^3 | seepage from streambed |
-
-**Block 2: channel storage `ch_stor` (one `hyd_output` record, 18 fields).** These are the `_stor` columns in the file header.
-
-**Block 3: inflow `ch_in_d` (one `hyd_output` record, 18 fields).** These are the `_in` columns.
-
-**Block 4: outflow `ch_out_d` (one `hyd_output` record, 18 fields).** These are the `_out` columns.
-
-**Block 5: water temperature `wtemp`** (deg C), one trailing scalar.
-
-The 18 fields of `hyd_output`, in declaration order:
-
-| Field | Units | Description |
-|-------|-------|-------------|
-| flo | m^3 (storage), m^3/s (in / out flow rate) | volume or flow rate |
-| sed | metric tons | sediment |
-| orgn | kg N | organic N |
-| sedp | kg P | organic P |
-| no3 | kg N | NO3-N |
-| solp | kg P | soluble P |
-| chla | kg | chlorophyll-a |
-| nh3 | kg N | NH3 |
-| no2 | kg N | NO2 |
-| cbod | kg | carbonaceous BOD |
-| dox | kg | dissolved oxygen |
-| san | tons | detached sand |
-| sil | tons | detached silt |
-| cla | tons | detached clay |
-| sag | tons | detached small aggregate |
-| lag | tons | detached large aggregate |
-| grv | tons | gravel |
-| temp | deg C | temperature |
-
-The line ends with `wtemp` after the `out` block.
-
-### Example header
-
-`refdata/Ames_sub1/basin_sd_cha_aa.txt`:
+The columns of every `chanbud_order_*` file:
 
 ```
- demo                      SWAT+ 2024-08-27        MODULAR Rev 2024.61.0.1-33-g68b1328
-   jday   mon   day    yr     unit   gis_id   name                  area         precip           evap           seep          flo_stor       sed_stor      orgn_stor      sedp_stor       no3_stor      solp_stor      chla_stor       nh3_stor       no2_stor      cbod_stor       dox_stor       san_stor       sil_stor       cla_stor       sag_stor       lag_stor       grv_stor           null         flo_in         sed_in        orgn_in        sedp_in         no3_in        solp_in        chla_in         nh3_in         no2_in        cbod_in         dox_in         san_in         sil_in         cla_in         sag_in         lag_in         grv_in           null        flo_out        sed_out       orgn_out       sedp_out        no3_out       solp_out       chla_out        nh3_out        no2_out       cbod_out        dox_out        san_out        sil_out        cla_out        sag_out        lag_out        grv_out           null
-                                                                      ha            m^3            m^3            m^3             m^3           tons            kgN            kgP            kgN            kgP             kg            kgN            kgN             kg             kg           tons           tons           tons           tons           tons           tons                         m^3/s           tons            kgN            kgP            kgN            kgP             kg            kgN            kgN             kg             kg           tons           tons           tons           tons           tons           tons                         m^3/s           tons            kgN            kgP            kgN            kgP             kg            kgN            kgN             kg             kg           tons           tons           tons           tons           tons           tons
+jday  mon  day  yr  iord  num  wid  dep  fp_km2  ebank_t  ebtm_t  ebank_m  ebtm_m  fp_t  fp_mm
 ```
 
-Each block ends with a `null`-labelled column. That column is the `temp` field of `hyd_output`. The writer passes `ch_in_d(ichan)`, `ch_out_d(ichan)`, and `ch_stor(ichan)` as whole records, so the 18th field of each block is `temp`. The basin-wide water temperature is the trailing `wtemp` scalar written after the outflow block.
+Take 40 first-order channels, each 5 m wide, that have flow on every day of a 10-year print period. In `chanbud_order_y.txt` the row with `iord` 1 has `num` = 40 × 365 = 14,600 and `wid` = 73,000, so `wid` / `num` gives the 5 m average width. In `chanbud_order_a.txt` the same row has `num` = 146,000 (the count over all ten years) and `wid` = 73,000 (the ten-year sum divided by 10), so the average width is 10 × `wid` / `num`.
 
-## Channel sediment budget and morphology
-
-- `sd_chanbud_*.txt`. Sediment budget per channel: bank erosion, bed erosion, deposition. Writer: `src/sd_chanbud_output.f90`. Basin sum in `src/basin_chanbud_output.f90`.
-- `sd_chamorph_*.txt`. Channel morphology: width, depth, slope. Writer: `src/sd_chanmorph_output.f90`. Basin sum in `src/basin_chanmorph_output.f90`.
+The reference outputs in `refdata/Ames_sub1` of the SWAT+ repository were written by revision 61.0.1 and contain none of the sediment budget files.
 
 ## Related files
 
-- [Aquifer, reservoir, plant outputs](../output-reference/aquifer-reservoir-plant.md).
-- [Water balance outputs](../output-reference/water-balance.md).
+- [`print.prt`](../input-reference/print-prt.md): switches each file on or off.
+- [Channels](../input-reference/cha.md) and [channel-lte](../input-reference/sd-channel.md): channel inputs, including the stream `order` column.
+- [Water balance outputs](water-balance.md): the landscape water that reaches the channels.
+- [Aquifer, reservoir, plant outputs](aquifer-reservoir-plant.md): reservoir and wetland files.
+- [Output naming convention](naming-convention.md): all output files.
+
+??? quote "Sources"
+
+    - File opening and headers: [`header_sd_channel.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_sd_channel.f90), [`header_write.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_write.f90), [`header_channel.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_channel.f90)
+    - Header and record types: [`sd_channel_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_channel_module.f90), [`hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hydrograph_module.f90), [`water_body_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_body_module.f90), [`channel_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/channel_module.f90), `basin_sediment_budget` in [`basin_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_module.f90)
+    - Channel writers: [`sd_channel_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_channel_output.f90), [`sd_chanmorph_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_chanmorph_output.f90), [`sd_chanbud_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_chanbud_output.f90)
+    - Sediment budget writers: [`ch_sedbud_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_sedbud_output.f90), [`chord_sedbud_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/chord_sedbud_output.f90), [`basin_sedbud_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_sedbud_output.f90)
+    - Basin writers: [`basin_sdchannel_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_sdchannel_output.f90), [`basin_chanmorph_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_chanmorph_output.f90), [`basin_chanbud_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_chanbud_output.f90), [`basin_channel_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_channel_output.f90)
+    - Values: [`sd_channel_control3.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_channel_control3.f90), [`sd_channel_sediment3.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_channel_sediment3.f90), [`ch_temp.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_temp.f90); upland, reservoir and wetland terms in [`hru_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_control.f90), [`res_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_control.f90), [`wetland_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wetland_control.f90)
+    - Call order: [`command.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/command.f90)
+
+    | File | Header type | Record |
+    |------|-------------|--------|
+    | `channel_sd_*` | `ch_wbod_hdr`, `hyd_stor_hdr`, `hyd_in_hdr`, `hyd_out_hdr`, `wtmp_hdr` | `ch_wat_*`, `ch_stor`, `ch_in_*`, `ch_out_*`, `wtemp` |
+    | `channel_sdmorph_*` | `sdch_hdr` | `chsd_*` (`sd_ch_output`) |
+    | `sd_chanbud_*` | `sdch_bud_hdr` | `ch_sed_bud*` (`channel_sediment_budget_output`) |
+    | `ch_sedbud_*` | `ch_sedbud_hdr` | `ch_morph*` (`channel_morphology_output`) |
+    | `chanbud_order_*` | `ch_bud_order_hdr` | `ch_morph_ord*` |
+    | `sedbud_*` | `ch_sed_bud_hdr` | `bsn_sedbud*` (`basin_sediment_budget`) |
+    | `channel_sd_subday.txt` | `sdch_hdr_subday` | `ob%hyd_flo(1,ii)` |
+
+    | Column | Fortran variable |
+    |--------|------------------|
+    | `geo_bf` | `sd_ch_output%aqu_in` |
+    | `hc_len` | `sd_ch_output%hc_m` |
+    | `flo_out_mm` | `sd_ch_output%flo_mm` |
+    | second `deg_btm`, `deg_bank` | `deg_btm_m`, `deg_bank_m` |
+    | `null` (each block) | `hyd_output%temp` |
+    | `water_temp` | module variable `wtemp` |
+    | `ob` (`ch_sedbud`) | `ob(iob)%gis_id` |

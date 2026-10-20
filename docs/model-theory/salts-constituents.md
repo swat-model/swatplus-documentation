@@ -1,147 +1,194 @@
 ---
 title: Salts and Constituents
-description: Salt ion and trace constituent transport, chemistry, and effect on plants in SWAT+.
+description: Transport, equilibrium chemistry and plant effects of salt ions, and transport, reactions and sorption of selenium and boron in SWAT+.
 status: review
+verified_against:
+  - src/salt_lch.f90
+  - src/salt_chem_hru.f90
+  - src/salt_chem_soil_single.f90
+  - src/salt_data_module.f90
+  - src/salt_plant_read.f90
+  - src/salt_uptake.f90
+  - src/salt_uptake_read.f90
+  - src/salt_roadsalt.f90
+  - src/pl_waterup.f90
+  - src/pl_biomass_gro.f90
+  - src/cs_lch.f90
+  - src/cs_rctn_hru.f90
+  - src/se_reactions_soil.f90
+  - src/cs_sorb_hru.f90
+  - src/cs_reactions_read.f90
+  - src/aqu_1d_control.f90
+  - src/input_file_module.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Overview
 
-SWAT+ tracks two optional families of conservative-but-reactive constituents:
+SWAT+ can simulate two optional groups of dissolved substances, both listed in [`constituents.cs`](../input-reference/cs.md#constituentscs):
 
-- Salt ions (`rtb salt`): SO4, Ca, Mg, Na, K, Cl, CO3, HCO3 (eight ions)
-- Trace constituents (`rtb cs`): SeO4, SeO3, boron
+- Salt ions: the eight major ions sulfate (SO₄), calcium (Ca), magnesium (Mg), sodium (Na), potassium (K), chloride (Cl), carbonate (CO₃) and bicarbonate (HCO₃). In soil and aquifers they take part in mineral precipitation and dissolution and in cation exchange, and soil salinity can reduce plant growth.
+- Constituents: selenate (SeO₄), selenite (SeO₃) and boron. Selenium species react in the soil (reduction, release from shale), and all three sorb to soil.
 
-Both families share the same flow paths as nitrate: surface runoff, lateral flow, tile drainage, percolation, plant uptake, rainfall and dry deposition, irrigation, and fertiliser/amendment inputs. Salt ions are subject to equilibrium chemistry (precipitation-dissolution of CaCO3, MgCO3, CaSO4, MgSO4, NaCl and cation exchange between Na, Ca, Mg, K). Selenium and boron use simple linear sorption and a first-order reaction term. Salinity stress can reduce crop water uptake.
+Both groups move with water along the same paths as nitrate: surface runoff, lateral flow, tile flow and percolation in the soil profile, then through aquifers, channels, reservoirs and wetlands. Inputs come from initial conditions, rain and dry deposition, fertiliser, irrigation, urban runoff and, for salts, road salt.
 
-These modules are active only when their respective databases are present, controlled by `cs_db%num_salts` and `cs_db%num_cs` (set during `cs_read_*` setup).
+## Transport in soil water
 
-## Process equations
+Salt ions and constituents are transported in each layer with the nitrate leaching equations, including anion exclusion. For each ion or constituent $m$ in a layer:
 
-### Soil-water transport
+$$
+C_m = \frac{M_m}{w}\left[1 - \exp\!\left(\frac{-w}{(1 - \theta_e)\,SAT}\right)\right]
+$$
 
-For both salts and trace constituents the layer-level transport routine mirrors `nut_nlch.f90`. For each salt ion (or cs species) `m`:
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $C_m$ | concentration in water leaving the layer | kg/ha per mm | |
+| $M_m$ | mass in the layer | kg/ha | |
+| $w$ | percolation plus lateral flow, plus surface runoff for the top layer and tile flow for the drained layer | mm | |
+| $\theta_e$ | fraction of porosity from which anions are excluded | fraction | `anion_excl` in [`soils.sol`](../input-reference/sol.md) |
+| $SAT$ | water content at saturation | mm | |
 
-```
-vv = perc + flat + (surfq if layer 1) + (qtile if tile layer)
-co = mass * (1 - exp(-vv / ul)) / vv
-surq_mass  = co * surfq             # layer 1 only
-latq_mass  = co * flat
-tile_mass  = co * qtile             # at tile layer
-perc_mass  = co * prk               # next layer or out of profile
-```
+Percolation, tile flow and lateral flow below the top layer remove mass at concentration $C_m$. Surface runoff and lateral flow from the top layer remove mass at $\beta_N C_m$, where $\beta_N$ is the nitrate percolation coefficient `n_perc` in [`parameters.bsn`](../input-reference/parameters-bsn.md) (adjusted per HRU by calibration). Percolation moves mass to the next layer and out of the bottom of the profile to the aquifer. When gwflow is active with solute transport, groundwater discharging into the soil profile also adds mass.
 
-Lateral, tile, and percolation are first-order in mobile water with porosity `ul`. No partition coefficient is applied to salt ions; sorbed selenium and boron use `cs_sorb_hru.f90`. Source: `salt_lch.f90`, `cs_lch.f90`.
+## Salt chemistry
 
-### Salt chemistry in soil
+In each soil layer and in each aquifer, the dissolved ions are brought into equilibrium with five minerals and with the exchange sites of the soil:
 
-`salt_chem_hru.f90` and `salt_chem_soil_single.f90` solve equilibrium speciation per layer using:
+- Precipitation and dissolution of calcite (CaCO₃), magnesite (MgCO₃), gypsum (CaSO₄), epsomite (MgSO₄) and halite (NaCl). A mineral dissolves when the ion activity product is below its solubility product and precipitates when above it.
+- Activity coefficients from the ionic strength $I$ of the solution: the extended Debye-Hückel equation for $I \le 0.1$ mol/L and the Davies equation above. For $I \ge 5$ mol/L the Davies equation is evaluated at $I = 0.5$.
+- Cation exchange among Ca, Mg, Na and K.
 
-- Activity coefficients via ionic strength (Davies / extended Debye-Huckel form)
-- Precipitation-dissolution of five minerals: CaCO3 (Ksp = 3.07e-9), MgCO3 (4.79e-6), CaSO4 (7.89e-5), MgSO4 (7.24e-3), NaCl (37.3)
-- Complexation reactions (CaCO3, MgCO3, CaSO4, MgSO4, NaCl)
-- Cation exchange between Na, Ca, Mg, K through `cationexchange`
+The calculation iterates until concentrations converge. The solubility products are fixed in the code:
 
-These run iteratively until ion concentrations converge. The same scheme is applied to the aquifer in `salt_chem_aqu.f90` using a separate set of Ksp values (currently the same defaults).
+| Mineral | Solubility product |
+|---|---|
+| CaCO₃ | 3.0702 × 10⁻⁹ |
+| MgCO₃ | 4.7937 × 10⁻⁶ |
+| CaSO₄ | 7.888 × 10⁻⁵ |
+| MgSO₄ | 7.244 × 10⁻³ |
+| NaCl | 37.3 |
 
-### Salinity stress on plants
+## Salinity stress on plants
 
-When `salt_tol_sim = 1` and at least one salt ion is simulated, `pl_waterup.f90` computes a salinity reduction factor per layer using the FAO yield-vs-ECe relationship:
+When the stress option in `salt_plants` is on and salts are simulated, each rooted soil layer gets a reduction factor from the FAO crop salt tolerance relation:
 
-```
-soil_TDS_sat = sum(soil_salt_conc) at saturation
-soil_ECe = soil_TDS_sat / salt_tds_ec
-if (soil_ECe > a):
-    reduc_salt = (100 - b * (soil_ECe - a)) / 100
-```
+$$
+f_{salt} =
+\begin{cases}
+1 & EC_e \le a \\
+\dfrac{100 - b\,(EC_e - a)}{100} & EC_e > a
+\end{cases}, \qquad 0 \le f_{salt} \le 1
+$$
 
-`a` is the salt tolerance threshold (dS/m), `b` is the slope (yield loss per dS/m above the threshold). Both are per-plant parameters read from `salt_plants.slt`. If `salt_soil_type = 1` (CaSO4 / gypsiferous), the threshold is increased by 2 dS/m. The minimum `reduc_salt` across rooted layers becomes the plant salt stress factor `strss`.
+$$
+EC_e = \frac{TDS}{k_{EC}}
+$$
 
-`salt_effect = 1` applies salinity stress after the other stresses are minimised; `salt_effect = 2` (default) includes it in the joint minimum.
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $EC_e$ | electrical conductivity of the soil water | dS/m | |
+| $TDS$ | sum of the salt ion concentrations in the soil water, scaled by water content | mg/L | |
+| $k_{EC}$ | TDS to EC conversion factor | (mg/L)/(dS/m) | `salt_plants` |
+| $a$ | salinity threshold of the plant | dS/m | `salt_plants`, per plant |
+| $b$ | yield loss per dS/m above the threshold | %/(dS/m) | `salt_plants`, per plant |
 
-### Salt uptake by plants
+For gypsiferous soils (soil type 1 in `salt_plants`) the threshold is raised by 2 dS/m. A plant with $a = 0$ has no salt stress. The smallest factor over the rooted layers is the plant's salt stress.
 
-When `salt_uptake_on = 1`, daily salt removal by plants is read from a user file (`salt_uptake.slt`) and applied through `salt_uptake.f90`. Otherwise no plant uptake of salt occurs.
+Salt stress reduces daily biomass growth. With the "after other stresses" option (`salt_effect = 1`), growth is multiplied by the salt stress after taking the smallest of the water, temperature, nitrogen, phosphorus and aeration stresses. With option 2, salt stress is included in that minimum.
 
-### Trace constituent reactions and sorption
+## Salt uptake by plants
 
-`cs_rctn_hru.f90` applies first-order reactions to SeO4, SeO3, and boron. Coefficients come from `cs_reactions.cs`. `cs_sorb_hru.f90` runs an equilibrium linear sorption between dissolved and solid-phase pools per layer, parameterised by partition coefficients in `cs_data_module.f90`. Constituent uptake follows the nitrate-style uptake routine `cs_uptake.f90`.
+If the file `salt_uptake` is present, each ion is removed from the soil in the amounts it specifies (kg/ha per day), distributed over the layers in proportion to root mass. The first plant of the HRU's plant community is used. Without the file, plants take up no salt.
 
-### Salt and constituent inputs
+## Selenium reactions
 
-- Atmospheric: wet deposition (`salt_rain.f90`, `cs_rain.f90`) and dry deposition (read from `atmodep_salt`, `atmodep_cs`), monthly or annual
-- Fertiliser: salt-bearing fertilisers from `salt_fert.f90`, `cs_fert.f90` (read into `fert_salt`, `fert_cs`)
-- Road salt: `salt_roadsalt.f90`, applied seasonally per HRU
-- Irrigation: salt and cs concentrations in irrigation water (`salt_irrig.f90`, `cs_irrig.f90`)
-- Initial soil conditions: `salt_hru_init.f90`, `cs_hru_init.f90`
+Selenate, selenite and nitrate in each soil layer are solved together each day (fourth-order Runge-Kutta, one-day step). The processes are:
 
-### In-channel and aquifer
+- reduction of selenate to selenite and of selenite to elemental selenium, both first order and slowed by nitrate through the inhibition term $I/(I + C_{NO3})$;
+- oxidation of selenium-bearing shale by oxygen and by nitrate, which releases selenate and consumes nitrate, in proportion to the shale fraction of the soil.
 
-Channels route salt ions through `ch_salt_module.f90` and `ch_salt_output.f90`; constituents through `ch_cs_module.f90` and `ch_cs_output.f90`. Aquifer fluxes are handled in `salt_aquifer.f90`, `salt_chem_aqu.f90`, `cs_aquifer.f90`, `cs_rctn_aqu.f90`, `cs_sorb_aqu.f90`. Reservoirs and wetlands have parallel implementations (`res_salt.f90`, `wet_salt.f90`).
+Rate constants, the inhibition constant, oxygen content and shale fractions are given per soil group in `cs_reactions`. Boron does not react.
 
-## Switches and parameters
+## Sorption of constituents
 
-### Salts
+Selenate, selenite and boron are split between soil water and the soil matrix with a linear partition coefficient:
 
-| File | Field | Default | Effect |
-|------|-------|---------|--------|
-| `salt_module.f90` | `salt_uptake_on` | 0 | 1 = enable user-defined daily salt uptake |
-| `salt_data_module.f90` | `salt_tol_sim` | 0 | 1 = salinity stress on plant water uptake |
-| `salt_data_module.f90` | `salt_soil_type` | 0 | 1 = CaSO4 (gypsiferous), 2 = NaCl |
-| `salt_data_module.f90` | `salt_effect` | 0 | 1 = applied after other stresses, 2 = joint minimum |
-| `salt_data_module.f90` | `salt_tds_ec` | input | TDS-to-EC conversion factor |
-| `salt_data_module.f90` | `Ksp11..Ksp51` | see source | Soil mineral solubility products |
-| `salt_data_module.f90` | `Ksp12..Ksp52` | same defaults | Aquifer mineral solubility products |
-| `salt_plants.slt` | `a`, `b` per plant | input | Salt tolerance threshold and slope |
-| `salt_recall.slt` and other recall files | input | Constituent loads on point sources |
+$$
+M_{sol} = \frac{M_{tot}}{1 + \dfrac{K_d\,\rho_b\,V_{soil}}{V_w}}, \qquad M_{sorb} = M_{tot} - M_{sol}
+$$
 
-### Constituents (cs)
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $M_{tot}$, $M_{sol}$, $M_{sorb}$ | total, dissolved and sorbed mass in the layer | kg | |
+| $K_d$ | partition coefficient for each constituent | L/kg | `cs_reactions` |
+| $\rho_b$ | bulk density | Mg/m³ | |
+| $V_{soil}$, $V_w$ | volumes of soil and of soil water in the layer | m³ | |
 
-| File | Field | Effect |
-|------|-------|--------|
-| `cs_data_module.f90` | partition coefficients | Linear sorption per constituent |
-| `cs_reactions.cs` | first-order rate coefficients | Constituent reaction rates |
-| `cs_uptake.cs` | uptake fractions per plant | Plant uptake of cs |
-| `cs_fert.cs` | constituent loads in fertiliser | Inputs from fertiliser |
-| `cs_irrig.cs` | constituent concentration in irrigation | Inputs from irrigation |
+Aquifers use the same reaction and sorption equations with the aquifer parameters in `cs_reactions`.
 
-## Implementation
+## Inputs
 
-### Salts
+| Source | File |
+|---|---|
+| Initial soil and aquifer content | [`salt_hru.ini`](../input-reference/salt.md#salt_hruini), [`salt_aqu.ini`](../input-reference/salt.md#salt_aquini), [`cs_hru.ini`](../input-reference/cs.md#cs_hruini), [`cs_aqu.ini`](../input-reference/cs.md#cs_aquini); channels: [`salt_channel.ini`](../input-reference/salt.md#salt_channelini), [`cs_channel.ini`](../input-reference/cs.md#cs_channelini) |
+| Rain and dry deposition | [`salt_atmo.cli`](../input-reference/cli.md#salt_atmocli) |
+| Fertiliser | [`salt_fertilizer.frt`](../input-reference/salt.md#salt_fertilizerfrt), `fertilizer.frt_cs` |
+| Irrigation water | `salt_irrigation`, `cs_irrigation` |
+| Urban runoff | `salt_urban`, `cs_urban` |
+| Road salt (monthly, daily or annual amounts added to the top layer) | `salt_road` |
+| Plant tolerance and stress options | `salt_plants` |
+| Plant uptake | `salt_uptake`, `cs_uptake` |
+| Reaction and sorption parameters | `cs_reactions` |
+| Point sources | recall files (see [Recall and point sources](recall-point-sources.md)) |
 
-Soil and HRU: `salt_balance.f90`, `salt_lch.f90`, `salt_chem_hru.f90`, `salt_chem_soil_single.f90`, `salt_uptake.f90`, `salt_rain.f90`, `salt_fert.f90`, `salt_fert_wet.f90`, `salt_irrig.f90`, `salt_roadsalt.f90`, `salt_hru_init.f90`.
+## Aquifers, channels and water bodies
 
-Inputs: `salt_aqu_read.f90`, `salt_cha_read.f90`, `salt_fert_read.f90`, `salt_hru_read.f90`, `salt_irr_read.f90`, `salt_plant_read.f90`, `salt_roadsalt_read.f90`, `salt_uptake_read.f90`, `salt_urban_read.f90`.
+In the 1D aquifer, recharge adds salt and constituent mass; the salt chemistry, constituent reactions and sorption are applied; and baseflow and seepage remove mass at the concentration of the aquifer water (mass divided by groundwater volume). Channels, reservoirs and wetlands mix incoming mass with the stored water and release it with outflow. With gwflow, salts and constituents are transported between grid cells.
 
-Modules: `salt_module.f90`, `salt_data_module.f90`.
+## Pathogens and heavy metals
 
-Channel and water bodies: `ch_salt_module.f90`, `ch_salt_output.f90`, `res_salt.f90`, `res_salt_module.f90`, `res_salt_output.f90`, `res_read_salt_cs.f90`, `res_read_saltdb.f90`, `wet_salt.f90`, `wet_salt_output.f90`, `wet_read_salt_cs.f90`.
+[`constituents.cs`](../input-reference/cs.md#constituentscs) can also list pathogens and heavy metals.
 
-Aquifer: `salt_aquifer.f90`, `salt_chem_aqu.f90`, `aqu_salt_output.f90`.
+Pathogens (bacteria and other microorganisms) are followed on foliage and in the top soil layer. Each day their number changes by first-order die-off minus growth, corrected for temperature:
 
-Climate, recall, export coefficients, delivery ratios: `cli_read_atmodep_salt.f90`, `recall_read_salt.f90`, `recall_salt.f90`, `dr_read_salt.f90`, `exco_read_salt.f90`, `header_salt.f90`.
+$$N_d = N_{d-1}\,\exp\!\left(-(k_{die} - k_{grow})\,\theta^{\,T - 20}\right)$$
 
-Output: `hru_salt_output.f90`, `ru_salt_output.f90`, `output_ls_salt_module.f90`.
+with the rates of [`pathogens.pth`](../input-reference/pth.md) for foliage or soil, $\theta$ = `t_adj` and $T$ the mean air temperature. Rain of at least 2.54 mm washes a fraction of the pathogens on foliage to the soil; pathogens then leave the top layer with percolation, surface runoff and sediment. In channels they die off over the travel time at `do_stream`, corrected to the water temperature. The pathogen routines of 62.0.1 do not form a complete model: the HRU routines use one [`pathogens.pth`](../input-reference/pth.md#pathogenspth) row for all pathogens, the runoff step removes all pathogens left in the top layer every day, and the channel die-off does not act on the routed water. [`pathogens.pth`](../input-reference/pth.md#behaviour-in-6201) lists these points.
 
-### Trace constituents (cs)
-
-Soil and HRU: `cs_balance.f90`, `cs_lch.f90`, `cs_rctn_hru.f90`, `cs_sorb_hru.f90`, `cs_uptake.f90`, `cs_rain.f90`, `cs_fert.f90`, `cs_fert_wet.f90`, `cs_irrig.f90`, `cs_hru_init.f90`.
-
-Inputs: `cs_aqu_read.f90`, `cs_cha_read.f90`, `cs_fert_read.f90`, `cs_hru_read.f90`, `cs_irr_read.f90`, `cs_plant_read.f90`, `cs_reactions_read.f90`, `cs_uptake_read.f90`, `cs_urban_read.f90`.
-
-Modules: `cs_module.f90`, `cs_data_module.f90`.
-
-Channel: `ch_cs_module.f90`, `ch_cs_output.f90`, `cs_str_output.f90`.
-
-Aquifer: `cs_aquifer.f90`, `cs_rctn_aqu.f90`, `cs_sorb_aqu.f90`, `aqu_cs_output.f90`.
-
-Reservoirs and wetlands: `res_cs_module.f90`, `res_cs_output.f90`, `wet_cs_output.f90`.
-
-HRU and RU output: `hru_cs_output.f90`, `ru_cs_output.f90`.
+Heavy metals are not transformed. They enter the network only from export coefficient and delivery ratio objects and move with the water as conservative loads (see [`metals`](../input-reference/mtl.md) and [Recall and point sources](recall-point-sources.md)).
 
 ## Related pages
 
-- [Nutrient cycling](../model-theory/nutrient-cycling.md)
-- [Plant growth](../model-theory/plant-growth-lum.md)
-- [Aquifers](../model-theory/aquifers.md)
-- [Channels](../model-theory/channels.md)
-- [Recall and point sources](../model-theory/recall-point-sources.md)
+- [Salt inputs](../input-reference/salt.md) and [constituent inputs](../input-reference/cs.md)
+- [Nutrient cycling](nutrient-cycling.md) for the nitrate transport equations
+- [Plant growth and land use management](plant-growth-lum.md) for plant stresses
+- [Aquifers](aquifers.md), [Channels](channels.md), [Reservoirs and wetlands](reservoirs-wetlands.md)
+- [Recall and point sources](recall-point-sources.md)
+
+??? quote "Sources"
+
+    Code at revision 62.0.1:
+
+    - Pathogens: [`src/path_ls_process.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/path_ls_process.f90) (die-off, growth, wash-off), [`src/path_ls_runoff.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/path_ls_runoff.f90), [`src/path_ls_swrouting.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/path_ls_swrouting.f90), channels [`src/ch_rtpath.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rtpath.f90); heavy metals: [`src/exco_read_hmet.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/exco_read_hmet.f90), [`src/dr_read_hmet.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/dr_read_hmet.f90)
+
+    - Soil transport: [`src/salt_lch.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_lch.f90), [`src/cs_lch.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_lch.f90)
+    - Salt chemistry: [`src/salt_chem_hru.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_chem_hru.f90), [`src/salt_chem_soil_single.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_chem_soil_single.f90), [`src/salt_chem_aqu.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_chem_aqu.f90); solubility products in [`src/salt_data_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_data_module.f90)
+    - Salinity stress: [`src/pl_waterup.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_waterup.f90), [`src/pl_biomass_gro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_biomass_gro.f90); options read in [`src/salt_plant_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_plant_read.f90)
+    - Salt uptake: [`src/salt_uptake.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_uptake.f90), [`src/salt_uptake_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_uptake_read.f90); road salt: [`src/salt_roadsalt.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/salt_roadsalt.f90)
+    - Selenium reactions: [`src/cs_rctn_hru.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_rctn_hru.f90), [`src/se_reactions_soil.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/se_reactions_soil.f90); sorption: [`src/cs_sorb_hru.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_sorb_hru.f90); parameters: [`src/cs_reactions_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_reactions_read.f90)
+    - Aquifers: [`src/aqu_1d_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/aqu_1d_control.f90), [`src/cs_rctn_aqu.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_rctn_aqu.f90), [`src/cs_sorb_aqu.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cs_sorb_aqu.f90)
+
+    Symbols and variables:
+
+    | Symbol or setting | Variable |
+    |---|---|
+    | $M_m$, concentration | `cs_soil%ly%salt`, `%saltc`; `cs_soil%ly%cs`, `%csc` |
+    | $\theta_e$ | `soil%anion_excl` |
+    | $\beta_N$ | `hru%nut%nperco` |
+    | solubility products (soil, aquifer) | `Ksp11` to `Ksp51`, `Ksp12` to `Ksp52` |
+    | $k_{EC}$, stress option, soil type, effect option | `salt_tds_ec`, `salt_tol_sim`, `salt_soil_type`, `salt_effect` |
+    | $a$, $b$ | `salt_stress_a`, `salt_stress_b` |
+    | $f_{salt}$ | `pcom%plstr%strss` |
+    | salt uptake switch | `salt_uptake_on` |
+    | selenium rates, inhibition, oxygen, shale | `cs_rct_soil%kseo4`, `%kseo3`, `%se_ino3`, `%oxy_soil`, `%shale`, `%ko2a`, `%kno3a` |
+    | $K_d$ | `cs_rct_soil%kd_seo4`, `%kd_seo3`, `%kd_born` |

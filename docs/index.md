@@ -9,7 +9,7 @@ hide:
 
 # SWAT+ Documentation
 
-A watershed model. Plain-text inputs. Plain-text outputs. Open source.
+An open-source watershed model with plain-text inputs and outputs.
 
 [Get started :material-arrow-right:](getting-started/index.md){ .md-button .md-button--primary }
 [What is SWAT+](introduction/what-is-swatplus.md){ .md-button }
@@ -32,7 +32,7 @@ A watershed model. Plain-text inputs. Plain-text outputs. Open source.
 
     ---
 
-    Every input file, with columns and units verified against the Fortran source.
+    Every input file, with its columns, units and defaults.
 
 -   :material-file-chart:{ .lg .middle } &nbsp; **[Output reference](output-reference/index.md)**
 
@@ -56,7 +56,7 @@ A watershed model. Plain-text inputs. Plain-text outputs. Open source.
 
     ---
 
-    Slow walks through the Ames_sub1 and Osu_1hru reference datasets.
+    Walkthroughs of the Ames_sub1 and Osu_1hru reference datasets.
 
 -   :material-help-circle:{ .lg .middle } &nbsp; **[FAQ](faq-troubleshooting/index.md)**
 
@@ -68,4 +68,8 @@ A watershed model. Plain-text inputs. Plain-text outputs. Open source.
 
 ## About this site
 
-Every input-reference and output-reference page is verified against the SWAT+ Fortran source at a specific commit, recorded in the page frontmatter. Known bugs and source/dataset discrepancies are documented in the **Important** section at the bottom of each affected page. Source: [github.com/swat-model/swatplus](https://github.com/swat-model/swatplus).
+This documentation describes SWAT+ revision 62.0.1. Each SWAT+ release has a separate version of the site, chosen with the version selector at the top of the page; `latest` is the newest.
+
+The pages are written for model users. Every statement about model behaviour has been checked against the Fortran source of the release, and the commit is recorded in each page's front matter. Where the source does something unexpected, the page says what the model does. Source files and variable names are listed in a collapsed Sources block at the end of each page.
+
+The model source is at [github.com/swat-model/swatplus](https://github.com/swat-model/swatplus). Every page can be downloaded as a PDF, alone or with its section ([Download as PDF](downloads.md)).

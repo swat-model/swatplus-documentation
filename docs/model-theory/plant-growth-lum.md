@@ -1,188 +1,349 @@
 ---
 title: Plant Growth and Land Use Management
-description: Heat-unit plant growth, biomass accumulation, LAI, stress factors, and how land use, management, and decision tables drive operations.
+description: Heat units, light interception, biomass, leaf area, roots, stresses, nutrient uptake and harvest in SWAT+, and how land use, management schedules and decision tables drive operations.
 status: review
+verified_against:
+  - src/hru_control.f90
+  - src/plant_init.f90
+  - src/pl_community.f90
+  - src/pl_grow.f90
+  - src/pl_nut_demand.f90
+  - src/pl_biomass_gro.f90
+  - src/pl_leaf_gro.f90
+  - src/pl_leaf_senes.f90
+  - src/pl_root_gro.f90
+  - src/pl_seed_gro.f90
+  - src/pl_dormant.f90
+  - src/pl_waterup.f90
+  - src/pl_tstr.f90
+  - src/pl_nupd.f90
+  - src/pl_nup.f90
+  - src/pl_nfix.f90
+  - src/pl_pupd.f90
+  - src/pl_pup.f90
+  - src/nuts.f90
+  - src/mgt_operatn.f90
+  - src/mgt_sched.f90
+  - src/mgt_read_mgtops.f90
+  - src/mgt_harvgrain.f90
+  - src/mgt_harvbiomass.f90
+  - src/mgt_operations_module.f90
+  - src/plant_data_module.f90
+  - src/basin_prm_default.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Overview
 
-SWAT+ grows one or more plants in a community on each HRU. Daily potential biomass is a function of intercepted photosynthetically active radiation. That potential is reduced by water, temperature, nitrogen, phosphorus, and aeration stresses. Phenology is tracked by accumulated plant heat units (PHU). The plants on an HRU are scheduled by `management.sch`, and land use plus structural BMPs are assigned through `landuse.lum`. Decision tables (`lum.dtl`) drive conditional operations such as auto-irrigation, auto-fertilisation, and land use change.
+Each HRU has a plant community: one or more plants listed in [`plant.ini`](../input-reference/ini.md#plantini) and described in [`plants.plt`](../input-reference/plt.md). SWAT+ grows every living plant of the community each day with a simplified version of the EPIC plant growth model. Phenological development follows accumulated heat units. Potential growth comes from intercepted light and the radiation use efficiency of the plant, and is reduced by water, temperature, nitrogen, phosphorus, aeration and (when salts are simulated) salinity stress. Growth removes water and nutrients from the soil, and harvest, kill and senescence return plant material to the residue and soil pools.
 
-## Process equations
+Plants are planted, harvested and killed by the management schedule of the HRU and by decision tables (see [Land use management](#land-use-management)).
 
-### Heat unit accumulation
+## Plant types
 
-Each plant accumulates a fraction of total heat units to maturity per day:
+The `plnt_typ` column of [`plants.plt`](../input-reference/plt.md) sets how a plant develops:
 
-```
-delg   = max(0, (tave - t_base) / phumat)
-phuacc = phuacc + delg
-```
+| `plnt_typ` | Behaviour |
+|------------|-----------|
+| `warm_annual`, `warm_annual_tuber` | Annual; leaf area declines towards the end of the season |
+| `cold_annual`, `cold_annual_tuber` | Annual; goes dormant in winter if planted late enough |
+| `perennial` | Grows over several years towards maturity (`yrs_mat`); goes dormant each year |
 
-`t_base` is the plant's minimum growth temperature (`plants.plt`), `phumat` is the heat units to maturity. When `phuacc` reaches 1.0 the plant is mature. `phuacc_p` is the perennial counterpart. Source: `pl_nut_demand.f90`.
+The `gro_trig` column sets what restarts growth: `temp_gro` for plants driven by temperature and day length, `moisture_gro` for plants in climates with a wet and dry season, where growth follows the ratio of precipitation to PET.
 
-### Biomass accumulation
+## Heat units
 
-Daily potential biomass is
+Plants develop at a rate set by temperature. Each day a plant above its base temperature accumulates heat units:
 
-```
-bioday = beadj * par
-```
+$$HU = \bar{T} - T_{base} \quad\text{when } \bar{T} > T_{base}$$
 
-where `par` is intercepted PAR (MJ/m^2) and `beadj` is radiation use efficiency adjusted for CO2 and vapour pressure deficit. The CO2 adjustment uses the two-point curve described by `bio_e`, `bioehi`, `co2hi` in `plants.plt`. When vapour pressure deficit exceeds 1.0 kPa, RUE declines at the plant-specific rate `wavp`, with a floor of `0.27 * bio_e`. Realised biomass is
+and the fraction of potential heat units reached is
 
-```
-bm_grow = bioday * reg
-reg     = min(strsw, strst, strsn, strsp, strsa[, strss])
-```
+$$fr_{PHU} = \sum_{i=1}^{d}\frac{HU_i}{PHU}$$
 
-`reg` is the most limiting stress factor. Plant carbon mass is fixed at `0.42 * biomass`. Source: `pl_biomass_gro.f90`.
+| Symbol | Meaning | Input |
+|--------|---------|-------|
+| $\bar{T}$ | Mean air temperature of the day | °C |
+| $T_{base}$ | Minimum (base) temperature for growth | `tmp_base` in [`plants.plt`](../input-reference/plt.md), °C |
+| $PHU$ | Potential heat units needed to bring the plant to maturity | see below |
 
-### Leaf area index
+$fr_{PHU}$ starts at 0 at planting and reaches 1 at maturity. SWAT+ sets PHU for each plant at the start of the run from the long-term monthly temperatures of the weather generator station and `days_mat` in [`plants.plt`](../input-reference/plt.md):
 
-LAI follows a two-point optimal curve defined by `(frgrw1, laimx1)` and `(frgrw2, laimx2)` from `plants.plt`. The model computes a fraction `f` of maximum LAI from `phuacc`:
+- `days_mat` > 0: the heat units accumulated over `days_mat` days, starting from an estimated planting date. For annuals the planting date is taken where base-zero heat units reach 15% of their annual total.
+- `days_mat` = 0: 95% of the heat units above $T_{base}$ in a whole year, so the plant can stay active through the entire growing season.
 
-```
-f = phuacc / (phuacc + exp(leaf1 - leaf2 * phuacc))
-```
+For perennials a second counter runs over the years to maturity, with $PHU \times$ `yrs_mat` as its target. It sets canopy height and root depth.
 
-`leaf1` and `leaf2` are shape parameters fitted from the two points. Before `phuacc` reaches `dlai` (fraction of season at which leaves decline), LAI grows toward `laimax`:
+Base-zero heat units ($T_{base} = 0$, divided by the annual total) are also accumulated each year from 1 January. They schedule operations that happen when no plant is growing.
 
-```
-deltaLAI = (f - laimxfr) * laimax * (1 - exp(5*(LAI - laimax))) * sqrt(strsw)
-```
+## Dormancy
 
-After `phuacc > dlai`, LAI declines following `dlai_rate`. Canopy height is `chtmx * sqrt(f)`. For perennials, LAI is scaled by tree age through `laixco_tree` and `mat_yrs`. Source: `pl_leaf_gro.f90`, `pl_leaf_senes.f90`.
+Perennials and cold-season annuals go dormant when the day length falls below the minimum day length of the station plus a threshold. While dormant a plant does not grow. When a perennial goes dormant its seed mass is moved to residue and its heat unit counter is reset; it starts accumulating heat units again when the day length rises above the threshold. Cold-season annuals go dormant only if they have reached less than 75% of their heat units.
 
-### Water stress and uptake
+## Light interception and biomass
 
-Potential transpiration `epmax(ipl)` is distributed through the rooting depth using an exponential extraction function with parameters `uptake%water_dis` and `uptake%water_norm`. Water uptake from each layer is
+Each growing plant intercepts photosynthetically active radiation (PAR), taken as half of incoming solar radiation, according to Beer's law:
 
-```
-sum = epmax * (1 - exp(-water_dis * gx / root_dep)) / water_norm
-wuse = sum - sump * (1 - epco)
-```
+$$H_{phosyn} = 0.5\,H_{day}\left[1 - \exp\left(-k_\ell\,(LAI + 0.05)\right)\right]$$
 
-where `gx` is depth to the bottom of the current layer. Layers below the root zone do not contribute. The compensation factor `epco` (0-1) controls how much a deeper layer can compensate when a shallower layer is dry. Water stress is
+where $H_{day}$ is the solar radiation (MJ/m²), $k_\ell$ the light extinction coefficient (`ext_co` in [`plants.plt`](../input-reference/plt.md)) and $LAI$ the leaf area index of the plant. Each plant intercepts light as though it were alone: SWAT+ 62.0.1 has a routine for competition for light between taller and shorter plants, but it is switched off.
 
-```
-strsw = sum_wuse / epmax
-```
+### Radiation use efficiency
 
-Aeration stress activates when soil water exceeds field capacity:
+The radiation use efficiency (RUE) is the biomass produced per unit of intercepted light. It responds to CO2 (Stockle et al., 1992). When `co2` in [`parameters.bsn`](../input-reference/parameters-bsn.md) is above 350 ppm,
 
-```
-satco = (sw - sumfc) / (sumul - sumfc)
-strsa = 1 - scparm / (scparm + exp(2.9014 - 0.03867*scparm))
-```
+$$RUE = \frac{100\,CO_2}{CO_2 + \exp(r_1 - r_2\,CO_2)}$$
 
-where `scparm = 100 * (satco - aeration) / (1.0001 - aeration)`. Source: `pl_waterup.f90`.
+where $r_1$ and $r_2$ are fitted so that RUE equals `bm_e` at 330 ppm and `bm_e_hi` at `co2_hi`. Otherwise RUE is `bm_e`. $CO_2$ is the concentration for the year (see [Climate and weather](climate-weather.md)).
 
-### Temperature stress
+When the vapour pressure deficit $vpd$ is above 1 kPa, RUE declines:
 
-```
-rto   = (tave - t_base) / (t_opt - t_base)
-strst = sin(pi/2 * rto)
-```
+$$RUE = RUE - \Delta ruedcl_{vpd}\,(vpd - 1), \qquad RUE \ge 0.27\,\mathrm{bm\_e}$$
 
-`strst = 0` if `tave <= t_base` or if `tmin <= annual mean - 15`. Source: `pl_tstr.f90`.
+where $\Delta ruedcl_{vpd}$ is `ru_vpd` in [`plants.plt`](../input-reference/plt.md).
 
-### Nitrogen and phosphorus stress and uptake
+### Biomass growth
 
-Plant N and P demands follow optimal concentration curves with `pltnfr1`, `pltnfr2`, `pltnfr3` and `pltpfr1`, `pltpfr2`, `pltpfr3` (see `plants.plt`). N and P are taken from soil layers with a depth-distribution function controlled by `n_updis` and `p_updis` in `parameters.bsn`. If supply is below demand, `strsn` and `strsp` reduce growth. Legumes fix N when soil supply is short:
+Potential daily biomass growth is $\Delta bio = RUE \times H_{phosyn}$ (kg/ha). The actual growth is
 
-```
-fxr   = min(1, fxw, fxn) * fxg
-fixn  = nfix_co * fxr * deficit + (1 - nfix_co) * deficit
-fixn  = min(nfixmx, fixn)
-```
+$$\Delta bio_{act} = \Delta bio\;\gamma_{reg}, \qquad \gamma_{reg} = \min\left(\gamma_w,\;\gamma_t,\;\gamma_n,\;\gamma_p,\;\gamma_a,\;\gamma_s\right)$$
 
-`nfix_co` is the legume coefficient (0.5 for legumes, 0 for non-legumes). `nfixmx` (default 20 kg N/ha/day, `parameters.bsn`) caps daily fixation. Source: `pl_nup.f90`, `pl_pup.f90`, `pl_nfix.f90`, `pl_nupd.f90`, `pl_pupd.f90`.
+where each $\gamma$ is a growth factor between 0 (no growth) and 1 (no stress) for water, temperature, nitrogen, phosphorus, aeration and salinity. When salinity is simulated with the salt tolerance option, the salinity factor multiplies the minimum of the others instead. Plant carbon is taken as 42% of biomass. `nostress` in [`codes.bsn`](../input-reference/codes-bsn.md) turns stresses off: `1` sets all factors to 1 and `2` sets only the nitrogen and phosphorus factors to 1.
 
-### Harvest
+The new biomass is split into roots, leaves, stems and seed. The root fraction falls from `rt_st_beg` at the start of the season to `rt_st_end` at maturity (for perennials, over the first 20% of the years to maturity).
 
-Yield is `harveff * seed_mass`. The harvest index is bounded below by `wsyf` and accumulates from zero up to `hvsti` as `phuacc` increases past 0.5. Harvest types in `harv.ops` are `grain`, `biomass`, `residue`, `tree`, `tuber`, `peanuts`, `stripper`, `picker`. Pesticide is removed in yield in proportion to `pl_yield%m / pl_mass(j)%tot(ipl)%m`. Source: `mgt_harvgrain.f90`, `mgt_harvbiomass.f90`, `mgt_harvresidue.f90`, `mgt_harvtuber.f90`, `mgt_killop.f90`.
+## Leaf area and canopy
+
+### Leaf area development
+
+Leaf area follows an optimal curve defined by two points from [`plants.plt`](../input-reference/plt.md): at `frac_hu1` of the heat units the plant reaches `lai_max1` of its maximum LAI, and at `frac_hu2` it reaches `lai_max2`. The fraction of maximum LAI for a given $fr_{PHU}$ is
+
+$$fr_{LAImx} = \frac{fr_{PHU}}{fr_{PHU} + \exp(\ell_1 - \ell_2\,fr_{PHU})}$$
+
+with the shape coefficients $\ell_1$ and $\ell_2$ fitted to the two points. Until $fr_{PHU}$ reaches `hu_lai_decl`, the leaf area added on a day is
+
+$$\Delta LAI = \left(fr_{LAImx,i} - fr_{LAImx,i-1}\right)LAI_{mx}\left[1 - \exp\left(5\,(LAI_{i-1} - LAI_{mx})\right)\right]\sqrt{\gamma_w}$$
+
+and is shared among plants in proportion to their LAI times canopy height. $LAI_{mx}$ is `lai_pot`. For perennials it grows with age:
+
+$$LAI_{mx} = \mathrm{lai\_pot}\left(\frac{yr_{cur}}{\mathrm{yrs\_mat}}\right)^{\mathrm{bm\_tree\_acc}}$$
+
+### Leaf senescence
+
+After `hu_lai_decl`, annuals lose leaf area until maturity:
+
+$$LAI = LAI_{mx}\left(\frac{1 - fr_{PHU}}{1 - fr_{PHU,sen}}\right)^{\mathrm{dlai\_rate}}$$
+
+where $fr_{PHU,sen}$ is the heat unit fraction at which decline started. Temperature-driven perennials drop to `lai_min` over 15 days once `hu_lai_decl` is passed. Moisture-driven perennials shed leaves continuously at a turnover rate between `leaf_tov_mn` and `leaf_tov_mx` months, faster when the 30-day precipitation to PET ratio is below 0.5. Leaves that fall are added to the surface residue.
+
+### Canopy height and roots
+
+$$h_c = h_{c,mx}\sqrt{fr_{LAImx}}$$
+
+with $h_{c,mx}$ = `can_ht_max`. Root depth grows with heat units:
+
+$$z_{root} = 2.5\,fr_{PHU}\,z_{root,mx}, \qquad 25.4\text{ mm} \le z_{root} \le \text{profile depth}$$
+
+with $z_{root,mx}$ = `rt_dp_max` (converted to mm). Perennials use the multi-year heat unit fraction, so their roots keep deepening until maturity.
+
+## Water uptake
+
+The potential transpiration of the HRU (see [Soil water and temperature](soil-water-temperature.md)) is shared among growing plants in proportion to their LAI. Each plant takes up water from the layers within its root zone. The potential uptake down to depth $z$ is
+
+$$w_{up,z} = \frac{E_t}{1 - \exp(-\beta_w)}\left[1 - \exp\left(-\beta_w\,\frac{z}{z_{root}}\right)\right]$$
+
+with the water use distribution parameter $\beta_w$ fixed at 10, so about half of the demand comes from the top 7% of the root zone. The uptake from a layer is the potential uptake to its bottom minus that to its top, with the shortfall of the layers above added back in part:
+
+$$w'_{up,ly} = w_{up,z_l} - w_{up,z_u}\,(1 - \mathrm{epco})$$
+
+where `epco` is the plant uptake compensation factor in [`hydrology.hyd`](../input-reference/hyd.md). With `epco` near 1 deeper layers can make up for dry layers above; near 0 they cannot. The second soil layer always compensates fully. Uptake is limited by the water in the layer, and SWAT+ does not reduce uptake as the soil dries below 25% of available water as SWAT 2009 did.
+
+The water stress factor is the ratio of actual to potential transpiration:
+
+$$\gamma_w = \frac{\sum w_{actualup}}{E_t}$$
+
+### Aeration stress
+
+When the profile contains more water than field capacity, roots lack oxygen. With $sat_{co} = (SW - FC)/(SAT - FC)$ for the whole profile and $a$ = `aeration` in [`plants.plt`](../input-reference/plt.md),
+
+$$\gamma_a = 1 - \frac{s}{s + \exp(2.9014 - 0.03867\,s)}, \qquad s = 100\,\frac{sat_{co} - a}{1.0001 - a}$$
+
+for $s > 0$; otherwise $\gamma_a = 1$.
+
+## Temperature stress
+
+In SWAT+ 62.0.1 temperature stress is
+
+$$\gamma_t = \sin\left(\frac{\pi}{2}\cdot\frac{\bar{T} - T_{base}}{T_{opt} - T_{base}}\right), \qquad 0 \le \gamma_t \le 1$$
+
+where $T_{opt}$ is `tmp_opt`. The factor is 0 at or below the base temperature, 1 at the optimum, falls again above it, and reaches 0 at $2\,T_{opt} - T_{base}$. The SWAT 2009 exponential temperature stress and the cold-night rule (no growth when the minimum temperature is 15 °C below the annual mean) are computed first but replaced by this sine function.
+
+## Nitrogen and phosphorus
+
+### Demand
+
+The optimal nitrogen fraction of the plant falls as it develops:
+
+$$fr_N = (fr_{N,1} - fr_{N,3})\left[1 - \frac{x}{x + \exp(n_1 - n_2\,x)}\right] + fr_{N,3}$$
+
+where $fr_{N,1}$, $fr_{N,2}$ and $fr_{N,3}$ are `frac_n_em`, `frac_n_50` and `frac_n_mat` (at emergence, at 50% of maturity and at maturity), $n_1$ and $n_2$ are fitted to them, and $x$ is $fr_{PHU}$ for annuals or the fraction of `yrs_mat` reached for perennials. The demand is the optimal nitrogen mass, $fr_N \times$ biomass, minus the nitrogen in the plant, and is limited to four times `frac_n_mat` times the day's potential growth. Phosphorus follows the same form with `frac_p_em`, `frac_p_50` and `frac_p_mat`.
+
+### Uptake
+
+Nitrate is taken from the root zone with a depth distribution like water uptake, using `n_uptake` in [`parameters.bsn`](../input-reference/parameters-bsn.md) as the distribution parameter; labile phosphorus uses `p_uptake`. When several plants compete and the soil cannot meet the total demand, each plant gets a share in proportion to its demand.
+
+### Nitrogen fixation
+
+Legumes (`nfix_co` > 0 in [`plants.plt`](../input-reference/plt.md)) fix nitrogen when the soil cannot supply their demand. Fixation depends on growth stage, soil water and soil nitrate:
+
+$$N_{fix} = \min\left(6,\; f_{gr}\,\min(1, f_{sw}, f_{no3})\,(N_{dem} - N_{up})\right)$$
+
+| Factor | Value |
+|--------|-------|
+| $f_{gr}$ | 0 before 15% of heat units; rises to 1 at 30%; 1 to 55%; falls to 0 at 75% |
+| $f_{sw}$ | $SW/(0.85\,FC)$ for the profile |
+| $f_{no3}$ | 1 for profile nitrate up to 100 kg N/ha, falling linearly to 0 at 300 kg N/ha |
+
+The result is blended with the unmet demand by the legume coefficient, $N'_{fix} = \mathrm{nfix\_co}\,N_{fix} + (1 - \mathrm{nfix\_co})(N_{dem} - N_{up})$, and limited to the unmet demand and to `n_fix_max` in [`parameters.bsn`](../input-reference/parameters-bsn.md) (kg N/ha/day).
+
+### Nutrient stress
+
+For non-legumes the nitrogen stress factor is
+
+$$\gamma_n = \frac{\varphi}{\varphi + \exp(3.535 - 0.02597\,\varphi)}, \qquad \varphi = 200\left(\frac{N_{plant}}{N_{opt}} - 0.5\right)$$
+
+which is 0 when the plant contains half its optimal nitrogen and close to 1 at the optimum. It is raised to the ratio of the day's uptake to demand when that is larger. Legumes have no nitrogen stress. Phosphorus stress uses the same form.
+
+## Harvest index and yield
+
+The harvest index is the fraction of above-ground biomass removed as yield. It grows through the season towards the optimal value `harv_idx` in [`plants.plt`](../input-reference/plt.md):
+
+$$HI = \mathrm{harv\_idx}\,\frac{100\,fr_{PHU}}{100\,fr_{PHU} + \exp(11.1 - 10\,fr_{PHU})}$$
+
+After half the heat units are reached, water deficit lowers it. With $wu = 100\,\sum E_t/\sum PET$ accumulated from that point,
+
+$$HI_{act} = (HI - HI_{min})\frac{wu}{wu + \exp(6.13 - 0.0883\,wu)} + HI_{min}$$
+
+with $HI_{min}$ = HI/2. The seed (yield) pool of the plant is kept at this fraction of the above-ground biomass as the plant grows. A grain harvest raises the plant's harvest index target to at least `harv_idx_ws`, but only after the seed pool has been built, so `harv_idx_ws` does not change the yield of that harvest.
+
+Harvest operations are defined in [`harv.ops`](../input-reference/ops.md#harvops) by `harv_typ`, `harv_idx`, `harv_eff` and `harv_bm_min`. A harvest takes place only when the plant biomass is above `harv_bm_min` (kg/ha).
+
+| `harv_typ` | Yield removed |
+|------------|---------------|
+| `grain`, `picker` | `harv_eff` × seed mass; the rest of the seed goes to the soil's active humus |
+| `biomass`, `tree`, `stripper` | `harv_idx` × `harv_eff` × (seed + leaf + stem) |
+| `tuber`, `peanuts` | Below-ground yield |
+| `residue` | A fraction of surface residue, given in the operation |
+
+Yield is reduced by any pesticide stress on the plant, and pesticide in the plant is removed with the yield.
 
 ## Land use management
 
-### `landuse.lum`
+### landuse.lum
 
-Each HRU points to a row in `landuse.lum`. That row carries the plant community name, curve number group, USLE conservation practice, tillage practice, and pointers to the management schedule, tile drainage code, septic code, filter strip, grass waterway, and BMP user practice. `hru_lum_init.f90` copies these pointers onto each HRU at the start of simulation. Source: `hru_lum_init.f90`, `landuse_data_module.f90`.
+Each HRU points to a row of [`landuse.lum`](../input-reference/lum.md), which names the plant community (`plnt_com`), the management schedule (`mgt`), the curve number row (`cn2`), the conservation practice (`cons_prac`), the urban land type, the overland Manning's n row (`ov_mann`), and any tile drain, septic system, filter strip, grassed waterway or user BMP.
 
-### `management.sch`
+### Management schedules
 
-For each schedule, operations are listed in calendar or PHU-trigger order. Operation codes used by `mgt_sched.f90` include:
+A schedule in [`management.sch`](../input-reference/management.md#managementsch) lists operations by date or by heat units, followed by the names of any decision tables that apply to the HRU. Each operation has a type, a month and day, a heat unit value and up to three data columns:
 
-| Code | Operation |
-|------|-----------|
-| `plnt` | Plant a single species (or community) |
-| `harv` | Harvest (grain / biomass / residue / tree / tuber etc.) |
-| `kill` | Kill the plant, transfer all biomass to residue |
-| `hvkl` | Harvest and kill in the same operation |
-| `till` | Tillage, mixes residue and pools using `till.til` |
-| `irrm` | Irrigation, applies depth from `irr.ops` |
-| `fert` | Mineral or organic fertiliser (`fertilizer.frt`) |
+| Operation | Action |
+|-----------|--------|
+| `plnt` | Plant one plant or the whole community |
+| `harv` | Harvest (see above) |
+| `kill` | Kill the plant; biomass goes to residue |
+| `hvkl` | Harvest and kill |
+| `till` | Tillage, mixing residue and nutrients into the soil ([`tillage.til`](../input-reference/til.md)) |
+| `irrm` | Irrigation by date ([`irr.ops`](../input-reference/ops.md#irrops)) |
+| `fert` | Fertiliser ([`fertilizer.frt`](../input-reference/frt.md#fertilizerfrt)) |
 | `manu` | Manure application |
-| `pest` | Pesticide application |
-| `graz` | Grazing |
-| `cnup` | Curve number update |
-| `burn` | Prescribed burn |
+| `pest` | Pesticide application ([`chem_app.ops`](../input-reference/ops.md#chem_appops)) |
+| `graz` | Start grazing ([`graze.ops`](../input-reference/ops.md#grazeops)) |
+| `cnup` | Change the curve number |
+| `burn` | Prescribed burn ([`fire.ops`](../input-reference/ops.md#fireops)) |
 | `swep` | Street sweeping |
-| `dwm`  | Drainage water management depth |
-| `weir` | Set or adjust weir height |
-| `mons` | Begin or end monsoon trigger window |
+| `dwm` | Set drain depth for drainage water management |
+| `weir` | Set or change a paddy or wetland weir height |
+| `irrp`, `irpm`, `pudl` | Rice paddy irrigation and puddling |
+| `mons` | Start or end of a monsoon planting window |
+| `skip` | Skip to the end of the year |
 
-PHU-triggered operations fire when `phuacc` of the plant in column `op2` crosses the value in column `phu`. Date-triggered operations fire on the given month and day. Source: `mgt_sched.f90`, `mgt_operations_module.f90`.
+What each operation does to plants and soil, with its equations, is described with its parameters: harvest types and harvest efficiency, grazing, irrigation, burning and street sweeping in [`*.ops`](../input-reference/ops.md); fertilizer and manure placement in [`fertilizer.frt`](../input-reference/frt.md#fertilizer-application); tillage and biological mixing in [`tillage.til`](../input-reference/til.md); and automatic irrigation and fertilization by decision table in [`*.dtl`](../input-reference/dtl.md).
 
-### Decision tables (`lum.dtl`)
+An operation with a heat unit value runs when the heat unit fraction passes it: $fr_{PHU}$ of the plant named in the operation if that plant is growing, or the base-zero heat units otherwise. An operation without a heat unit value runs on its month and day. When all remaining operations of a year share one date, the scheduler moves on after one full pass.
 
-Each row in `landuse.lum` may also reference one or more decision tables in `lum.dtl`. Decision tables are conditional rule sets that fire actions when their conditions are met. Each table has `conds` conditions, `alts` alternative outcomes, and `acts` actions. On each day in `hru_control.f90` the model loops over the HRU's `num_autos` auto operations and calls `conditions` then `actions` for each. Typical actions include auto-irrigation, auto-fertilisation, planting based on PHU triggers, and land use change. The decision table reader is `dtbl_lum_read.f90`; the run-time logic is in `conditions.f90` and `actions.f90`.
+### Decision tables
 
-See the [Decision tables](decision-tables.md) theory page for the rule grammar.
+Decision tables in [`lum.dtl`](../input-reference/dtl.md) are conditional rule sets: each table has conditions, alternatives that combine them, and actions that fire when an alternative is true. The tables named in an HRU's schedule are evaluated every day before the other landscape processes, so they can plant, harvest, irrigate, fertilise or change land use in response to weather, soil water or plant growth. See [Decision tables](decision-tables.md).
 
 ## Switches and parameters
 
-| File | Field | Effect |
-|------|-------|--------|
-| `codes.bsn` | `nostress` | 0 = all stresses applied, 1 = no stress, 2 = no N/P stress |
-| `codes.bsn` | `cswat` | Selects soil carbon model. The dynamic CENTURY/SWAT-C model (=2) changes residue and tillage routines |
-| `parameters.bsn` | `co2` | Ambient CO2 concentration (ppm), default 400 |
-| `parameters.bsn` | `nfixmx` | Maximum daily N fixation (kg/ha), default 20 |
-| `parameters.bsn` | `n_updis`, `p_updis` | Depth-distribution shape for plant N/P uptake |
-| `parameters.bsn` | `evlai` | LAI above which only transpiration occurs, default 3.0 |
-| `plants.plt` | `bio_e`, `bioehi`, `co2hi`, `wavp` | RUE and its CO2 / VPD response |
-| `plants.plt` | `blai`, `frgrw1`, `laimx1`, `frgrw2`, `laimx2`, `dlai`, `dlai_rate` | LAI development curve |
-| `plants.plt` | `t_base`, `t_opt` | Temperature response |
-| `plants.plt` | `hvsti`, `wsyf` | Harvest index and water-stress floor |
-| `plants.plt` | `chtmx`, `rdmx` | Maximum canopy height and root depth |
-| `plants.plt` | `aeration` | Aeration stress threshold (fraction above FC) |
-| `plants.plt` | `pltnfr1..3`, `pltpfr1..3` | N and P optimal concentration curves |
-| `plants.plt` | `nfix_co` | Legume coefficient |
-| `plants.plt` | `mat_yrs`, `laixco_tree`, `bmx_peren`, `leaf_tov_min`, `leaf_tov_max` | Perennial / tree parameters |
-
-## Implementation
-
-Plant growth: `pl_grow.f90`, `pl_biomass_gro.f90`, `pl_leaf_gro.f90`, `pl_leaf_senes.f90`, `pl_root_gro.f90`, `pl_seed_gro.f90`, `pl_partition.f90`, `pl_community.f90`, `pl_waterup.f90`, `pl_tstr.f90`, `pl_nut_demand.f90`, `pl_nup.f90`, `pl_pup.f90`, `pl_nupd.f90`, `pl_pupd.f90`, `pl_nfix.f90`, `pl_dormant.f90`, `pl_mortality.f90`, `pl_rootfr.f90`.
-
-Plant data and initialisation: `plant_data_module.f90`, `plant_module.f90`, `plant_parm_read.f90`, `plant_init.f90`, `plant_all_init.f90`, `plant_transplant_read.f90`.
-
-Management operations: `mgt_sched.f90`, `mgt_operatn.f90`, `mgt_plantop.f90`, `mgt_harvgrain.f90`, `mgt_harvbiomass.f90`, `mgt_harvresidue.f90`, `mgt_harvtuber.f90`, `mgt_killop.f90`, `mgt_biomix.f90`, `mgt_newtillmix_cswat0.f90`, `mgt_newtillmix_cswat1.f90`, `mgt_newtillmix_wet.f90`, `mgt_tillfactor.f90`, `mgt_transplant.f90`, `mgt_operations_module.f90`, `mgt_read_*.f90`.
-
-Plant operation utilities: `pl_fert.f90`, `pl_fert_wet.f90`, `pl_manure.f90`, `pl_graze.f90`, `pl_burnop.f90`.
-
-Land use: `hru_lum_init.f90`, `hru_lum_init_all.f90`, `landuse_data_module.f90`, `lum_read*.f90`.
-
-Decision tables: `dtbl_lum_read.f90`, `conditions.f90`, `actions.f90`, `conditional_module.f90`.
+| Input | File | Effect |
+|-------|------|--------|
+| `nostress` | [`codes.bsn`](../input-reference/codes-bsn.md) | `0` all stresses, `1` no stress, `2` no nutrient stress |
+| `co2` | [`parameters.bsn`](../input-reference/parameters-bsn.md) | CO2 concentration without `co2_yr.dat`, ppm |
+| `n_uptake`, `p_uptake` | [`parameters.bsn`](../input-reference/parameters-bsn.md) | Depth distribution of N and P uptake |
+| `n_fix_max` | [`parameters.bsn`](../input-reference/parameters-bsn.md) | Maximum daily N fixation, kg N/ha |
+| `epco` | [`hydrology.hyd`](../input-reference/hyd.md) | Plant uptake compensation |
+| `plnt_typ`, `gro_trig`, `days_mat` | [`plants.plt`](../input-reference/plt.md) | Plant type, growth trigger, days to maturity |
+| `bm_e`, `bm_e_hi`, `co2_hi`, `ru_vpd`, `ext_co` | [`plants.plt`](../input-reference/plt.md) | Light interception and RUE |
+| `lai_pot`, `frac_hu1`, `lai_max1`, `frac_hu2`, `lai_max2`, `hu_lai_decl`, `dlai_rate`, `lai_min` | [`plants.plt`](../input-reference/plt.md) | Leaf area curve and decline |
+| `can_ht_max`, `rt_dp_max`, `rt_st_beg`, `rt_st_end` | [`plants.plt`](../input-reference/plt.md) | Canopy height, root depth, root fraction |
+| `tmp_base`, `tmp_opt` | [`plants.plt`](../input-reference/plt.md) | Temperature response |
+| `frac_n_*`, `frac_p_*`, `nfix_co` | [`plants.plt`](../input-reference/plt.md) | Nutrient demand and fixation |
+| `harv_idx`, `harv_idx_ws` | [`plants.plt`](../input-reference/plt.md) | Harvest index |
+| `aeration` | [`plants.plt`](../input-reference/plt.md) | Aeration stress threshold |
+| `yrs_mat`, `bm_tree_acc`, `bm_tree_max`, `leaf_tov_mn`, `leaf_tov_mx` | [`plants.plt`](../input-reference/plt.md) | Perennials |
+| `bm_dieoff` | [`plants.plt`](../input-reference/plt.md) | Read but not applied at dormancy in 62.0.1 |
 
 ## Related pages
 
-- [`landuse.lum`](../input-reference/lum.md)
-- [`plants.plt`](../input-reference/plt.md)
-- [`fertilizer.frt`](../input-reference/frt.md)
-- [`management.sch`](../input-reference/ops.md)
-- [`lum.dtl`](../input-reference/dtl.md)
-- [`codes.bsn`](../input-reference/codes-bsn.md)
-- [`parameters.bsn`](../input-reference/parameters-bsn.md)
-- [Decision tables](../model-theory/decision-tables.md)
-- [Nutrient cycling](../model-theory/nutrient-cycling.md)
-- [Carbon](../model-theory/carbon.md)
+- [`plants.plt`](../input-reference/plt.md), [`landuse.lum`](../input-reference/lum.md), [`management.sch` and operations](../input-reference/ops.md), [`lum.dtl`](../input-reference/dtl.md)
+- [Soil water and temperature](soil-water-temperature.md) for the transpiration demand.
+- [Nutrient cycling](nutrient-cycling.md) for the soil nitrogen and phosphorus pools.
+- [Carbon](carbon.md) for residue and soil carbon.
+- [Decision tables](decision-tables.md).
+
+??? quote "Sources"
+
+    - Community, PAR and transpiration split: [`pl_community.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_community.f90)
+    - Growth driver: [`pl_grow.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_grow.f90); biomass: [`pl_biomass_gro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_biomass_gro.f90)
+    - Heat units and nutrient demand: [`pl_nut_demand.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nut_demand.f90), [`pl_nupd.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nupd.f90), [`pl_pupd.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_pupd.f90); PHU setup in [`plant_init.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/plant_init.f90)
+    - Leaf area, roots, seed: [`pl_leaf_gro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_leaf_gro.f90), [`pl_leaf_senes.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_leaf_senes.f90), [`pl_root_gro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_root_gro.f90), [`pl_seed_gro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_seed_gro.f90)
+    - Dormancy: [`pl_dormant.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_dormant.f90)
+    - Stresses: [`pl_waterup.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_waterup.f90), [`pl_tstr.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_tstr.f90), [`nuts.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/nuts.f90)
+    - Uptake and fixation: [`pl_nup.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nup.f90), [`pl_pup.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_pup.f90), [`pl_nfix.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pl_nfix.f90)
+    - Scheduling: [`mgt_operatn.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_operatn.f90), [`mgt_sched.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_sched.f90), [`mgt_read_mgtops.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_read_mgtops.f90); decision tables evaluated in [`hru_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_control.f90)
+    - Harvest: [`mgt_harvgrain.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvgrain.f90), [`mgt_harvbiomass.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvbiomass.f90), [`mgt_harvtuber.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvtuber.f90), [`mgt_harvresidue.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvresidue.f90); `type harvest_operation` in [`mgt_operations_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_operations_module.f90)
+    - Plant database type: `type plant_db` in [`plant_data_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/plant_data_module.f90)
+
+    | `plants.plt` column | Fortran variable |
+    |---------------------|------------------|
+    | `plnt_typ`, `gro_trig` | `pldb%typ`, `pldb%trig` |
+    | `bm_e`, `bm_e_hi`, `co2_hi`, `ru_vpd` | `pldb%bio_e`, `pldb%bioehi`, `pldb%co2hi`, `pldb%wavp` |
+    | `harv_idx`, `harv_idx_ws` | `pldb%hvsti`, `pldb%wsyf` |
+    | `lai_pot`, `frac_hu1`, `lai_max1`, `frac_hu2`, `lai_max2` | `pldb%blai`, `pldb%frgrw1`, `pldb%laimx1`, `pldb%frgrw2`, `pldb%laimx2` |
+    | `hu_lai_decl`, `dlai_rate`, `lai_min` | `pldb%dlai`, `pldb%dlai_rate`, `pldb%alai_min` |
+    | `can_ht_max`, `rt_dp_max` | `pldb%chtmx`, `pldb%rdmx` |
+    | `tmp_opt`, `tmp_base` | `pldb%t_opt`, `pldb%t_base` |
+    | `frac_n_em`, `frac_n_50`, `frac_n_mat` | `pldb%pltnfr1`, `pldb%pltnfr2`, `pldb%pltnfr3` |
+    | `frac_p_em`, `frac_p_50`, `frac_p_mat` | `pldb%pltpfr1`, `pldb%pltpfr2`, `pldb%pltpfr3` |
+    | `stcon_max`, `vpd`, `frac_stcon` | `pldb%gsi`, `pldb%vpdfr`, `pldb%gmaxfr` |
+    | `usle_c_min` | `pldb%usle_c` |
+    | `plnt_decomp` | `pldb%rsdco_pl` |
+    | `bm_tree_acc`, `yrs_mat`, `bm_tree_max` | `pldb%laixco_tree`, `pldb%mat_yrs`, `pldb%bmx_peren` |
+    | `ext_co`, `leaf_tov_mn`, `leaf_tov_mx` | `pldb%ext_coef`, `pldb%leaf_tov_min`, `pldb%leaf_tov_max` |
+    | `rt_st_beg`, `rt_st_end` | `pldb%rsr1`, `pldb%rsr2` |
+    | `n_uptake`, `p_uptake`, `n_fix_max` (parameters.bsn) | `bsn_prm%n_updis`, `bsn_prm%p_updis`, `bsn_prm%nfixmx` |
+    | `harv_typ`, `harv_idx`, `harv_eff`, `harv_bm_min` (harv.ops) | `harvop_db%typ`, `%hi_ovr`, `%eff`, `%bm_min` |
+
+    | Symbol | Fortran variable |
+    |--------|------------------|
+    | $fr_{PHU}$, multi-year fraction | `pcom(j)%plcur(ipl)%phuacc`, `%phuacc_p` |
+    | $PHU$ | `pcom(j)%plcur(ipl)%phumat`, `%phumat_p` |
+    | $H_{phosyn}$ | `par(ipl)` |
+    | $\Delta bio$, $\gamma_{reg}$ | `bioday`, `pcom(j)%plstr(ipl)%reg` |
+    | $\gamma_w$, $\gamma_t$, $\gamma_n$, $\gamma_p$, $\gamma_a$, $\gamma_s$ | `pcom(j)%plstr(ipl)%strsw`, `%strst`, `%strsn`, `%strsp`, `%strsa`, `%strss` |
+    | $E_t$ per plant | `epmax(ipl)` |
+    | $\beta_w$ | `uptake%water_dis` |
+    | $HI$ | `pcom(j)%plg(ipl)%hi_adj` |

@@ -1,89 +1,46 @@
 ---
 title: Output reference
-description: SWAT+ writes time-stepped outputs for every object class. Files follow a consistent naming scheme and are toggled in print.prt.
+description: SWAT+ output files for revision 62.0.1. Which files exist, how print.prt switches them on, and where each group is described.
 status: review
 verified_against:
-  - src/output_landscape_init.f90
-  - src/header_aquifer.f90
-  - src/header_channel.f90
-  - src/header_sd_channel.f90
-  - src/header_reservoir.f90
-  - src/header_write.f90
+  - src/basin_print_codes_read.f90
+  - src/output_path_module.f90
+  - src/proc_open.f90
   - src/proc_bsn.f90
-  - src/proc_hru.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/output_landscape_init.f90
+  - src/header_write.f90
+  - src/header_sd_channel.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-SWAT+ writes one text file per (scope, group, interval) combination. Every output is toggled in `print.prt`. This section documents the file groups, their columns, and where they are written in the source.
+SWAT+ writes text files with results for each object type (HRU, landscape unit, channel, aquifer, reservoir and so on) and for the basin as a whole, by day, month, year and as an average over the simulation. Which files are written is set in [`print.prt`](../input-reference/print-prt.md): each row names a group of outputs and has a `y` or `n` for the daily, monthly, yearly and average annual files. A few files are written in every run.
 
-## Naming convention
+The files go to the output folder named in [`file.cio`](../input-reference/file-cio.md), or to the run folder when none is named. Every run also writes `files_out.out`, a list of the output files it opened, which is the quickest way to see what a given [`print.prt`](../input-reference/print-prt.md) produced.
 
-All time-step output files follow the pattern:
+## Pages
 
-```
-<scope>_<group>_<interval>.txt
-```
+| Page | Content |
+|------|---------|
+| [Naming convention](naming-convention.md) | How files are named and laid out, print timing, and the [`print.prt`](../input-reference/print-prt.md) row behind every file. |
+| [Water balance](water-balance.md) | `hru_wb`, `hru-lte_wb`, `lsunit_wb` and `basin_wb`: precipitation, evapotranspiration, runoff, percolation, soil water and snow. |
+| [Channel, sediment, nutrient](channel-sediment-nutrient.md) | `channel_sd`, `channel_sdmorph`, `sd_chanbud`, the sediment budget files `ch_sedbud`, `chanbud_order` and `sedbud`, their basin sums, and the legacy `channel` files. |
+| [Hydrographs](hydrographs.md) | `hydout`, `hydin`, `deposition` and `ru`: water and loads passed between objects, and the `hydcon.out` connection list. |
+| [Recall](recall.md) | `recall` and `basin_psc`: loads released by point sources, inlets and diversions. |
+| [Nutrient balance and losses](nutrient-balance.md) | `hru_nb`, `hru_ls`, `lsunit_nb`, `lsunit_ls`, `basin_nb`, `basin_ls` and `hru-lte_ls`: nitrogen and phosphorus balances and the sediment and nutrient losses from the landscape. |
+| [Aquifer, reservoir, plant](aquifer-reservoir-plant.md) | `aquifer`, `reservoir`, `wetland`, crop yields and the plant and weather (`_pw`) files. |
+| [Carbon](carbon.md) | Soil, residue and plant carbon files. |
+| [gwflow](gwflow.md) | Outputs of the gridded groundwater module. |
+| [Checker and diagnostics](checker-diagnostics.md) | Files written in every run: `checker.out`, `diagnostics.out`, `files_out.out` and others. |
+| [Post-processing](post-processing.md) | The Python scripts in the `test` folder of the SWAT+ source. |
 
-When `csvout = y` in `print.prt`, a matching `.csv` variant is also written.
+## Recent changes
 
-**Scopes** (the spatial aggregation level):
+- 62.0.1 adds the channel sediment budget files `ch_sedbud_*` (each channel), `chanbud_order_*` (each stream order) and `sedbud_*` (basin), all switched on by the `channel_sd` row.
+- 62.0.0 added the carbon rows of [`print.prt`](../input-reference/print-prt.md) (`hru_cb_gl`, `hru_cb_trf`, `lsu_cb_gl` and others) for the carbon output families; see [Carbon](carbon.md).
 
-| Scope | Meaning |
-|-------|---------|
-| `hru_` | one row per Hydrologic Response Unit |
-| `hru-lte_` | one row per low-resolution HRU (lite model) |
-| `lsunit_` | one row per landscape unit (`ls_unit.def`) |
-| `ru_` | one row per routing unit |
-| `region_` | one row per region defined for regional output |
-| `basin_` | one row, the basin-wide sum or average |
-| `channel_` | one row per channel object (legacy `cha`) |
-| `channel_sd` / `sd_chan` | one row per channel object (sd_channel routing) |
-| `aquifer_` | one row per aquifer object |
-| `reservoir_` | one row per reservoir object |
-| `wetland_` | one row per wetland object |
-| `recall_` | one row per recall object (point source or inlet) |
-| `crop_yld_` | one row per HRU per harvested plant |
+??? quote "Sources"
 
-**Groups** (the variable family):
-
-| Group | Meaning |
-|-------|---------|
-| `_wb` | water balance (precipitation, ET, runoff, percolation, storage) |
-| `_nb` | nutrient balance (mineral and organic N and P pools) |
-| `_ls` | losses from the landscape (sediment, nutrient yields) |
-| `_pw` | plant and weather (LAI, biomass, yield, temperature, stress) |
-| `_cha` | channel routing (legacy: flow, sediment, nutrients) |
-| `_sd_cha` | sd_channel routing (water body storage, in, out) |
-| `_aqu` | aquifer storage and fluxes |
-| `_res` | reservoir storage and fluxes |
-| `_pest` | pesticide |
-| `_salt` | salt ions |
-| `_cs` | constituents |
-| `_carbon` | soil carbon pools |
-| `_chanbud` | channel sediment budget |
-| `_chamorph` | channel morphology |
-
-**Intervals** (the time aggregation):
-
-| Suffix | Meaning |
-|--------|---------|
-| `_day` | one row per simulated day |
-| `_mon` | one row per month |
-| `_yr` | one row per year |
-| `_aa` | one row, average annual over the print window |
-
-Each interval is enabled independently in `print.prt`. A row in `print.prt` named `hru_wb` with `y` in the `avann` column produces `hru_wb_aa.txt`; with `y` in the `daily` column it also produces `hru_wb_day.txt`. The file is opened in `output_landscape_init.f90` only if the matching switch is `y`.
-
-## Per-group pages
-
-- [Naming convention](../output-reference/naming-convention.md). The full grammar and the `print.prt` mapping.
-- [Water balance](../output-reference/water-balance.md). The `*_wb_*.txt` columns: precipitation, ET, runoff, percolation, soil and snow storage.
-- [Channel and sediment](../output-reference/channel-sediment-nutrient.md). The legacy `channel_*.txt` and the sd_channel `channel_sd_*.txt` columns, including sediment and nutrient routing.
-- [Aquifer, reservoir, plant](../output-reference/aquifer-reservoir-plant.md). The `aquifer_*.txt`, `reservoir_*.txt`, `crop_yld_*.txt`, and plant/water-stress (`*_pw_*.txt`) columns.
-- [Checker and diagnostics](../output-reference/checker-diagnostics.md). The always-on diagnostic files: `checker.out`, `diagnostics.out`, `simulation.out`, `files_out.out`.
-- [gwflow](../output-reference/gwflow.md). 2D groundwater outputs: basin and per-cell water balance, heat, six solute species, observation wells, and pumping.
-- [Post-processing helpers](../output-reference/post-processing.md). The two Python scripts shipped in `test/` for regression checks and CSV conversion.
-
-## Output index file
-
-When SWAT+ runs, it writes a master index `files_out.out` listing every output file actually opened during that run. The first column is a short tag (`HRU`, `BASIN`, `CHK`, `CHN`, `AQU`, `RES`, ...) and the second column is the filename. Open `files_out.out` first to see exactly which outputs your `print.prt` produced.
+    - `print.prt` reader: [`basin_print_codes_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_print_codes_read.f90)
+    - Output folder: [`output_path_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/output_path_module.f90)
+    - File opening: [`proc_open.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_open.f90), [`output_landscape_init.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/output_landscape_init.f90), [`header_write.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_write.f90), [`header_sd_channel.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_sd_channel.f90)
+    - `files_out.out`: [`proc_bsn.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_bsn.f90)

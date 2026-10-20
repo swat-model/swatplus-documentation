@@ -49,6 +49,14 @@ extra_css:
 
 extra_javascript:
   - assets/pdf-download.js?v=2
+  - assets/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+
+extra:
+  version:
+    provider: mike
+    default: latest
+    alias: true
 
 markdown_extensions:
   - admonition
@@ -59,6 +67,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
@@ -77,6 +87,9 @@ markdown_extensions:
 
 plugins:
   - search
+  - mike:
+      alias_type: redirect
+      canonical_version: latest
 
 nav:
   - Home: index.md
@@ -124,6 +137,9 @@ nav:
       - Spatial and connectivity:
           - "*.con": input-reference/con.md
           - hru-data.hru: input-reference/hru.md
+          - hru-lte.hru: input-reference/hru-lte.md
+          - Routing and landscape units: input-reference/units.md
+          - "*.lin (link files)": input-reference/link.md
           - hydrology and topography: input-reference/hyd.md
           - recall: input-reference/recall.md
       - Climate:
@@ -137,8 +153,8 @@ nav:
           - landuse.lum: input-reference/lum.md
           - lum lookup tables: input-reference/lum-tables.md
       - Channels:
-          - "*.cha (legacy)": input-reference/cha.md
-          - sd_channel: input-reference/sd-channel.md
+          - "*.cha (channel group)": input-reference/cha.md
+          - chandeg channel files: input-reference/sd-channel.md
       - Aquifers, reservoirs, wetlands:
           - "*.aqu": input-reference/aqu.md
           - "*.res": input-reference/res.md
@@ -174,6 +190,9 @@ nav:
       - Water balance: output-reference/water-balance.md
       - Channel, sediment, nutrient: output-reference/channel-sediment-nutrient.md
       - Aquifer, reservoir, plant: output-reference/aquifer-reservoir-plant.md
+      - Nutrient balance and losses: output-reference/nutrient-balance.md
+      - Hydrographs: output-reference/hydrographs.md
+      - Recall: output-reference/recall.md
       - Carbon: output-reference/carbon.md
       - gwflow: output-reference/gwflow.md
       - Checker and diagnostics: output-reference/checker-diagnostics.md

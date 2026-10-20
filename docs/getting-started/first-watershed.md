@@ -1,11 +1,15 @@
 ---
 title: Your first watershed
 status: review
+verified_against:
+  - swatplus/src/input_file_module.f90
+  - swatplus/src/main.f90.in
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-This walks through the workflow to build a SWAT+ project for an area of your own, run it, and look at the output. It does not click through QSWAT+ screen by screen. It covers the steps and what each one produces so you know what to expect.
+The steps below build a SWAT+ project for an area of your choice, run it and look at the output, with what each step produces. They do not go through QSWAT+ screen by screen.
 
-## What you need
+## Requirements
 
 Data:
 
@@ -17,9 +21,7 @@ Data:
 
 Software:
 
-- QGIS with the QSWAT+ plugin. See [Install](install.md).
-- SWAT+ Editor.
-- The SWAT+ executable.
+- QGIS with the QSWAT+ plugin, SWAT+ Editor and, for calibration, SWAT+ Toolbox. See [Install](install.md).
 
 ## Step 1: Delineate the watershed (QSWAT+)
 
@@ -45,26 +47,26 @@ Output: HRU definitions and `*.con` connectivity files.
 
 Open the project in SWAT+ Editor. The editor will:
 
-1. Import climate station data and write the `.cli`, `.pcp`, `.tmp`, and `weather-wgn.cli` files. Stations without data get filled by the weather generator.
+1. Import climate station data and write the `.cli`, `.pcp`, `.tmp`, and [`weather-wgn.cli`](../input-reference/cli.md#weather-wgncli) files. Stations without data get filled by the weather generator.
 2. Populate soil layer parameters from the soil property table.
 3. Populate plant, fertiliser, tillage, and pesticide databases.
 4. Let you assign management schedules to each land use.
 5. Write the final input folder.
 
-Set the simulation period in `time.sim` (typically include a one- to three-year warm-up at the start) and the output toggles in `print.prt`.
+Set the simulation period and choose the outputs. Start the simulation one to three years before the period you want to analyse, and set the number of warm-up years in `nyskip` of [`print.prt`](../input-reference/print-prt.md) so they are left out of the outputs.
 
 Output: a folder of plain-text SWAT+ inputs, ready to run.
 
 ## Step 4: Run
 
-Copy the SWAT+ executable into the project folder. From a terminal:
+Run the model from SWAT+ Editor, or from a terminal inside the project's `TxtInOut` folder:
 
 ```bash
-cd path/to/your/project
-./swatplus-<version>-gnu-lin_x86_64
+cd path/to/your/project/Scenarios/Default/TxtInOut
+path/to/swatplus-62.0.1-gnu-lin_x86_64-Rel
 ```
 
-Watch `simulation.out` for the `Execution successfully completed` message. Check `diagnostics.out` and `checker.out` for warnings.
+Watch for the `Execution successfully completed` message. Then read `diagnostics.out`: it lists every name that could not be matched (a management schedule, a weather station, a plant) and every missing file. Fix those before looking at results.
 
 ## Step 5: Look at output
 
@@ -74,7 +76,7 @@ Start with the basin water balance:
 basin_wb_aa.txt
 ```
 
-The annual-average precipitation, evapotranspiration, surface runoff, lateral flow, percolation, and water yield should be in the range you expect for your climate. If precipitation is wildly off, your climate file mapping is wrong. If ET dominates everything, check land use and plant parameters.
+The annual-average precipitation, evapotranspiration, surface runoff, lateral flow, percolation, and water yield should be in the range you expect for your climate. If precipitation is far from the expected value, the weather stations are probably assigned wrongly. If ET takes up nearly all of the precipitation, check land use and plant parameters.
 
 Then look at the channel output (`basin_sd_cha_aa.txt` or the per-channel `channel_sd_aa.txt`) for streamflow.
 
@@ -86,7 +88,11 @@ The first run is rarely a good match to observed data. Move on to [Calibration](
 
 ## Common first-run problems
 
-- **No precipitation anywhere.** The climate station coordinates are outside the watershed extent, so QSWAT+ assigned every HRU to the weather generator instead of the station. Check `weather-sta.cli`.
-- **Crops never grow.** The management schedule is not assigned, or the planting date is outside the simulation period.
-- **All flow is surface runoff.** Curve numbers are too high. Check `cntable.lum` and the soil hydrologic group.
-- **Streamflow is zero downstream.** A channel object has no upstream connection in `chandeg.con` or `hru.con`. Inspect the connectivity.
+- No precipitation anywhere: the climate station coordinates are outside the watershed extent, so QSWAT+ assigned every HRU to the weather generator instead of the station. Check [`weather-sta.cli`](../input-reference/cli.md#weather-stacli).
+- Crops never grow: the management schedule is not assigned, or the planting date is outside the simulation period.
+- All flow is surface runoff: curve numbers are too high. Check [`cntable.lum`](../input-reference/lum-tables.md#cntablelum) and the soil hydrologic group.
+- Streamflow is zero downstream: a channel object has no upstream connection in [`chandeg.con`](../input-reference/con.md) or [`hru.con`](../input-reference/con.md). Inspect the connectivity.
+
+??? quote "Sources"
+
+    - File names and groups: [`src/input_file_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90). Completion message: [`src/main.f90.in`](https://github.com/swat-model/swatplus/blob/62.0.1/src/main.f90.in).

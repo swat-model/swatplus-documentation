@@ -1,60 +1,127 @@
 ---
 title: Conditions and regionalization
-description: Apply a parameter change only to objects that match a condition or live in a named region.
+description: Limit a calibration.cal change to objects that meet conditions, and set up regional calibration with calibration groups or object lists.
 status: review
+verified_against:
+  - src/cal_parmchg_read.f90
+  - src/cal_conditions.f90
+  - src/cal_cond_read.f90
+  - src/hrudb_init.f90
+  - src/landuse_data_module.f90
+  - src/time_control.f90
+  - src/calibration_data_module.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-A change in `calibration.cal` can carry condition lines that restrict where the change is applied. The conditions are tested object by object in `cal_conditions.f90`. If every condition evaluates true for a given object, the change is passed to `cal_parm_select` for that object; otherwise the object is skipped.
+## Purpose
 
-## Source
+A row of [`calibration.cal`](../calibration/parameter-change-files.md) can be followed by condition lines. SWAT+ then changes the parameter only on the objects that meet every condition of the row. Conditions are checked once, at start-up, against the state of each object after the inputs are read.
 
-- Condition evaluation: [`src/cal_conditions.f90`](https://github.com/swat-model/swatplus/blob/main/src/cal_conditions.f90)
-- Condition reader: [`src/cal_cond_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/cal_cond_read.f90)
-- Parameter dispatch: [`src/cal_parm_select.f90`](https://github.com/swat-model/swatplus/blob/main/src/cal_parm_select.f90)
-- Condition record type: [`src/calibration_data_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/calibration_data_module.f90), `type calibration_conditions` and `type update_conditional`.
+Conditions and object lists are the two ways to calibrate parts of a watershed separately, for example one set of curve number changes for cropland and another for forest, or different groundwater parameters upstream and downstream of a gauge.
 
-## Two condition syntaxes
+## Condition lines
 
-`cal_parmchg_read.f90` peeks at the first token of each condition line:
+The number of condition lines is given in the `conds` column of the change row, and the lines follow the row directly. Each line has one of two forms.
 
-- If the token is the literal word `range`, the line is read as `range <var> <val1> <val2>`. The condition holds when the value of `<var>` for the current object falls inside `[val1, val2]`. `val1` and `val2` are stored on the parent change record (shared across that record's range conditions).
-- Otherwise the line is read as a `calibration_conditions` record: `<var> <alt> <targ> <targc>`. `targ` is a real, `targc` is a string. The reader stores all four fields but `cal_conditions.f90` only uses `var`, `targc`, and `targ` depending on the variable.
+**Range condition**
 
-## Supported variables
+```
+range  <variable>  <min>  <max>
+```
 
-The `select case (cal_upd(ichg_par)%cond(ic)%var)` block in `cal_conditions.f90` accepts:
+The object's value must be greater than `<min>` and less than `<max>`.
 
-| Variable | Object type | Form | Semantics |
-|----------|-------------|------|-----------|
-| `res_pvol` | reservoirs | range | Reservoir principal storage volume (compared in units of 10000). |
-| `hsg` | HRU soils | categorical (`targc`) | Hydrologic soil group must equal `targc` (`A`, `B`, `C`, `D`). |
-| `res_typ` | reservoirs | categorical (`targc`) | Reservoir decision-table name must equal `targc`. |
-| `texture` | HRU soils | categorical (`targc`) | Soil texture string must equal `targc`. |
-| `plant` | HRU plant community | categorical (`targc`) | The HRU's plant community must contain a plant named `targc`. |
-| `pl_class` | HRU plants | categorical (`targc`) | Plant class for the HRU must equal `targc`. |
-| `landuse` | HRU land use management | categorical (`targc`) | `hru%land_use_mgt_c` must equal `targc`. |
-| `cal_group` | HRU calibration tag | categorical (`targc`) | `hru%cal_group` must equal `targc`. |
+**Text condition**
 
-A change with multiple conditions implements an AND: all must hold for the object to be modified.
+```
+<variable>  <operator>  <number>  <text>
+```
 
-## Regionalization
+The object's value must equal `<text>`. All four values must be present. The operator and number are read but none of the existing conditions uses them, so any placeholder works (for example `=` and `0`).
 
-Two patterns produce a regional effect:
+When a row has several condition lines, an object must meet all of them.
 
-- **Implicit through `cal_group`.** Tag every HRU with a `cal_group` name (set on the HRU input). Then a change with a `cal_group <name>` condition runs only on that group. This is how named region-based hard calibration is typically done.
-- **Explicit object list.** Put the HRU (or channel, or aquifer) indices directly on the change record (`nspu > 0`). No conditions needed. This is what soft calibration writes when it commits its perturbations.
+## Condition variables
 
-The two can combine: an explicit object list with one or more conditions further filters the list.
+| Variable | Form | Objects | Condition met when |
+|----------|------|---------|--------------------|
+| `cal_group` | text | HRU | the `cal_group` of the HRU's land use in [`landuse.lum`](../input-reference/lum.md) equals the text |
+| `landuse` | text | HRU | the HRU's land use name (the `lu_mgt` entry of [`hru-data.hru`](../input-reference/hru.md)) equals the text |
+| `hsg` | text | HRU | the hydrologic soil group of the HRU's soil (`hyd_grp` in [`soils.sol`](../input-reference/sol.md)) equals the text, for example `C` |
+| `texture` | text | HRU | the `texture` of the HRU's soil in [`soils.sol`](../input-reference/sol.md) equals the text |
+| `plant` | text | HRU | the first plant of the HRU's plant community is the named plant |
+| `pl_class` | text | | see below |
+| `res_typ` | text | reservoir decision table | the decision table's name equals the text |
+| `res_pvol` | range | reservoir | the principal spillway volume, in 10⁴ m³ (ha-m, as in [`hydrology.res`](../input-reference/res.md#hydrologyres)), is between `<min>` and `<max>` |
 
-## Decision-table conditional updates
+The HRU conditions apply to parameters whose object type is `hru`, `sol` or `plt`. They compare against the HRU with the same number as the object being changed, so with other object types (aquifers, channels) they test an unrelated HRU.
 
-`cal_cond_read.f90` reads a separate file, `scen_dtl.upd`, that schedules updates by decision table. Each row gives a maximum number of times the table may fire, a table type, and the name of a `dtbl` entry in `conditional.ctl`. The reader crosswalks the table name into `dtbl_scen` and stores the result in `upd_cond` (`type update_conditional`). The same decision-table machinery used elsewhere in SWAT+ (land-use change scenarios, management triggers) is reused here.
+Text comparisons are exact and case sensitive, and an unknown variable name is ignored, so a misspelt condition lets every object through.
 
-## Parameter dispatch
+Notes on specific variables:
 
-Once conditions pass, the change is sent to `cal_parm_select.f90` with the parameter name, change type, magnitude, absolute bounds, the target element, and the soil layer (for layer-targeted soil parameters). `cal_parm_select` is a long `select case (chg_parm)` that writes the change into the live model state via `chg_par` (the change operator) and calls the relevant re-initializer (`curno` for `cn2`, `soil_awc_init` for `awc`, and so on).
+- `plant`: only the first plant in the community is checked. For a community of corn and soybean in that order, `plant = corn` matches and `plant = soyb` does not. For the plant parameters `lai_pot`, `harv_idx` and `phu_mat` the `plant` condition has a second role: it names the plant whose value is changed (see [Plant parameters](../calibration/hard-calibration.md#plant-parameters)).
+- `pl_class`: compares the class of the plant at the same position in [`plants.plt`](../input-reference/plt.md) as the object number. It does not look at the HRU's plants, so it is not useful for selecting HRUs.
+- `res_pvol`: both limits are taken from the last `range` line of the row.
+
+## Regional calibration
+
+### Calibration groups
+
+The most direct way to calibrate regions or land-use groups separately is the `cal_group` column of [`landuse.lum`](../input-reference/lum.md):
+
+1. Give each land use a group name in `cal_group`, for example `crop_north`, `crop_south`, `forest`. Land uses that share a name form one group.
+2. Write one change row per group, each with a `cal_group` condition.
+
+```
+cn2      pctchg   -8.0   1   0  0  0  0  0  0   0
+cal_group  =  0  crop_north
+cn2      pctchg    4.0   1   0  0  0  0  0  0   0
+cal_group  =  0  forest
+```
+
+The same `cal_group` names are used by [soft calibration](../calibration/soft-calibration.md) to match its water balance targets to HRUs.
+
+### Object lists
+
+The other way is to list the objects in the row itself (`obj_tot` and the numbers after it), for example the HRUs, aquifers or channels upstream of a gauge. A negative number closes a range, so `3  1 -120 245` selects objects 1 to 120 and 245. Object lists work for every object type.
+
+Object lists and conditions can be combined: the conditions are then checked only on the listed objects.
+
+## Scheduled land use updates
+
+SWAT+ also reads a file named `scen_dtl.upd` from the project folder, if it exists. It lists decision tables from the scenario decision table file ([`scen_lu.dtl`](../input-reference/dtl.md) by default, named on the `decision_table` line of [`file.cio`](../input-reference/file-cio.md)) that are checked for every HRU at the start of every simulated day. Their actions can change land use, management or other HRU settings during the run, for example to simulate land use change at a set date.
+
+- Line 1: title.
+- Line 2: number of tables.
+- Line 3: header.
+- One line per table: maximum number of times the table may act, table type, and table name.
+
+The maximum and the type are read but not used in 62.0.1: every listed table is checked every day for every HRU.
+
+This file is separate from [`calibration.cal`](../calibration/parameter-change-files.md). Its changes happen during the run, while [`calibration.cal`](../calibration/parameter-change-files.md) changes happen before the run starts. See [Decision tables](../model-theory/decision-tables.md) for how tables are written.
 
 ## Related pages
 
-- [Parameter change files](../calibration/parameter-change-files.md). The columns that hold these conditions on disk.
-- [Hard calibration](../calibration/hard-calibration.md). When conditions are evaluated in the calibration run.
+- [Parameter change files](../calibration/parameter-change-files.md). Layout of the change rows.
+- [Hard calibration](../calibration/hard-calibration.md). When and how changes are applied.
+- [landuse.lum](../input-reference/lum.md). The `cal_group` column.
+
+??? quote "Sources"
+
+    - Reading condition lines: [`src/cal_parmchg_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_parmchg_read.f90).
+    - Evaluating conditions: [`src/cal_conditions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_conditions.f90).
+    - Calibration group of an HRU: [`src/hrudb_init.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hrudb_init.f90) copies `lum(ilu)%cal_group` to `hru(ihru)%cal_group`.
+    - `scen_dtl.upd`: [`src/cal_cond_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/cal_cond_read.f90); used in [`src/time_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/time_control.f90).
+    - Types: `type calibration_conditions`, `type update_parameters` and `type update_conditional` in [`src/calibration_data_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/calibration_data_module.f90).
+
+    | Condition variable | Compared with |
+    |--------------------|---------------|
+    | `cal_group` | `hru(ielem)%cal_group` |
+    | `landuse` | `hru(ielem)%land_use_mgt_c` |
+    | `hsg` | `soil(ielem)%hydgrp` |
+    | `texture` | `soil(ielem)%texture` |
+    | `plant` | `pcom(ielem)%pl(1)` |
+    | `pl_class` | `pl_class(ielem)` |
+    | `res_typ` | `dtbl_res(ielem)%name` |
+    | `res_pvol` | `res_ob(ielem)%pvol`, against `10000 * val1` and `10000 * val2` |

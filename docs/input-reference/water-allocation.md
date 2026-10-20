@@ -1,333 +1,485 @@
 ---
 title: water allocation
-description: Inputs for the water-rights and inter-object water transfer module.
+description: Places of use, points of diversion and points of return, and the treatment, use, tower, canal, pipe and outside-basin files that make up the water allocation network.
 status: review
 verified_against:
+  - src/input_file_module.f90
+  - src/readcio_read.f90
+  - src/main.f90.in
+  - src/water_allocation_module.f90
   - src/water_allocation_read.f90
-  - src/water_canal_read.f90
-  - src/water_orcv_read.f90
-  - src/water_osrc_read.f90
-  - src/water_pipe_read.f90
-  - src/water_tower_read.f90
+  - src/water_hru_irr_read.f90
+  - src/wallo_wtps_wuses.f90
   - src/water_treatment_read.f90
   - src/water_use_read.f90
-  - src/water_allocation_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/water_osrc_read.f90
+  - src/water_orcv_read.f90
+  - src/water_tower_read.f90
+  - src/water_pipe_read.f90
+  - src/water_canal_read.f90
+  - src/om_treat_read.f90
+  - src/om_use_read.f90
+  - src/om_osrc_read.f90
+  - src/time_control.f90
+  - src/wallo_start_day.f90
+  - src/wallo_control.f90
+  - src/wallo_withdraw.f90
+  - src/wallo_pou_deliv.f90
+  - src/wallo_return.f90
+  - src/wallo_treatment.f90
+  - src/wallo_use.f90
+  - src/wallo_canal.f90
+  - src/wallo_transfer.f90
+  - src/sd_channel_control3.f90
+  - src/res_control.f90
+  - src/aqu_1d_control.f90
+  - src/hru_control.f90
+  - src/actions.f90
+  - src/conditions.f90
+  - src/hydrograph_module.f90
+  - src/header_water_allocation.f90
+  - src/gwflow_read.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
+
+!!! warning
+    In revision 62.0.1 the water allocation calculation follows these inputs only for a network with a single place of use, other than an irrigation district, whose POD lines are listed in POD-number order. Other layouts can take the wrong amounts or stop the run, and several columns are read but have no effect. See [Limitations in 62.0.1](#limitations-in-6201) before setting up a network.
 
 ## Purpose
 
-The water allocation module moves water between spatial objects (channels, reservoirs, aquifers, HRUs) and an auxiliary transport network (canals, pipes, towers, treatment plants, end-use sinks, out-of-basin sources and receivers). It is the mechanism SWAT+ uses for irrigation withdrawals, municipal and industrial supply, inter-basin transfer, and any rule-driven diversion. The driver type is `water_allocation` (`type water_allocation`, alias `wallo`) defined in `water_allocation_module.f90`. The entry-point file is `water_allocation.wro`. All other water-allocation files supply objects referenced from that file.
+Water allocation moves water from where it is taken to where it is used: irrigation districts, towns, industry, treatment plants, reservoirs, canals and places outside the basin. Revision 62.0.1 describes the network with three kinds of object:
 
-## How it fits together
+- A **place of use** (POU) is where water goes: an irrigation district, a water treatment plant, a water use, a water tower, a canal, a channel, a reservoir, an aquifer or a receiver outside the basin. Each POU has a daily demand (its duty).
+- A **point of diversion** (POD) is where water is taken: a channel, reservoir, aquifer, canal, water tower, outside-basin source or an unlimited source. A POD can supply several POUs, and a POU can draw on several PODs.
+- A **point of return** (POR) is where a POU sends water after it has been used or treated: back to a channel, reservoir or aquifer, on to another treatment plant or use, or out of the basin.
 
-A single water allocation object (`wallo(iwro)`) owns one or more transfer objects (`wallo%trn(itrn)`). Each transfer object has:
+Two files define the network: `place_of_use.wro` lists every POU with its PODs and PORs, and `point_of_diver.wro` lists every POD with the POUs it serves. The `.wal` files describe the objects between them: treatment plants, water uses, water towers, canals, pipes, irrigation districts and outside-basin sources.
 
-- a transfer type (`trn_typ`): `outflo`, `ave_day`, `div_min`, `div_frac`, `dtbl_con`, `dtbl_lum`. The first five draw from the source list directly; `dtbl_lum` and `dtbl_con` defer the amount to a decision table.
-- one or more source objects (`src`), each with a type from `cha`, `res`, `aqu`, `osrc`, `osrc_a`, `wtp`, `use`, `can`, plus a conveyance pointer (`pipe` or `pump`) and an optional withdrawal-limit decision table.
-- exactly one receiving object (`rcv`), with a type from `hru`, `cha`, `res`, `aqu`, `wtp`, `use`, `stor` (tower), `can`, `orcv`.
+This structure replaces the `water_allocation.wro` transfer file of earlier revisions, whose columns in earlier documentation (`rule_typ`, `srcs`, `ob_typ`, `withdr`, `limit_mon`, `cha_ob`, `rcv_ob`, `rcv_num`) have no counterpart in 62.0.1. `water_allocation.wro`, `element.wro` and `water_rights.wro` are no longer read.
 
-The transport network is a set of independent files, each read by its own subroutine:
+## Files and activation
+
+| File | Name set by | Contents |
+|------|-------------|----------|
+| `place_of_use.wro` | `water_rights` line of [`file.cio`](../input-reference/file-cio.md), first name | Places of use, with their PODs and PORs |
+| `point_of_diver.wro` | `water_rights` line of [`file.cio`](../input-reference/file-cio.md), second name | Points of diversion and the POUs each serves |
+| `water_hru_irr.wal` | fixed name | HRUs in each irrigation district |
+| `wtps_wuses.wal` | fixed name | Numbers of treatment plants and water uses |
+| `water_treat.wal` | fixed name | Water treatment plants |
+| `water_use.wal` | fixed name | Water uses (domestic, industrial, commercial) |
+| `outside_src.wal` | fixed name | Sources outside the basin |
+| `om_treat.wal`, `om_use.wal`, `om_osrc.wal` | fixed names | Water quality sets for treated water, used water and outside sources |
+| `water_tower.wal` | fixed name | Water towers (storage) |
+| `water_canal.wal` | fixed name | Canals |
+| `water_pipe.wal` | fixed name | Pipes |
+| `outside_rcv.wal` | fixed name | Receivers outside the basin (not read) |
+
+The `water_rights` line of [`file.cio`](file-cio.md) now takes two file names, the POU file and the POD file, with defaults `place_of_use.wro` and `point_of_diver.wro`. A [`file.cio`](../input-reference/file-cio.md) written for an earlier revision has `water_allocation.wro element.wro water_rights.wro` on that line, and SWAT+ 62.0.1 then reads `water_allocation.wro` as the POU file and `element.wro` as the POD file. Update the line before running an older project; [older file.cio files](file-cio.md#older-filecio-files) explains how the old line is read.
+
+Water allocation runs when the POU file has at least one place of use. If a `.wro` file or `wtps_wuses.wal` is missing, or the line in [`file.cio`](../input-reference/file-cio.md) says `null`, SWAT+ creates an empty file of that name in the run folder (a file called `null` in the second case) and reads nothing from it. The empty file does no harm.
+
+All files have a title on line 1. The `.wro` files and most `.wal` files then give the number of records on line 2 and a column header on line 3. Records are read as free-format values separated by spaces, by position, so the header text is not checked.
+
+## Daily sequence
+
+Each day, before any object is simulated:
+
+1. The day's POD and POR totals are set to zero.
+2. Outside-basin source PODs, water tower PODs and unlimited PODs give water to their POUs.
+3. POUs with no PODs (a treatment plant or use fed only by returns from other POUs) treat or use the water they have stored and pass it to their PORs.
+4. The demand of every POU is set, from `rate_max` or from its decision table, and split among its PODs by `frac` (or by a decision table).
+
+During the day, natural PODs give water when their object is simulated: a channel POD after the channel is routed (the water comes out of the channel's outflow for the day), a reservoir POD after the day's inflow is added, an aquifer POD after recharge is added. A canal POD gives water when the canal receives water.
+
+Each time a POD gives water, every POU whose PODs have all given water for the day receives it. Water delivered to a POU that is a treatment plant, use or canal is processed at once (treated, used, or routed through the canal), and the POU's outflow is passed to its PORs.
+
+Because step 2 runs before step 4, outside-source, water tower and unlimited PODs work with the previous day's demand, and with zero demand on the first day.
+
+## place_of_use.wro
+
+Line 1 is a title, line 2 the number of POUs, line 3 a header. Each POU then takes one line, followed by one line for each of its PODs and one line for each of its PORs.
+
+### POU line
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `num` | - | POU number, 1 to the number on line 2. The record is stored under this number. |
+| 2 | `name` | - | POU name. |
+| 3 | `typ` | - | POU type, from the table below. |
+| 4 | `typ_num` | - | Number of the object of that type that receives the water (for example the channel number, or the record number in `water_treat.wal`). For `irr`, the record number in `water_hru_irr.wal`. |
+| 5 | `pods` | - | Number of POD lines that follow. 0 for a POU fed only by returns from other POUs. |
+| 6 | `pors` | - | Number of POR lines that follow. |
+| 7 | `dtbl_mx` | - | Name of a flow control decision table ([`flo_con.dtl`](../input-reference/dtl.md)) that sets the daily demand, or `null`. |
+| 8 | `rate_max` | m³/s | Maximum demand rate. Without a decision table the POU demands $\mathrm{rate\_max} \times 86400$ m³ every day. With a decision table, its demand is capped at that amount. |
+| 9 | `dtbl_pod_fr` | - | Name of a flow control decision table that sets the fraction taken from each POD, or `null` to use the `frac` column of the POD lines. |
+| 10 | `dtbl_por_fr` | - | Name of a flow control decision table that sets the fraction sent to each POR, or `null` to use the `frac` column of the POR lines. |
+
+| POU type | Water goes to |
+|----------|---------------|
+| `irr` | The HRUs of an irrigation district in `water_hru_irr.wal` |
+| `cha` | A channel (added to the channel's inflow) |
+| `res` | A reservoir |
+| `aqu` | An aquifer |
+| `wtp` | A water treatment plant in `water_treat.wal` |
+| `use` | A water use in `water_use.wal` |
+| `wtow` | A water tower in `water_tower.wal` |
+| `can` | A canal in `water_canal.wal` |
+| `orcv` | A receiver outside the basin in `outside_rcv.wal` |
+
+### POD lines
+
+One line per POD, starting with the word `POD`.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `kind` | - | The word `POD`. |
+| 2 | `num` | - | Not used (overwritten by column 5). |
+| 3 | `name` | - | POD name, for reference. |
+| 4 | `typ` | - | POD type, for reference. The type used is the one in `point_of_diver.wro`. |
+| 5 | `typ_num` | - | Object number, for reference. |
+| 6 | `conv_typ` | - | Conveyance type, `pipe` or `pump`. Read but not used. |
+| 7 | `conv_num` | - | Conveyance number. Read but not used. |
+| 8 | `dtbl_min` | - | Decision table for the minimum level. Read but not used. |
+| 9 | `const_min` | depends on POD type | Minimum level below which the POD gives no water. See the POD type table under [point_of_diver.wro](#point_of_diverwro). |
+| 10 | `dtbl_wdraw` | - | Name of a flow control decision table that manages the annual withdrawal limit, or `null`. When a name is given, the limit is not reset at the start of each year; the `duty_reset` decision table action resets it instead. |
+| 11 | `ann_max` | m³/s | Annual withdrawal limit for this POD and POU. Once the volume taken during the year reaches $\mathrm{ann\_max} \times 86400$ m³, the POD gives this POU no more water until the limit is reset. |
+| 12 | `frac` | fraction | Fraction of the POU's daily demand taken from this POD. The fractions of a POU's PODs normally add up to 1. |
+| 13 | `comp` | - | `y` to let this POD make up a shortfall when the POU's PODs together delivered less than its demand, `n` otherwise. Channel PODs cannot make up a shortfall. |
+
+### POR lines
+
+One line per POR, starting with the word `POR`.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `kind` | - | The word `POR`. |
+| 2 | `num` | - | Not used (overwritten by column 5). |
+| 3 | `name` | - | POR name, for reference. |
+| 4 | `typ` | - | Receiving object type: `cha`, `res`, `aqu`, `wtp`, `use`, `wtow`, `can` or `orcv`. `hru` is accepted but receives nothing. |
+| 5 | `typ_num` | - | Number of the receiving object of that type. |
+| 6 | `conv_typ` | - | Conveyance type. Read but not used. |
+| 7 | `conv_num` | - | Conveyance number. Read but not used. |
+| 8 | `dtbl_max` | - | Read but not used. |
+| 9 | `const_max` | - | Read but not used. |
+| 10 | `ann_max` | - | Read but not used. |
+| 11 | `frac` | fraction | Fraction of the POU's outflow sent to this POR. |
+
+A water treatment plant POU sends each POR its `frac` of the treated water, and a water use POU sends each POR its `frac` of its effluent. For the other POU types, canals included, each POR receives its `frac` of the water withdrawn for the POU, in addition to the delivery to the POU itself.
+
+## point_of_diver.wro
+
+Line 1 is a title, line 2 the number of PODs, line 3 a header. Each POD takes one line: five fixed columns, then six columns for each POU it serves.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `num` | - | POD number. |
+| 2 | `name` | - | POD name. |
+| 3 | `typ` | - | POD type, from the table below. |
+| 4 | `typ_num` | - | Number of the object of that type (channel number, reservoir number, record number in `outside_src.wal`, and so on). |
+| 5 | `pous` | - | Number of POUs served. |
+| 6 to 11 | `pou_num`, `pou_name`, `pod_num`, `pou_typ`, `pou_typ_num`, `right` | - | Repeated for each POU: the POU number in `place_of_use.wro`, its name, the position of this POD among that POU's POD lines, the POU type and object number, and the water right (`sr` senior, `jr` junior). |
+
+The `right` column is read but does not change the order of withdrawals in 62.0.1.
+
+| POD type | Water taken from | Meaning of `const_min` |
+|----------|------------------|------------------------|
+| `cha` | Channel outflow for the day | Minimum daily flow volume (m³). No water is taken on days when the channel outflow is at or below it. |
+| `res` | Reservoir storage | Fraction of the principal spillway volume. No water is taken when storage is at or below it. |
+| `aqu` | Aquifer storage | Water table depth (m). Water is taken only while the water table is shallower than this depth. |
+| `can` | Canal storage | Fraction of the current canal storage, so values up to 1 set no limit. |
+| `wtow` | Water tower storage | Fraction of the current tower storage, so values below 1 set no limit. |
+| `osrc` | Outside-basin source | Not used. |
+| `unl` | Unlimited source with no water quality | Not used. |
+| `hru` | Accepted, gives no water | - |
+| `gwf` | Accepted, gives no water | - |
+
+The amount taken is the POD's duty (its `frac` of the POU demand), limited by the water the object has above the minimum. Withdrawals from channels, reservoirs, canals and towers take sediment and nutrients with the water in proportion. Aquifer withdrawals take water, nitrate and mineral P.
+
+Two types do not follow this rule:
+
+- An `osrc` POD gives its `frac` of the daily volume available from the outside source, whatever the POU demand. The available volume is the `flo` value of the `om_osrc.wal` record with the same number as the source. The water has no sediment or nutrients.
+- A `unl` POD gives $\mathrm{frac}$ times its duty, which is $\mathrm{frac}^2$ times the POU demand.
+
+## water_hru_irr.wal
+
+Irrigation districts for `irr` POUs. Line 1 is a title, line 2 the number of districts, line 3 a header. Each district takes one line with its name and number of HRUs, followed by one line per HRU.
+
+| Line | Columns | Description |
+|------|---------|-------------|
+| District | `name`, `num_hrus` | District name and the number of HRU lines that follow. |
+| HRU | `hru`, `dtbl_lum` | HRU number and the name of the decision table in [`lum.dtl`](../input-reference/dtl.md) that sets its irrigation demand. |
+
+The demand of an irrigation POU is meant to be the sum of the demands of its HRUs, set by their decision tables. See [Limitations in 62.0.1](#limitations-in-6201) for how 62.0.1 handles it.
+
+## wtps_wuses.wal
+
+Sets up storage for treatment plants and water uses. It is needed whenever `water_treat.wal` or `water_use.wal` is used.
+
+| Line | Contents |
+|------|----------|
+| 1 | Title |
+| 2 | Number of treatment plants, number of water uses |
+| 3 | Header (skipped) |
+| 4 | Names of the treatment plants |
+| 5 | Names of the water uses |
+
+The two numbers must match the number of records in `water_treat.wal` and `water_use.wal`. Lines 4 and 5 must both be present, even when one of the numbers is 0. The names are read but not used.
+
+## water_treat.wal
+
+Water treatment plants. Line 1 is a title, line 2 the number of plants, line 3 a header. Each plant takes one line, followed by one line per treatment level.
+
+Plant line:
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `name` | - | Plant name. |
+| 2 | `stor_mx` | m³ | Maximum storage. Read but not used. |
+| 3 | `lag_days` | days | Treatment time. Read but not used: treated water leaves the same day. |
+| 4 | `loss_fr` | fraction | Water loss during treatment. Read but not used; the loss comes from the `flo` value of the quality set. |
+| 5 | `num_treats` | - | Number of treatment level lines that follow. |
+
+Treatment level line:
+
+| # | Column | Description |
+|---|--------|-------------|
+| 1 | `org_min_typ` | How the quality of the treated water is set: `const` (a record in `om_treat.wal`), `dtbl` (a decision table) or `recall` (a recall record). |
+| 2 | `org_min_name` | Name of the `om_treat.wal` record, decision table or recall record. |
+| 3, 4 | `pests_typ`, `pests_name` | Same pair for pesticides. Read but not used. |
+| 5, 6 | `paths_typ`, `paths_name` | Same pair for pathogens. Read but not used. |
+| 7, 8 | `salts_typ`, `salts_name` | Same pair for salt ions. Read but not used. |
+| 9, 10 | `constit_typ`, `constit_name` | Same pair for other constituents. Read but not used. |
+| 11 | `description` | Text. |
+
+If the project has pesticides, each treatment level line is followed by a header line and a line of pesticide concentrations in the treated water, one value per pesticide. If it has pathogens, a header line and a line of pathogen concentrations follow in the same way.
+
+When a plant has more than one treatment level, the last level sets the quality of the outflow.
+
+Treated outflow to each POR is
+
+$$Q_{out} = V_{stor}\; f_{\mathrm{om}}\; \mathrm{frac}_{POR}$$
+
+where $V_{stor}$ is the water delivered to the plant that day (m³), $f_{\mathrm{om}}$ is the `flo` value of the quality set (the fraction of water that leaves the plant after treatment losses) and $\mathrm{frac}_{POR}$ is the POR's fraction. Sediment and nutrient loads are the quality set's concentrations times $Q_{out}$, limited to the loads that came into the plant. The difference between incoming and outgoing loads is reported as the amount removed by treatment.
+
+## water_use.wal
+
+Water uses (domestic, industrial, commercial). Line 1 is a title, line 2 the number of uses, line 3 a header. Each use takes one line, followed by the optional pesticide and pathogen lines described for `water_treat.wal`.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `name` | - | Use name. |
+| 2 | `stor_mx` | m³ | Maximum storage. Read but not used. |
+| 3 | `lag_days` | days | Read but not used. |
+| 4 | `loss_fr` | fraction | Read but not used. |
+| 5 to 14 | `org_min_typ`, `org_min_name`, ... `constit_typ`, `constit_name` | - | Quality pairs as in a `water_treat.wal` treatment level. `org_min_name` names a record in `om_use.wal` when the type is `const`. |
+| 15 | `description` | - | Text. |
+
+The outflow of a use is the water delivered that day times the `flo` value of its `om_use.wal` record (the fraction returned as effluent), with the record's concentrations. Each POR receives its `frac` of the outflow.
+
+## outside_src.wal
+
+Sources outside the basin, used by `osrc` PODs. Line 1 is a title, line 2 the number of sources, line 3 a header. Each source takes one line, followed by the optional pesticide and pathogen lines described for `water_treat.wal`.
+
+| # | Column | Description |
+|---|--------|-------------|
+| 1 | `name` | Source name. |
+| 2 to 11 | `org_min_typ`, `org_min_name`, ... `constit_typ`, `constit_name` | Quality pairs as in a `water_treat.wal` treatment level. `org_min_name` names a record in `om_osrc.wal` when the type is `const`. |
+| 12 | `description` | Text. |
+
+## om_treat.wal, om_use.wal and om_osrc.wal
+
+Water quality sets for treated water, used water (effluent) and outside sources. Line 1 is a title, line 2 the number of records, line 3 a header. Each record is a name followed by 18 values.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `name` | - | Record name. |
+| 2 | `flo` | see text | In `om_treat.wal` and `om_use.wal`, the fraction of the incoming water that leaves the plant or use. In `om_osrc.wal`, the volume available from the source each day (m³). |
+| 3 | `sed` | mg/L | Sediment. |
+| 4 | `orgn` | mg N/L | Organic nitrogen. |
+| 5 | `sedp` | mg P/L | Organic phosphorus. |
+| 6 | `no3` | mg N/L | Nitrate nitrogen. |
+| 7 | `solp` | mg P/L | Soluble (mineral) phosphorus. |
+| 8 | `chla` | mg/L | Chlorophyll a. |
+| 9 | `nh3` | mg N/L | Ammonia nitrogen. |
+| 10 | `no2` | mg N/L | Nitrite nitrogen. |
+| 11 | `cbod` | mg/L | Carbonaceous biological oxygen demand. |
+| 12 | `dox` | mg/L | Dissolved oxygen. |
+| 13 to 18 | `san`, `sil`, `cla`, `sag`, `lag`, `grv` | mg/L | Sand, silt, clay, small aggregates, large aggregates and gravel. |
+| 19 | `temp` | °C | Water temperature. |
+
+## water_tower.wal
+
+Water towers: storage between a source and its users. Line 1 is a title, line 2 the number of towers, line 3 a header, then one line per tower.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `id` | - | Tower number. |
+| 2 | `name` | - | Tower name. |
+| 3 | `stor_mx` | m³ | Storage capacity. Used by the `wtow_vol` decision table condition and the `fill_wtow` action. |
+| 4 | `ddown_days` | days | Read but not used. |
+| 5 | `loss_fr` | fraction | Read but not used. |
+
+A tower is filled by a `wtow` POU and emptied by a `wtow` POD. Its water quality does not change in storage.
+
+## water_canal.wal
+
+Canals. Line 1 is a title, line 2 the number of canals, line 3 a header, then one line per canal.
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `id` | - | Canal number. |
+| 2 | `name` | - | Canal name. |
+| 3 | `w_sta` | - | Nearby weather station. Read but not used. |
+| 4 | `init` | - | Initial concentrations. Read but not used. |
+| 5 | `dtbl` | - | Decision table for canal outflow. Must be `null` in 62.0.1: with any other name the canal releases no water. |
+| 6 | `ddown_days` | days | Days to draw the storage down. Each day the canal releases its storage divided by `ddown_days`. |
+| 7 | `w` | m | Bottom width. |
+| 8 | `d` | m | Depth. |
+| 9 | `l` | km | Length. |
+| 10 | `s` | m/m | Slope. Read but not used. |
+| 11 | `ss` | m/m | Side slope (horizontal to vertical) of the trapezoidal section. |
+| 12 | `sat_con` | mm/day | Seepage rate from the canal bed to groundwater. |
+| 13 | `evap_co` | fraction | Fraction of the canal storage kept after evaporation each day. 1 means no evaporation loss; 0 empties the canal. |
+| 14 | `num_aqu` | - | Number of aquifers that receive seepage. |
+| 15 onward | `aqu_fr` | fraction | One value per aquifer: the fraction of the seepage that goes to aquifer 1, aquifer 2, and so on. The aquifers are always the first `num_aqu` aquifers of the model, in order. |
+
+The canal capacity is computed from its shape as $V_{max} = (w + ss\,d)\,d\,l \times 1000$ m³ (with $l$ in km), and is used by the `fill_can` decision table action.
+
+When a canal receives water, it first supplies any POUs for which it is a POD. Evaporation is then applied, and seepage of $\mathrm{sat\_con} \times d \times l$ m³ is divided among the aquifers by their fractions, with nitrate and soluble P in proportion. Finally the canal releases its storage divided by `ddown_days`. In 62.0.1 this release is removed from the canal but is not passed on; the PORs of a canal POU receive their share of the water withdrawn for the canal instead.
+
+When [gwflow](gwflow.md) canal seepage is switched on, gwflow takes canal width, depth and `sat_con` from this file. It also expects a bed thickness, a diversion ID and start and end days for each canal, which `water_canal.wal` does not supply in 62.0.1, so gwflow treats every canal as connected to a channel.
+
+## water_pipe.wal
+
+Pipes. In 62.0.1 pipes are read but have no effect: water moves from PODs to POUs and from POUs to PORs without conveyance losses.
+
+Line 1 is a title, line 2 the number of pipes, line 3 a header. For each pipe the reader then takes a header line and two record lines: the first gives the number of aquifers, and the second is read as the full record. Both record lines have the same layout:
+
+| # | Column | Units | Description |
+|---|--------|-------|-------------|
+| 1 | `id` | - | Pipe number. |
+| 2 | `name` | - | Pipe name. |
+| 3 | `stor_mx` | m³ | Maximum storage. |
+| 4 | `ddown_days` | days | Drawdown time. |
+| 5 | `loss_fr` | fraction | Water lost along the pipe. |
+| 6 | `num_aqu` | - | Number of aquifers that receive the loss. |
+| 7 onward | `aqu_fr` | fraction | One value per aquifer: fraction of the loss to that aquifer. |
+
+## outside_rcv.wal
+
+Receivers outside the basin, with columns `id`, `name` and `filename` (an output file for the receiver). SWAT+ 62.0.1 does not read this file, so `orcv` POUs and PORs have no receiving object.
+
+## Decision tables
+
+Water allocation uses flow control decision tables ([`flo_con.dtl`](../input-reference/dtl.md)) and land use decision tables ([`lum.dtl`](../input-reference/dtl.md)). See [decision tables](dtl.md) for the file format.
+
+| Item | Kind | Effect |
+|------|------|--------|
+| `wallo_dmd` with option `set_dmd` | action | Sets the POU demand to the action's constant (m³). |
+| `wallo_dmd` with option `irr_dmd` | action | Adds the current demand of the POU named by the action's object number. |
+| `wallo_dmd` with option `fill_res`, `fill_wtow` or `fill_can` | action | Sets the demand to the volume needed to fill a reservoir (to a fraction of its principal or emergency volume), a water tower or a canal (to a fraction of capacity), times a second constant. |
+| `duty_reset` | action | Sets a new annual withdrawal limit for one POD of one POU and resets the volume taken so far. |
+| `irr_pou_dmd` | condition | Tests the current demand of a POU. |
+| `wtow_vol` | condition | Tests water tower storage as a fraction of `stor_mx`. |
+
+## Limitations in 62.0.1
+
+Several parts of the daily calculation do not follow the input structure above:
+
+- The duty used for a withdrawal is looked up with the POD's number and the position of the POU in that POD's list, in place of the POU's number and the POD's position in that POU. Results follow the input only when these coincide: POD number $n$ is the $n$-th POD line of every POU it serves, and the $k$-th POU listed for a POD in `point_of_diver.wro` is POU number $k$. A network with one POU whose POD lines are listed in POD-number order meets this. Other layouts take the wrong duty or fail.
+- For an irrigation district (`irr` POU), the HRU demands from the district's decision tables are summed and then replaced by $\mathrm{rate\_max} \times 86400$, so the POU always demands its maximum rate. Delivery to the district does not step through the listed HRUs.
+- No decision table action sets the POD and POR fractions, so naming a table in `dtbl_pod_fr` or `dtbl_por_fr` sets all fractions to zero.
+- For an aquifer POD, the water delivered is computed after the aquifer storage has been reduced, so it is smaller than the water removed from the aquifer by the factor $(1 - r)$, where $r$ is the fraction of storage withdrawn.
+- Projects with pesticides or pathogens fail when `water_treat.wal`, `water_use.wal` or `outside_src.wal` is read, because the storage for the treated-water concentrations is not set up.
+- Water taken by start-of-day PODs (outside sources, towers, unlimited sources) is not counted in the day's delivered totals, which are reset when the day's demand is set.
+
+## Example
+
+A town water use that draws on a channel and an aquifer and returns its effluent to another channel. The single POU lists its PODs in POD-number order, which keeps POD numbers and POU positions aligned as 62.0.1 requires.
+
+`place_of_use.wro`:
 
 ```
-                       water_allocation.wro
-                                |
-              +-----------------+----------------+
-              |                 |                |
-            sources         transfer         receivers
-              |                 |                |
-   cha res aqu osrc       (rule type)      hru cha res aqu wtp
-   can wtp use osrc_a                       use stor can orcv
-              |                                  |
-              +--conveyance: pipe / pump --------+
-                         |
-                       canal
-                  (water_canal.wal)
-                         |
-                       pipe
-                  (water_pipe.wal)
-                         |
-                       tower
-                  (water_tower.wal)
-
-   wtp  : water_treat.wal     (treatment plant; lag-and-loss store)
-   use  : water_use.wal       (domestic/industrial/commercial sink)
-   osrc : out_src.wal         (out-of-basin source, recall-driven)
-   orcv : outside_rcv.wal     (out-of-basin receiver)
-```
-
-The water allocation routine runs per day. `wallo_control` advances the current transfer object, computes demand (`wallo_demand`), withdraws from each source in turn (`wallo_withdraw`), allows compensation between sources that share a `comp = y` flag, transports water through any pipe/pump conveyance (`wallo_transfer`), and delivers it to the receiver. Receiver-side post-processing (`wallo_treatment`, `wallo_use`, `wallo_canal`) handles lag, loss and outflow for `wtp`, `use` and `can` receivers.
-
-## Activation
-
-The water allocation files are read at startup from `main.f90`, in this order:
-
-```fortran
-call om_treat_read
-call om_use_read
-call om_osrc_read
-call water_treatment_read
-call water_use_read
-!call water_osrc_read
-call water_tower_read
-call water_pipe_read
-call water_canal_read
-call water_allocation_read
-```
-
-The module is active whenever `water_allocation.wro` exists and is not `null`. The `wallo` array is then allocated from the count on line 2. If the file is absent the array is allocated as `wallo(0:0)` and the module is inert.
-
-Per-step execution of `wallo_control` is triggered from `command.f90` (channel and reservoir commands) and from `sd_channel_control3.f90` (channel routing). The check `wallo(iwallo)%trn_cur <= wallo(iwallo)%trn_obs` advances the current transfer object until all are processed for the day.
-
-Output (`water_allo_*.txt` / `.csv`) is produced when `db_mx%wallo_db > 0` and the corresponding `pco%water_allo` switch in `print.prt` is `y`.
-
-## Files
-
-### `water_allocation.wro`
-
-Master file. Reader: [`src/water_allocation_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_allocation_read.f90). Pointed to by `in_watrts%transfer_wro` in `input_file_module.f90`.
-
-Layout:
-
-- Line 1: title (skipped).
-- Line 2: `imax`, the number of water allocation objects. Allocates `wallo(imax)`.
-- For each allocation object:
-    - Header line (skipped).
-    - One record with the object header: `name`, `rule_typ`, `trn_obs`.
-    - Header line (skipped).
-    - `trn_obs` transfer-object records.
-
-Allocation-object header columns (`wallo(iwro)`):
-
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | name | char(25) | name of the water allocation object |
-| 2 | rule_typ | char(25) | rule type to allocate water |
-| 3 | trn_obs | int | number of transfer objects that follow |
-
-Each transfer-object record is variable-width. The reader reads it twice: first to learn `src_num`, then, after allocating `src(num_src)` and `osrc(num_src)`, to read the source and receiving fields. The full record is:
-
-```
-id  trn_typ  trn_typ_name  amount  right  src_num  dtbl_src  src(1)..src(src_num)  rcv
-```
-
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | id | int | transfer object index (also stored as `trn%num`) |
-| 2 | trn_typ | char(10) | one of `outflo`, `ave_day`, `div_min`, `div_frac`, `dtbl_con`, `dtbl_lum` |
-| 3 | trn_typ_name | char(40) | name of the dtbl row (for `dtbl_lum` / `dtbl_con`) or recall (for `outflo` with `osrc`); otherwise free text |
-| 4 | amount | real | demand amount. m3/day for urban objects; mm for HRU; m3/s for `ave_day`, `div_min`, `div_frac` |
-| 5 | right | char(2) | water right priority. `sr` (senior) or `jr` (junior) |
-| 6 | src_num | int | number of source objects in this record |
-| 7 | dtbl_src | char(25) | decision table name to allocate among sources (may be `null`) |
-| 8 to 7+8*src_num | src block | source-object tuple, repeated `src_num` times. See below. |
-| last three | rcv block | receiving-object tuple. See below. |
-
-Source-object tuple (`transfer_source_objects`, 8 columns per source):
-
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | typ | char(10) | source type: `cha`, `res`, `aqu`, `osrc`, `osrc_a`, `wtp`, `use`, `can` |
-| 2 | num | int | sequential number of the source object in its own database |
-| 3 | conv_typ | char(10) | conveyance type: `pipe`, `pump`, or none |
-| 4 | conv_num | int | sequential number of the conveyance object |
-| 5 | dtbl_lim | char(25) | decision-table name that sets the withdrawal limit (may be `null`) |
-| 6 | wdraw_lim | real | actual withdrawal limit. Units depend on source type: reservoir uses principal-storage fraction; aquifer uses maximum depth (m); channel uses minimum flow (m3/s) |
-| 7 | frac | real | fraction of total transfer supplied by this source |
-| 8 | comp | char(1) | compensate from this source if other sources are past their threshold. `y` or `n` |
-
-Receiving-object tuple (`transfer_receiving_objects`, 3 columns):
-
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | typ | char(10) | receiver type: `hru`, `cha`, `res`, `aqu`, `wtp`, `use`, `stor`, `can`, `orcv` |
-| 2 | num | int | sequential number of the receiver in its own database |
-| 3 | frac | int | for an HRU receiver, the soil layer that receives incoming tile flow. Declared `integer :: frac = 0.` in the module (initializer is a real literal). |
-
-Synthetic example (no example exists in `refdata/`):
-
-```
-water_allocation.wro: synthetic example
+place_of_use.wro: town supply
 1
-name                      rule_typ          trn_obs
-muni_supply               demand            1
-id  trn_typ      trn_typ_name      amount    right  src_num  dtbl_src  [src...]                                                    rcv
-1   ave_day      none              0.10      sr     1        null      cha 5  none 0  null  0.0   1.0   n                          use 1 0
+num  name   typ  typ_num  pods  pors  dtbl_mx  rate_max  dtbl_pod_fr  dtbl_por_fr
+1    town   use  1        2     1     null     0.05      null         null
+POD  1  river   cha  12  pipe  0  null  20000.0  null  20.0  0.7  n
+POD  2  wells   aqu  3   pump  0  null  15.0     null  20.0  0.3  y
+POR  1  outfall cha  14  pipe  0  null  0.0      0.0   1.0
 ```
 
-`TODO: verify` exact whitespace and `null` keyword handling in `dtbl_src`. The reader uses list-directed input, so any whitespace separates fields, but the `null` token convention is inferred from other SWAT+ inputs.
+`point_of_diver.wro`:
 
-### `water_canal.wal`
+```
+point_of_diver.wro: town supply
+2
+num  name   typ  typ_num  pous  pou_num  pou_name  pod_num  pou_typ  pou_typ_num  right
+1    river  cha  12       1     1        town      1        use      1            sr
+2    wells  aqu  3        1     1        town      2        use      1            sr
+```
 
-Reader: [`src/water_canal_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_canal_read.f90). Filename is hard-coded in the reader; not pointed to from `file.cio`.
+`wtps_wuses.wal`, `water_use.wal` and `om_use.wal`:
 
-Layout:
+```
+wtps_wuses.wal: town supply
+0  1
+treatment plant names on line 4, water use names on line 5
+none
+town
+```
 
-- Line 1: title (skipped).
-- Line 2: `imax`, the number of canal objects.
-- Line 3: header (skipped).
-- `imax` canal records, each read twice (back-spaced) to learn `num_aqu` before allocating `aqu_loss(num_aqu)`.
+```
+water_use.wal: town supply
+1
+name  stor_mx  lag_days  loss_fr  org_min_typ  org_min_name  pests_typ  pests_name  paths_typ  paths_name  salts_typ  salts_name  constit_typ  constit_name  description
+town  0.0      0.0       0.0      const        town_eff      null       null        null       null        null       null        null         null          municipal
+```
 
-Canal record (`water_canal_data`):
+```
+om_use.wal: town supply
+1
+name      flo  sed  orgn  sedp  no3  solp  chla  nh3  no2  cbod  dox  san  sil  cla  sag  lag  grv  temp
+town_eff  0.8  20   2     0.5   10   1     0     5    0.1  20    4    0    0    0    0    0    0    18
+```
 
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | id | int | none | record index |
-| 2 | name | char(25) | none | canal name |
-| 3 | w_sta | char(25) | none | nearby weather station |
-| 4 | init | char(25) | none | initial concentrations record |
-| 5 | dtbl | char(25) | none | decision table that determines canal outflow |
-| 6 | ddown_days | real | days | days to drawdown storage to zero |
-| 7 | w | real | m | top width |
-| 8 | d | real | m | depth |
-| 9 | s | real | m/m | slope |
-| 10 | ss | real | m/m | side slope (trapezoidal) |
-| 11 | sat_con | real | varies | parameter used to compute percolation to groundwater |
-| 12 | loss_fr | real | fraction | water loss during conveyance |
-| 13 | bed_thick | real | m | bed-sediment thickness for Darcy seepage in `gwflow`; 0 if not used |
-| 14 | div_id | int | none | recall diversion ID (gwflow). 0 if routed by `wallo` |
-| 15 | day_beg | int | Julian | canal operation start day (gwflow external) |
-| 16 | day_end | int | Julian | canal operation end day (gwflow external) |
-| 17 | num_aqu | int | none | number of aquifers that receive seepage loss |
-| 18 .. 17+2*num_aqu | aqu_loss block | int, real pairs | each tuple is `aqu_num` (aquifer index) and `frac` (fraction of loss to that aquifer) |
+The town demands $0.05 \times 86400 = 4320$ m³ a day: 70% (3024 m³) from channel 12 and 30% (1296 m³) from aquifer 3. The channel gives water only on days its outflow exceeds 20 000 m³, and the aquifer only while its water table is shallower than 15 m. The aquifer may make up a shortfall from the channel. Each POD may supply at most $20 \times 86400 = 1\,728\,000$ m³ a year to the town. 80% of the water delivered returns to channel 14 as effluent with the concentrations in `town_eff`.
 
-### `water_pipe.wal`
+## Outputs
 
-Reader: [`src/water_pipe_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_pipe_read.f90). Filename hard-coded.
+Set the `water_allo` row of [`print.prt`](print-prt.md) to write `water_allo_day.txt` (and the monthly, yearly and average annual files) with each POU's demand and delivery, the withdrawal from each POD and the water sent to each POR. Treatment plants and water uses are reported in `wallo_treat_*.txt` and `wallo_use_*.txt`.
 
-Layout:
+## Related files
 
-- Line 1: title (skipped).
-- Line 2: `imax`.
-- Line 3: header (skipped).
-- For each of `imax` pipes:
-    - Header line (skipped).
-    - One record, read twice (back-spaced) to learn `num_aqu`.
+- [`file.cio`](file-cio.md): the `water_rights` line names the POU and POD files.
+- [Decision tables](dtl.md): flow control and land use tables used for demand, limits and irrigation.
+- [Channels](sd-channel.md), [reservoirs](res.md) and [aquifers](aqu.md): PODs and receiving objects.
+- [`print.prt`](print-prt.md): output switches.
+- [gwflow](gwflow.md): canal seepage to the groundwater grid.
 
-Pipe record (`water_transfer_data`):
+??? quote "Sources"
 
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | id | int | none | record index |
-| 2 | name | char(25) | none | pipe name |
-| 3 | stor_mx | real | m3 | maximum storage |
-| 4 | ddown_days | real | days | drawdown time |
-| 5 | loss_fr | real | fraction | water loss during conveyance |
-| 6 | num_aqu | int | none | number of aquifers that receive loss |
-| 7 .. 6+2*num_aqu | aqu_loss block | int, real | aquifer index and loss fraction |
+    - File names and `file.cio` line: `type input_water_allocation` in [`input_file_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90), [`readcio_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/readcio_read.f90)
+    - Read order: [`main.f90.in`](https://github.com/swat-model/swatplus/blob/62.0.1/src/main.f90.in)
+    - Readers: [`water_allocation_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_allocation_read.f90) (POU and POD files), [`water_hru_irr_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_hru_irr_read.f90), [`wallo_wtps_wuses.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_wtps_wuses.f90), [`water_treatment_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_treatment_read.f90), [`water_use_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_use_read.f90), [`water_osrc_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_osrc_read.f90), [`om_treat_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/om_treat_read.f90), [`om_use_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/om_use_read.f90), [`om_osrc_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/om_osrc_read.f90), [`water_tower_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_tower_read.f90), [`water_canal_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_canal_read.f90), [`water_pipe_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_pipe_read.f90), [`water_orcv_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_orcv_read.f90) (not called)
+    - Types: [`water_allocation_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/water_allocation_module.f90); `hyd_output` in [`hydrograph_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hydrograph_module.f90)
+    - Daily calculation: [`wallo_start_day.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_start_day.f90) (called from [`time_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/time_control.f90)), [`wallo_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_control.f90), [`wallo_withdraw.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_withdraw.f90), [`wallo_pou_deliv.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_pou_deliv.f90), [`wallo_return.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_return.f90), [`wallo_treatment.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_treatment.f90), [`wallo_use.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_use.f90), [`wallo_canal.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_canal.f90), [`wallo_transfer.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_transfer.f90) (not called)
+    - POD hooks: [`sd_channel_control3.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_channel_control3.f90), [`res_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_control.f90), [`aqu_1d_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/aqu_1d_control.f90), [`hru_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_control.f90)
+    - Decision tables: [`actions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/actions.f90), [`conditions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/conditions.f90)
+    - Outputs: [`header_water_allocation.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/header_water_allocation.f90), [`wallo_pou_output.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wallo_pou_output.f90)
+    - gwflow canals: [`gwflow_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/gwflow_read.f90)
 
-The `init` field exists in the type definition (`character (len=25) :: init`) but is not read by `water_pipe_read.f90`. `TODO: verify` whether this is by design or an oversight.
-
-### `water_tower.wal`
-
-Reader: [`src/water_tower_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_tower_read.f90). Filename hard-coded.
-
-Layout:
-
-- Line 1: title (skipped).
-- Line 2: `imax`.
-- Line 3: header (skipped).
-- For each of `imax` towers:
-    - Header line (skipped).
-    - One record.
-
-Tower record (subset of `water_transfer_data`):
-
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | id | int | none | record index |
-| 2 | name | char(25) | none | tower name |
-| 3 | stor_mx | real | m3 | maximum storage |
-| 4 | ddown_days | real | days | drawdown time |
-| 5 | loss_fr | real | fraction | storage loss |
-
-The reader does not allocate or read `aqu_loss` for towers even though the type carries the array. The tower is treated as a passive storage node.
-
-### `water_treat.wal`
-
-Reader: [`src/water_treatment_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_treatment_read.f90). Filename hard-coded.
-
-Layout:
-
-- Line 1: title (skipped).
-- Line 2: `imax`.
-- Line 3: header (skipped).
-- For each of `imax` plants:
-    - One main record.
-    - If `cs_db%num_pests > 0`: a header line then one record of `num_pests` pesticide concentrations into `wtp_cs_treat(iwtp)%pest`.
-    - If `cs_db%num_paths > 0`: a header line then one record of `num_paths` pathogen concentrations into `wtp_cs_treat(iwtp)%path`.
-
-Main record (`water_treatment_use_data`):
-
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | id | int | none | record index |
-| 2 | name | char(25) | none | plant name |
-| 3 | stor_mx | real | m3 | maximum storage |
-| 4 | lag_days | real | days | treatment time (outflow lag) |
-| 5 | loss_fr | real | fraction | water loss during treatment |
-| 6 | org_min | char(25) | none | name of `om_treat` record for sediment, carbon, nutrients. Cross-walked to `iorg_min` |
-| 7 | pests | char(25) | none | name of pesticide-set record (`ipests`) |
-| 8 | paths | char(25) | none | name of pathogen-set record (`ipaths`) |
-| 9 | salts | char(25) | none | name of salt-ion record (`isalts`) |
-| 10 | constit | char(25) | none | name of other-constituent record (`iconstit`) |
-| 11 | descrip | char(80) | none | free-text description |
-
-`init` is declared in the type but commented out in the source. The reader does not read it. The cross-walk loop sets `iorg_min` only; `ipests`, `ipaths`, `isalts`, `iconstit` are left at 0. `TODO: verify` whether the missing cross-walks are intentional.
-
-### `water_use.wal`
-
-Reader: [`src/water_use_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_use_read.f90). Filename hard-coded.
-
-Same `water_treatment_use_data` type and same layout as `water_treat.wal`, including the conditional `pest` and `path` concentration blocks. Records are stored in `wuse` instead of `wtp`. Cross-walk is against `om_use_name` rather than `om_treat_name`.
-
-### `out_src.wal`
-
-Reader: [`src/water_osrc_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_osrc_read.f90). The reader checks `inquire(file='outside_src.wal')` but then opens `'out_src.wal'`. See the Important section.
-
-Layout (as written, assuming the open succeeds):
-
-- Line 1: title (skipped).
-- Line 2: `imax`.
-- Line 3: header (skipped).
-- For each of `imax` sources: one main record, then conditional pest and path blocks (header + values) as in `water_treat.wal`.
-
-Main record (`outside_basin_source`):
-
-| # | Field | Type | Units | Description |
-|---|-------|------|-------|-------------|
-| 1 | id | int | none | record index |
-| 2 | name | char(25) | none | out-of-basin source name |
-| 3 | stor_mx | real | m3 | maximum storage |
-| 4 | lag_days | real | days | lag |
-| 5 | loss_fr | real | fraction | loss fraction |
-
-### `outside_rcv.wal`
-
-Reader: [`src/water_orcv_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/water_orcv_read.f90). Filename hard-coded. The reader is not called from `main.f90`. See the Important section.
-
-Layout (as written):
-
-- Line 1: title (skipped).
-- Line 2: `imax`.
-- Line 3: header (skipped).
-- For each of `imax` receivers: one record.
-
-Main record (`outside_basin_receive`):
-
-| # | Field | Type | Description |
-|---|-------|------|-------------|
-| 1 | id | int | record index |
-| 2 | name | char(25) | out-of-basin receiver name |
-| 3 | filename | char(25) | name of the output file written for this receiver |
-
-### `element.wro` and `water_rights.wro`
-
-Declared in `input_file_module.f90` (`in_watrts%element`, `in_watrts%water_rights`). No reader in `water_*_read.f90` or anywhere else under `src/` references either filename. `TODO: verify` whether these are legacy placeholders or are read by code outside the water-allocation subroutines.
-
-## Related
-
-- [`*.dtl` decision tables](dtl.md) drive transfers via the `water_rights` action. `dtbl_lum` rows are looked up by `trn_typ_name` from `dtbl_lum` and supply irrigation amount; `dtbl_con` rows are looked up from `dtbl_flo` and supply flow-control amount, source availability and source/receiver allocation. `dtbl_src` and `dtbl_lim` are matched to decision-table names at run time.
-- [`object.cnt`](object-cnt.md) has a `wro` column (position 21). It is currently noted in the source as "not used"; the actual count of water allocation objects is taken from line 2 of `water_allocation.wro`.
-- [`recall_db`](#) is cross-walked for `osrc` sources (daily/monthly/yearly recall) and `exco_db` for `osrc_a` (annual constant from an `exco` record).
-- [`om_treat.om`, `om_use.om`, `om_osrc.om`] supply the organic and mineral concentration sets named in `org_min` fields of `water_treat.wal`, `water_use.wal` and `out_src.wal`.
+    | File | Column | Fortran variable |
+    |------|--------|------------------|
+    | `place_of_use.wro` POU line | `num`, `name`, `typ`, `typ_num`, `pods`, `pors`, `dtbl_mx`, `rate_max`, `dtbl_pod_fr`, `dtbl_por_fr` | `ipou`, `pou%name`, `%typ`, `%typ_num`, `%pods`, `%pors`, `%dtbl_mx`, `%rate_max`, `%dtbl_pod_fr`, `%dtbl_por_fr` |
+    | POD line | columns 2 to 13 | `pou%pod%num`, `%name`, `%typ`, `%num`, `%conv_typ`, `%conv_num`, `%dtbl_min`, `%const_min`, `%dtbl_wdraw`, `%ann_max`, `%frac`, `%comp` |
+    | POR line | columns 2 to 11 | `pou%por%num`, `%name`, `%typ`, `%num`, `%conv_typ`, `%conv_num`, `%dtbl_max`, `%const_max`, `%ann_max`, `%frac` |
+    | `point_of_diver.wro` | `num`, `name`, `typ`, `typ_num`, `pous` | `pod%num`, `%name`, `%typ`, `%typ_num`, `%pous` |
+    | `point_of_diver.wro` per POU | `pou_num`, `pou_name`, `pod_num`, `pou_typ`, `pou_typ_num`, `right` | `pod%pou%num`, `%name`, `%pod_num`, `%typ`, `%typ_num`, `%right` |
+    | `water_hru_irr.wal` | `name`, `num_hrus`, `hru`, `dtbl_lum` | `hruirr_db%name`, `%hrus`, `%hru_num`, `%dtbl_lum` |
+    | `water_treat.wal` | `name`, `stor_mx`, `lag_days`, `loss_fr`, `num_treats` | `wtp%name`, `%stor_mx`, `%lag_days`, `%loss_fr`, `%num_treats` |
+    | treatment level, `water_use.wal`, `outside_src.wal` | quality pairs | `%conc%org_min_typ`, `%org_min_name`, `%pests_typ`, `%pests_name`, `%paths_typ`, `%paths_name`, `%salts_typ`, `%salts_name`, `%constit_typ`, `%constit_name` |
+    | `om_*.wal` | 18 values | `wtp_om_treat`, `wuse_om_efflu`, `osrc_om` (`type hyd_output`) |
+    | `water_tower.wal` | `stor_mx`, `ddown_days`, `loss_fr` | `wtow%stor_mx`, `%ddown_days`, `%loss_fr` |
+    | `water_canal.wal` | `w_sta` ... `num_aqu`, `aqu_fr` | `canal%w_sta`, `%init`, `%dtbl`, `%ddown_days`, `%w`, `%d`, `%l`, `%s`, `%ss`, `%sat_con`, `%evap_co`, `%num_aqu`, `%aqu_loss_fr` |
+    | `water_pipe.wal` | `stor_mx` ... `aqu_fr` | `pipe%stor_mx`, `%ddown_days`, `%loss_fr`, `%num_aqu`, `%aqu_loss_fr` |

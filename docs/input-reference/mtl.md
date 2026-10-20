@@ -1,42 +1,59 @@
 ---
-title: heavy metals module
-description: Per-HRU and aquifer initial heavy metal concentrations.
+title: metals.mtl and heavy metal initial conditions
+description: Heavy metal inputs. The metals.mtl and hmet_water.ini slots in file.cio have no reader in 62.0.1; hmet_hru.ini is read but its values are not used.
 status: review
 verified_against:
   - src/hmet_hru_aqu_read.f90
   - src/constituent_mass_module.f90
+  - src/constit_db_read.f90
   - src/input_file_module.f90
-verified_at_commit: 8a1edd4a23915a2cac1cd90c788f0d521404700e
+  - src/proc_read.f90
+  - src/exco_read_hmet.f90
+  - src/dr_read_hmet.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Purpose
 
-The heavy metals module simulates user-listed metals across HRU soils and plants. The set of metals simulated is declared in [`constituents.cs`](cs.md), which populates `cs_db%num_metals`. Only initial soil and plant concentrations are loaded by a dedicated reader; no separate metal parameter database is read by `hmet_hru_aqu_read`.
+Heavy metals listed in [`constituents.cs`](cs.md) can be routed through the network as loads. In 62.0.1 they enter the model only through export coefficients (`exco_hmet.exc`) and delivery ratios (`dr_hmet.del`) and are routed with the water. There is no metal property database, and soils, plants, channels and reservoirs have no metal processes.
 
-## Activation
+[`file.cio`](../input-reference/file-cio.md) has slots for four metal files:
 
-`in_parmdb%hmetcom_db` is defined in [`src/input_file_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/input_file_module.f90) with default `metals.mtl`. No reader in `src/` opens this filename, so the parameter database is declared in `file.cio` but not loaded.
+| File | Named in | Status in 62.0.1 |
+|------|----------|------------------|
+| `metals.mtl` | `hru_parm_db` line of [`file.cio`](file-cio.md) | No reader. The file is not opened. |
+| `hmet_hru.ini` | `init` line of [`file.cio`](../input-reference/file-cio.md) | Read, but the values are not used. |
+| `hmet_water.ini` | `init` line of [`file.cio`](../input-reference/file-cio.md) | No reader. The file is not opened. |
+| `exco_hmet.exc`, `dr_hmet.del` | export coefficient and delivery ratio lines of [`file.cio`](../input-reference/file-cio.md) | Read. Metal loads from routing objects. |
 
-The initial-conditions file is referenced from `file.cio` via `in_init%hmet_soil` (default `hmet_hru.ini`). `hmet_hru_aqu_read` is called from `proc_read.f90`.
+Set `metals.mtl`, `hmet_hru.ini` and `hmet_water.ini` to `null` in [`file.cio`](../input-reference/file-cio.md) unless a later revision uses them. The `hmet` columns of [`initial.cha`](cha.md) and [`initial.aqu`](aqu.md) name records of these files and have no effect.
 
-## Files
+## hmet_hru.ini
 
-### hmet_hru.ini
+Initial heavy metals in the soil and on plants of HRUs. The reader expects this layout:
 
-Initial metal concentrations for HRU soils and plants.
+- Line 1: title.
+- For each record: a header line, a name line, then for each metal in the order of [`constituents.cs`](../input-reference/cs.md#constituentscs) two lines, `label soil` and then `label plant`.
 
-- Reader: [`src/hmet_hru_aqu_read.f90`](https://github.com/swat-model/swatplus/blob/main/src/hmet_hru_aqu_read.f90)
-- Type: `hmet_soil_ini` (`type cs_soil_init_concentrations`) in [`src/constituent_mass_module.f90`](https://github.com/swat-model/swatplus/blob/main/src/constituent_mass_module.f90). Fields: `name`, `soil(num_metals)` (ppm), `plt(num_metals)` (ppm).
-- Format: one title line, then per record: a header line, a name line, then `num_metals` pairs of lines (`metal_name, soil_value` then `metal_name, plt_value`) in `constituents.cs` order.
+The counting pass expects one line per metal instead of two, so files with more than one record are miscounted. The values (soil and plant concentrations in mg/kg) are stored but no part of the model uses them.
 
-The same reader allocates `cs_hmet_solsor(num_metals)`.
+## Related files
 
-### metals.mtl
+- [`constituents.cs`](cs.md): the list of metals.
+- [`file.cio`](file-cio.md): the file name slots.
+- [Pesticides](pes.md) and [pathogens](pth.md): the constituents with full process models.
 
-Declared as `in_parmdb%hmetcom_db` in `input_file_module.f90` (default name `metals.mtl`). No reader in the current source opens this file. The file is reserved but inert.
+??? quote "Sources"
 
-## Related
+    - Reader: [`hmet_hru_aqu_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hmet_hru_aqu_read.f90), called from [`proc_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/proc_read.f90)
+    - Type: `type cs_soil_init_concentrations` (`hmet_soil_ini`) in [`constituent_mass_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/constituent_mass_module.f90)
+    - File name slots: `in_parmdb%hmetcom_db`, `in_init%hmet_soil`, `in_init%hmet_water` in [`input_file_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/input_file_module.f90)
+    - Metal list: [`constit_db_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/constit_db_read.f90)
+    - Metal loads: [`exco_read_hmet.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/exco_read_hmet.f90), [`dr_read_hmet.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/dr_read_hmet.f90)
 
-- [`constituents.cs`](cs.md). Declares the metal list and sets `cs_db%num_metals`. The metals block in `constit_db_read` is read but its name-database cross-walk is commented out, so listed metals only contribute the count.
-- [`pesticide module`](pes.md). Same per-object initial-condition pattern.
-- [`pathogen module`](pth.md). Same per-object initial-condition pattern.
+    | Item | Fortran variable |
+    |------|------------------|
+    | hmet_hru.ini record name | `hmet_soil_ini%name` |
+    | soil value | `hmet_soil_ini%soil` |
+    | plant value | `hmet_soil_ini%plt` |
+    | metals.mtl slot | `in_parmdb%hmetcom_db` |

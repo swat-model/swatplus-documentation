@@ -1,147 +1,242 @@
 ---
 title: Pesticides
-description: Pesticide application, foliar and soil decay, partitioning to runoff and percolation.
+description: Pesticide application, washoff, decay, plant uptake and transport in runoff, sediment, soil water, channels and aquifers.
 status: review
+verified_against:
+  - src/pest_apply.f90
+  - src/pest_washp.f90
+  - src/pest_decay.f90
+  - src/pest_lch.f90
+  - src/pest_pesty.f90
+  - src/pest_pl_up.f90
+  - src/pest_parm_read.f90
+  - src/pest_tempdecay_module.f90
+  - src/pesticide_data_module.f90
+  - src/mgt_sched.f90
+  - src/hru_control.f90
+  - src/ch_rtpest.f90
+  - src/sd_hydsed_init.f90
+  - src/res_pest.f90
+  - src/aqu_1d_control.f90
+  - src/basin_module.f90
+  - src/basin_read_prm.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Overview
 
-SWAT+ tracks a configurable set of pesticides as constituents. Each pesticide is described by sorption, solubility, half-lives, and (optionally) one or more daughter products. Applications are scheduled by the management table and split between the canopy and the top two soil layers. Once in the system the pesticide decays exponentially on foliage and in the soil, washes off the canopy in rain, leaches with percolation, partitions to runoff water and sediment, and may be taken up by plants. Daughter products are accumulated as the parent decays.
+SWAT+ simulates any number of pesticides, listed in the constituent setup and described in [`pesticide.pes`](../input-reference/pes.md#pesticidepes). Each pesticide has a sorption coefficient, a solubility, half-lives on foliage, in soil, in water and in benthic sediment, and optional degradation products (metabolites). On land, a pesticide is applied by a management operation, split between plant foliage and the soil, washed from foliage by rain, decayed, taken up by plants, and moved by surface runoff, lateral flow, tile flow, percolation and eroded sediment. Pesticide that reaches channels, reservoirs and aquifers continues to react and move there.
 
-## Process equations
+The daily order in an HRU is washoff (on days with at least 2.54 mm of rain), plant uptake, decay, transport in water, then transport with sediment (on days with erosion).
 
-### Application
+## Application
 
-Per application, ground cover is
+A pesticide application operation names the pesticide, the amount and an application method from [`chem_app.ops`](../input-reference/ops.md#chem_appops). The amount reaching the field is the applied amount multiplied by the application efficiency of the method:
 
-```
-gc = (1.99532 - erfc(1.333 * lai_sum - 2)) / 2.1
-```
+$$
+P_{app} = P_{op}\,\varepsilon_{app}
+$$
 
-clamped to [0, 1]. Of the applied mass `pest_kg`:
+The fraction intercepted by the canopy depends on the leaf area index of all plants in the HRU:
 
-- `gc * pest_kg` goes to plant foliage, partitioned among plants in proportion to their LAI
-- `(1 - gc) * surf_frac * pest_kg` goes to soil layer 1
-- `(1 - gc) * (1 - surf_frac) * pest_kg` goes to soil layer 2
+$$
+f_{gc} = \frac{1.99532 - \operatorname{erfc}(1.333\,LAI - 2)}{2.1}, \qquad f_{gc} \ge 0
+$$
 
-`surf_frac` is the surface application fraction read from `chem_app.ops`. Source: `pest_apply.f90`.
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $P_{app}$ | pesticide reaching the field | kg/ha | |
+| $P_{op}$ | amount in the operation | kg/ha | application operation |
+| $\varepsilon_{app}$ | application efficiency | fraction | `app_eff` in [`chem_app.ops`](../input-reference/ops.md#chem_appops) |
+| $f_{gc}$ | fraction intercepted by foliage | fraction | |
+| $LAI$ | sum of leaf area index of all plants | m²/m² | |
 
-### Decay
+The intercepted part, $f_{gc}P_{app}$, is divided among the plants in proportion to their leaf area. The rest reaches the soil: the surface fraction `surf_frac` of the application method goes to the top soil layer (10 mm) and the remainder to the second layer.
 
-First-order decay in soil and on foliage:
+## Washoff
 
-```
-decay_s = exp(-ln(2) / soil_hlife)
-decay_f = exp(-ln(2) / foliar_hlife)
-pest(t+1) = pest(t) * decay
-```
+On days with at least 2.54 mm of precipitation, a fixed fraction of the pesticide on each plant's foliage is washed to the top soil layer:
 
-The decay coefficients `pestcp(k)%decay_s` and `pestcp(k)%decay_f` are pre-computed once from `soil_hlife` and `foliar_hlife` in `pesticide.pst`. Daughter pesticides accumulate decayed mass scaled by the molecular weight ratio:
+$$
+P_{wash} = f_{wash}\,P_{fol}
+$$
 
-```
-metab_decay = pst_decay * soil_fr * (mol_wt_daughter / mol_wt_parent)
-```
+where $f_{wash}$ is the washoff fraction `frac_wash` of the pesticide and $P_{fol}$ the pesticide on the foliage (kg/ha).
 
-Source: `pest_decay.f90`.
+## Decay
 
-### Foliar washoff
+Pesticide on foliage and in each soil layer decays by first-order kinetics. The daily survival factor is computed from the half-life:
 
-Each rain day, a fraction `washoff` of the pesticide on each plant's foliage is washed to soil layer 1:
+$$
+P_{i} = P_{i-1}\,\exp\!\left(\frac{-0.693}{t_{1/2}}\right)
+$$
 
-```
-pest_soil = washoff * pl_on
-```
+with $t_{1/2}$ the foliar half-life `hl_foliage` for foliage and the soil half-life `hl_soil` for soil (days). A half-life of 0 removes all of the pesticide in one day.
 
-`washoff` is per pesticide in `pesticide.pst`. Source: `pest_washp.f90`.
+### Temperature adjustment
 
-### Soil partitioning
+When the temperature switch for pesticide decay in [`parameters.bsn`](../input-reference/parameters-bsn.md) is 1, the half-lives are treated as values at 25 °C and adjusted each day with a Q10 relation:
 
-In each layer, the pesticide is split between adsorbed and dissolved phases using a `Kd` partition computed from soil organic carbon:
+$$
+t_{1/2}(T) = t_{1/2,25}\;Q_{10}^{\,(25 - T)/10}, \qquad Q_{10} = 2.58
+$$
 
-```
-kd   = koc * cbn / 100
-zdb1 = ul + kd * bd * thick
-```
+| Pool | Half-life used | Temperature $T$ |
+|---|---|---|
+| Soil layer | `hl_soil` | temperature of that layer |
+| Foliage | `hl_foliage` | temperature of the top soil layer |
+| Channel water | `aq_hlife` | channel water temperature (at least 0.1 °C) |
+| Channel benthic sediment | `ben_hlife` | channel water temperature |
+| Aquifer | `aq_hlife` | 0 °C; the aquifer temperature is not set in 62.0.1 |
 
-`koc` is the organic-carbon-normalised partition coefficient. `zdb1` is the effective partitioning depth in mm. The dissolved concentration available for transport is
+Each 10 °C below 25 °C multiplies the half-life by 2.58, and each 10 °C above 25 °C divides it by 2.58. Reservoirs always use the unadjusted half-lives.
 
-```
-co = pest * (1 - exp(-vf / zdb1)) / vf
-co = min(solub / 100, co)
-```
+The temperature switch and the pesticide groundwater mixing factor are read as the 6th and 7th values of [`parameters.bsn`](../input-reference/parameters-bsn.md). Files written by the SWAT+ Editor label these columns `lin_sed` and `exp_sed`, which older revisions did not use. A file with `exp_sed = 1` therefore turns temperature-adjusted decay on, and the `lin_sed` value becomes the groundwater mixing factor. Check both columns before running pesticides with an older [`parameters.bsn`](../input-reference/parameters-bsn.md).
 
-where `vf` is total flow through the layer (`prk + flat`, plus `surfq` in layer 1 and `qtile` in the tile layer). Source: `pest_lch.f90`.
+### Metabolites
 
-### Surface runoff, lateral flow, tile flow, percolation
+When a pesticide has degradation products, a share of the mass that decays is added to each daughter pesticide:
 
-Surface runoff carries
+$$
+\Delta P_{d} = \Delta P_{parent}\;f_{d}\;\frac{M_{d}}{M_{parent}}
+$$
 
-```
-csurf = percop * co
-surq  = csurf * surfq
-```
+| Symbol | Meaning | Units |
+|---|---|---|
+| $\Delta P_{d}$ | mass added to the daughter | kg/ha |
+| $\Delta P_{parent}$ | parent mass decayed on the day | kg/ha |
+| $f_{d}$ | fraction of the parent that degrades to this daughter, set separately for foliage, soil, water and benthic sediment | fraction |
+| $M$ | molecular weight `mol_wt` | g/mol |
 
-Lateral and tile flow use `co` directly (layer 1 lateral uses `csurf`). Percolation moves `co * prk` to the next layer or out of the profile at the bottom layer. `percop` is the basin percolation coefficient (`parameters.bsn`, default 0.5). Source: `pest_lch.f90`.
+Metabolites form on foliage, in soil, in channel water and benthic sediment, and in aquifers.
 
-### Sediment-attached transport
+## Plant uptake
 
-For the top layer, sediment-attached pesticide is
+Growing plants take up dissolved pesticide with the water they extract from each soil layer. Uptake from a layer is
 
-```
-conc = 100 * kd * pest / (zdb1 + 1e-10)
-sed_pest = 0.001 * sedyld * conc * er / area_ha
-```
+$$
+P_{up} = f_{TSCF}\;\frac{w_{up}}{SW_{eff} + w_{up} + K_d\,\rho_b\,z}\;P_{ly}
+$$
 
-The enrichment ratio `er` is either the channel-specific `erorgn` or the CREAMS-derived value from `pest_enrsb.f90`. Source: `pest_pesty.f90`.
+$$
+SW_{eff} = SW + n\,\max(0,\;FC - SW)
+$$
 
-### Plant uptake
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $P_{up}$ | pesticide taken up from the layer | kg/ha | |
+| $f_{TSCF}$ | transpiration stream concentration factor | - | `pl_uptake` |
+| $w_{up}$ | plant water uptake from the layer | mm | |
+| $SW$, $FC$ | layer soil water and field capacity | mm | |
+| $n$ | resistance blending factor, 0 uses actual soil water and 1 uses field capacity | 0 to 1 | `resistance_n` (default 1) |
+| $K_d$ | soil partition coefficient, $K_{oc}\cdot OC/100$ | mL/g | `soil_ads` |
+| $\rho_b$, $z$ | bulk density and layer thickness | Mg/m³, mm | |
+| $P_{ly}$ | pesticide in the layer | kg/ha | |
 
-Daily uptake from each layer is proportional to water uptake by the plant:
+When `harvest_sink` is 1 (default), pesticide taken up is lost from the system. When it is 0, it is stored in the plant, removed with the harvested yield, and returned to the soil surface when the plant is killed.
 
-```
-pest_up = pl_uptake * uptake(ly) / st(ly) * pest(ly)
-```
+## Transport in water
 
-`pl_uptake` is the per-pesticide fraction in `pesticide.pst`. Pesticide on the plant is removed in harvest in proportion to the harvested biomass fraction. Source: `pest_pl_up.f90`, `mgt_harvgrain.f90`.
+In each soil layer, pesticide is shared between the soil water and sorbed phases with a linear partition coefficient based on the organic carbon content of the layer:
 
-### In-channel and in-aquifer
+$$
+K_d = \frac{K_{oc}\;OC}{100}
+$$
 
-Channel pesticide reactions use aquatic and benthic half-lives, settling and resuspension velocities, burial, volatilisation, and benthic decay. Source: `ch_rtpest.f90`, `ch_pesticide_module.f90`, `aqu_pesticide_module.f90`, `pest_cha_res_read.f90`.
+where $K_{oc}$ is `soil_ads` (mL/g) and $OC$ the organic carbon content of the layer (%). The concentration of pesticide in water leaving the layer is
 
-## Switches and parameters
+$$
+C = \min\!\left(\frac{P_{ly}\left[1 - \exp\!\left(\dfrac{-w}{SAT + K_d\,\rho_b\,z}\right)\right]}{w},\;\frac{S_w}{100}\right)
+$$
 
-| File | Field | Default | Effect |
-|------|-------|---------|--------|
-| `parameters.bsn` | `percop` | 0.5 | Pesticide percolation coefficient (0-1). 0 = no pesticide in surface runoff |
-| `pesticide.pst` | `koc` | per pest | Organic-carbon-normalised partition (mL/g) |
-| `pesticide.pst` | `washoff` | per pest | Fraction washed from foliage per rain day |
-| `pesticide.pst` | `foliar_hlife` | per pest | Foliar half-life (days) |
-| `pesticide.pst` | `soil_hlife` | per pest | Soil half-life (days) |
-| `pesticide.pst` | `aq_hlife`, `ben_hlife` | per pest | Aquatic and benthic half-lives (days) |
-| `pesticide.pst` | `solub` | per pest | Water solubility (mg/L) |
-| `pesticide.pst` | `pl_uptake` | per pest | Fraction taken up by plant |
-| `pesticide.pst` | `aq_volat`, `aq_resus`, `aq_settle`, `ben_bury` | per pest | Channel kinetics |
-| `chem_app.ops` | `surf_frac` | per op | Surface application fraction (rest to layer 2) |
-| `pest_hru_aqu.ini` | initial mass | per HRU | Initial pesticide mass per HRU and layer |
+| Symbol | Meaning | Units |
+|---|---|---|
+| $C$ | pesticide concentration in mobile water | kg/ha per mm |
+| $w$ | water leaving the layer: percolation and lateral flow, plus surface runoff for the top layer and tile flow for the drained layer | mm |
+| $SAT$ | water content of the layer at saturation | mm |
+| $S_w$ | solubility `solub` | mg/L |
 
-## Implementation
+Mass moved by each flow path is the concentration times the flow:
 
-Land phase: `pest_apply.f90`, `pest_decay.f90`, `pest_washp.f90`, `pest_lch.f90`, `pest_pesty.f90`, `pest_pl_up.f90`, `pest_enrsb.f90`, `pest_soil_tot.f90`.
+- surface runoff removes $\beta_{perc}\,C$ times the runoff depth, where $\beta_{perc}$ is the pesticide percolation coefficient `pest_perc` in [`parameters.bsn`](../input-reference/parameters-bsn.md);
+- lateral flow from the top layer also uses $\beta_{perc}\,C$; lateral flow from deeper layers uses $C$;
+- tile flow and percolation use $C$. Percolation moves pesticide to the next layer, and out of the bottom layer to the aquifer.
 
-Inputs: `pest_parm_read.f90`, `pest_hru_aqu_read.f90`, `pest_metabolite_read.f90`, `pesticide_data_module.f90`.
+## Transport with sediment
 
-Constituent driver: `constituent_mass_module.f90`, `cs_db%num_pests` controls activation.
+On days with erosion, pesticide sorbed to the top soil layer leaves with the sediment yield:
 
-HRU output: `hru_pesticide_output.f90`.
+$$
+P_{sed} = 0.001\;\frac{C_{sorb}\;sed\;\varepsilon_{er}}{A}
+$$
 
-Channel and aquifer: `ch_rtpest.f90`, `ch_pesticide_module.f90`, `aqu_pesticide_module.f90`, `aqu_pest_output_init.f90`, `aqu_pesticide_output.f90`, `pest_cha_res_read.f90`, `cha_pesticide_output.f90`.
+| Symbol | Meaning | Units |
+|---|---|---|
+| $P_{sed}$ | pesticide removed with sediment | kg/ha |
+| $C_{sorb}$ | sorbed concentration in the top layer | g/t |
+| $sed$ | sediment yield | t |
+| $\varepsilon_{er}$ | enrichment ratio, `erorgn` in [`hydrology.hyd`](../input-reference/hyd.md#hydrologyhyd) if above 0.001, otherwise computed from the sediment concentration | - |
+| $A$ | HRU area | ha |
 
-The driver in `hru_control.f90` calls (in order) `pest_apply` (via management), then daily: `pest_washp`, `pest_decay`, `pest_lch`, `pest_pesty`, `pest_pl_up`.
+## Channels
+
+Pesticide entering a channel is split into dissolved and sorbed phases using the channel carbon content and the sediment concentration of the inflow. Over the travel time through the reach (as a fraction of a day, at most 1) the dissolved and sorbed mass in water decays with the aquatic half-life `aq_hlife`. Dissolved pesticide volatilises at rate `aq_volat` and sorbed pesticide settles to the bed at rate `aq_settle` (m/day, divided by flow depth). Bed pesticide is resuspended at rate `aq_resus`, exchanges with the water by diffusion (a mixing velocity derived from the molecular weight and bed porosity), is buried at rate `ben_bury` over the active bed depth `ben_act_dep`, and decays with the benthic half-life `ben_hlife`. Dissolved pesticide above the solubility limit is moved to the bed. The pesticide left in the water leaves the reach in proportion to outflow over outflow plus storage.
+
+Reservoirs follow the same set of processes (decay, volatilisation, settling, resuspension, diffusion and burial) without temperature adjustment. Pesticide reactions in wetlands are not simulated in this revision.
+
+## Aquifers
+
+Pesticide reaching an aquifer decays with the aquatic half-life and leaves in baseflow and deep seepage. Its concentration is the aquifer pesticide mass divided by a mixing volume made of baseflow, seepage, revap and a fraction of aquifer storage. That fraction is the pesticide groundwater mixing factor in [`parameters.bsn`](../input-reference/parameters-bsn.md) (default 0, so only the day's outflows dilute the pesticide). See [Aquifers](aquifers.md).
+
+## Parameters
+
+| Parameter | File | Effect |
+|---|---|---|
+| `soil_ads` | [`pesticide.pes`](../input-reference/pes.md) | Sorption coefficient normalised for organic carbon, $K_{oc}$ (mL/g) |
+| `frac_wash` | [`pesticide.pes`](../input-reference/pes.md) | Fraction washed off foliage by rain |
+| `hl_foliage`, `hl_soil` | [`pesticide.pes`](../input-reference/pes.md) | Half-lives on foliage and in soil (days) |
+| `solub` | [`pesticide.pes`](../input-reference/pes.md) | Water solubility (mg/L) |
+| `aq_hlife`, `ben_hlife` | [`pesticide.pes`](../input-reference/pes.md) | Half-lives in water and in benthic sediment (days) |
+| `aq_volat`, `aq_resus`, `aq_settle`, `ben_bury` | [`pesticide.pes`](../input-reference/pes.md) | Channel volatilisation, resuspension, settling and burial velocities (m/day) |
+| `ben_act_dep` | [`pesticide.pes`](../input-reference/pes.md) | Depth of the active benthic layer (m) |
+| `mol_wt` | [`pesticide.pes`](../input-reference/pes.md) | Molecular weight (g/mol) |
+| `pl_uptake`, `harvest_sink`, `resistance_n` | [`pesticide.pes`](../input-reference/pes.md) | Plant uptake factor and its fate in the plant |
+| `app_eff`, `surf_frac` | [`chem_app.ops`](../input-reference/ops.md) | Application efficiency and share placed in the top 10 mm |
+| `pest_perc` | [`parameters.bsn`](../input-reference/parameters-bsn.md) | Pesticide concentration in runoff relative to soil water |
+| 6th and 7th values | [`parameters.bsn`](../input-reference/parameters-bsn.md) | Groundwater mixing factor and temperature switch (columns labelled `lin_sed` and `exp_sed` by the Editor) |
 
 ## Related pages
 
+- [`pesticide.pes`](../input-reference/pes.md) and [operation files](../input-reference/ops.md)
 - [`parameters.bsn`](../input-reference/parameters-bsn.md)
-- [`management.sch`](../input-reference/ops.md)
-- [Plant growth](../model-theory/plant-growth-lum.md)
-- [Channels](../model-theory/channels.md)
-- [Erosion and sediment](../model-theory/erosion-sediment.md)
+- [Plant growth and land use management](plant-growth-lum.md)
+- [Erosion and sediment](erosion-sediment.md)
+- [Channels](channels.md), [Reservoirs and wetlands](reservoirs-wetlands.md), [Aquifers](aquifers.md)
+
+??? quote "Sources"
+
+    Code at revision 62.0.1:
+
+    - Application: [`src/pest_apply.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_apply.f90), amount and efficiency in [`src/mgt_sched.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_sched.f90) and [`src/actions.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/actions.f90)
+    - Washoff: [`src/pest_washp.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_washp.f90); call order and the 2.54 mm rain threshold: [`src/hru_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/hru_control.f90)
+    - Decay and metabolites: [`src/pest_decay.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_decay.f90); Q10 function: [`src/pest_tempdecay_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_tempdecay_module.f90)
+    - Plant uptake: [`src/pest_pl_up.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_pl_up.f90); harvest and kill: [`src/mgt_harvtuber.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_harvtuber.f90), [`src/mgt_killop.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_killop.f90)
+    - Transport in water: [`src/pest_lch.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_lch.f90); with sediment: [`src/pest_pesty.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_pesty.f90), [`src/pest_enrsb.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_enrsb.f90)
+    - Database and decay factors: [`src/pest_parm_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pest_parm_read.f90), [`src/pesticide_data_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/pesticide_data_module.f90)
+    - Channels: [`src/ch_rtpest.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/ch_rtpest.f90), mixing velocity in [`src/sd_hydsed_init.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/sd_hydsed_init.f90); reservoirs: [`src/res_pest.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_pest.f90); aquifers: [`src/aqu_1d_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/aqu_1d_control.f90)
+    - Basin parameters: [`src/basin_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_module.f90) (`basin_parms`), read list-directed in [`src/basin_read_prm.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/basin_read_prm.f90)
+
+    Symbols and variables:
+
+    | Symbol or column | Variable |
+    |---|---|
+    | $f_{gc}$ | `gc` |
+    | `app_eff`, `surf_frac` | `chemapp_db%app_eff`, `chemapp_db%surf_frac` |
+    | `soil_ads`, `frac_wash`, `hl_foliage`, `hl_soil` | `pestdb%koc`, `%washoff`, `%foliar_hlife`, `%soil_hlife` |
+    | daily survival factors | `pestcp%decay_f`, `%decay_s`, `%decay_a`, `%decay_b` |
+    | $f_d$ | `pestcp%daughter%foliar_fr`, `%soil_fr`, `%aq_fr`, `%ben_fr` |
+    | $f_{TSCF}$, $n$ | `pestdb%pl_uptake`, `pestdb%resistance_n` |
+    | $\beta_{perc}$ | `bsn_prm%percop` |
+    | temperature switch | `bsn_prm%temp_decay` |
+    | groundwater mixing factor | `bsn_prm%pestgwfact` |
+    | pesticide on foliage, in the plant, in soil | `cs_pl%pl_on%pest`, `cs_pl%pl_in%pest`, `cs_soil%ly%pest` |

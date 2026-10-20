@@ -1,142 +1,192 @@
 ---
 title: Reservoirs and wetlands
-description: Reservoir water balance and release rules, sediment and nutrient processes, and HRU wetlands in SWAT+.
+description: Reservoir water balance, release rules, sediment and nutrient settling, and wetlands and rice paddies on HRUs in SWAT+.
 status: review
+verified_against:
+  - src/res_control.f90
+  - src/res_hydro.f90
+  - src/res_initial.f90
+  - src/res_read.f90
+  - src/res_sediment.f90
+  - src/res_nutrient.f90
+  - src/reservoir_module.f90
+  - src/reservoir_data_module.f90
+  - src/wetland_control.f90
+  - src/wet_initial.f90
+  - src/et_act.f90
+  - src/hru_control.f90
+  - src/theta.f90
+  - src/input_file_module.f90
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
 ## Overview
 
-Reservoirs are standalone water body objects in the routing network. They receive inflow from upstream channels, HRUs, or recall objects, store it, and release it according to a decision table in `res_rel.dtl`. Each reservoir runs sediment settling, in-pond nutrient processes, and optional pesticide, salt, and constituent processes.
+SWAT+ has two kinds of water body:
 
-Wetlands are a separate object type linked to individual HRUs. They sit on the HRU surface, intercept surface runoff before it reaches the channel, and run a similar water balance and sediment-nutrient set as reservoirs. Wetland storage is configured per HRU in `wetland.wet`.
+- Reservoirs are spatial objects in the routing network. They receive water from channels, HRUs, routing units, aquifers or recall objects, store it, and release it by rules written in a decision table. They are defined in [`reservoir.res`](../input-reference/res.md#reservoirres), which points to records in [`hydrology.res`](../input-reference/res.md#hydrologyres), [`sediment.res`](../input-reference/res.md#sedimentres), [`nutrients.res`](../input-reference/res.md#nutrientsres), [`initial.res`](../input-reference/res.md#initialres) and a release table in [`res_rel.dtl`](../input-reference/dtl.md).
+- Wetlands belong to an HRU. They store water on the HRU surface (including rice paddies and other impoundments), receive rain, irrigation and the HRU's runoff, and release water by the same kind of decision table. They are defined in [`wetland.wet`](../input-reference/wet.md#wetlandwet) and [`hydrology.wet`](../input-reference/wet.md#hydrologywet) and assigned to HRUs through the `surf_stor` column of [`hru-data.hru`](../input-reference/hru.md).
 
-## Process equations
+Both use the same release, sediment and nutrient calculations.
 
-### Reservoir water balance
+## Reservoir water balance
 
-The daily water balance for a reservoir in `res_control.f90` is
+A reservoir starts to operate in the year and month given by `yr_op` and `mon_op` in [`hydrology.res`](../input-reference/res.md#hydrologyres). Before that date, inflow passes through unchanged.
 
-```
-stor_new = stor_prev + inflow + precip - outflow - evap - seep - irrig
-```
+Each day:
 
-where:
+1. Inflow is added to storage. If the reservoir is a point of diversion in the water allocation inputs, withdrawals are taken.
+2. The release table is evaluated and the release computed (see below). The release is smoothed with lag factors.
+3. Rain on the water surface is added, then release, evaporation and seepage are removed, each limited to the water available.
+4. The surface area is updated from the new storage.
 
-- `inflow` is the upstream hydrograph (`ht1`).
-- `precip` is precipitation onto the water surface from the assigned weather station, using the current surface area.
-- `outflow` is the release computed by `res_hydro.f90`.
-- `evap` is potential evaporation times the water surface area, optionally adjusted by the reservoir evaporation coefficient.
-- `seep` is seepage through the bed, computed from the bed hydraulic conductivity over the surface area.
-- `irrig` is water withdrawn for irrigation through the water allocation module.
+$$
+V_i = V_{i-1} + V_{in} + V_{pcp} - V_{out} - V_{evap} - V_{seep}
+$$
 
-Surface area as a function of storage is interpolated from the principal volume `pvol_m3` and emergency volume `evol_m3` defined for the reservoir.
+$$
+V_{pcp} = 10\,R\,A, \qquad V_{evap} = 10\,\eta\,E_o\,A, \qquad V_{seep} = 240\,K_{sat}\,A
+$$
 
-### Release rules via `res_rel.dtl`
+| Symbol | Meaning | Units | Input |
+|---|---|---|---|
+| $V$ | water stored | m³ | |
+| $R$ | precipitation | mm | |
+| $E_o$ | potential evapotranspiration | mm | |
+| $\eta$ | evaporation coefficient | - | `evap_co` |
+| $K_{sat}$ | hydraulic conductivity of the reservoir bottom | mm/h | `k` |
+| $A$ | water surface area on the previous day | ha | |
 
-Releases are not hard-coded. Each reservoir points to a decision table in `res_rel.dtl`. The table lists conditions (volume above principal, day of year, downstream demand, ...) and corresponding actions (weir release, target release, percent of volume, irrigation supply, ...). At each daily step `res_hydro.f90`:
+When gwflow is active, seepage is computed by gwflow as exchange with the groundwater cells under the reservoir.
 
-1. Walks the action list (`d_tbl%acts`).
-2. For each action, evaluates whether all condition alternatives are satisfied (`d_tbl%act_hit`).
-3. Fires the corresponding release equation.
+### Surface area
 
-Release types include:
+Surface area is a power function of storage, $A = \beta_1 V^{\beta_2}$. The coefficients are computed from the areas and volumes at the principal and emergency spillways (`area_ps`, `vol_ps`, `area_es`, `vol_es`):
 
-- `weir_release` for a weir of height `wbody_prm%weir_hgt` and width `wbody_prm%weir_wid`. The discharge over time follows the weir equation with the daily volume above the weir crest as the head source.
-- `pvol_release` and `evol_release` for releases triggered when storage exceeds the principal or emergency volume.
-- Doell-style storage-based release with coefficient `kr` and exponent `alpha` (Jose T 2025 extension in `res_hydro.f90`).
-- Hanazaki monthly-target release using monthly inflow and demand.
-- HYPE seasonal sine and linear storage modulation for hydropower-style operations.
+$$
+\beta_2 = \frac{\log_{10} A_{es} - \log_{10} A_{ps}}{\log_{10} V_{es} - \log_{10} V_{ps}} \;(\le 0.9), \qquad \beta_1 = \left(\frac{A_{es}}{V_{es}}\right)^{\beta_2}
+$$
 
-The weir branch calls `res_weir_release.f90` to integrate over sub-daily steps.
+If $\beta_2$ would exceed 0.9, it is set to 0.9 and $\beta_1 = (A_{ps}/V_{ps})^{0.9}$.
 
-### Reservoir sediment
+### Release smoothing
 
-`res_sediment.f90` computes settling using a first-order rate. If the in-reservoir sediment concentration (ppm) exceeds the equilibrium concentration `wbody_prm%sed%nsed`, the excess is reduced by the settling coefficient `wbody_prm%sed_stlr_co`:
+The release from the decision table is blended with the previous day's release so that outflow does not jump:
 
-```
-sed_ppm_new = (sed_ppm - nsed) * sed_stlr_co + nsed
-```
+$$
+Q_i = \alpha\,Q^{*} + (1 - \alpha)\,Q_{i-1}, \qquad \alpha = e^{-\lambda}
+$$
 
-After settling, sand, large aggregates, silt, clay, and gravel are recomputed; all of the sand-sized fraction is assumed to deposit. Outflow sediment leaves at the post-settling concentration.
+where $Q^{*}$ is the release from the table and $\lambda$ is the lag for rising releases or the lag for falling releases. The two lags are read from the last two columns of [`hydrology.res`](../input-reference/res.md#hydrologyres), which the SWAT+ Editor labels `shp_co1` and `shp_co2` (formerly area-volume shape coefficients). A lag of 0 gives no smoothing.
 
-### Reservoir nutrients
+## Release rules
 
-`res_nutrient.f90` runs an in-pond nutrient set: settling of organic N and organic P, mineralisation, nitrification, and algal growth limited by light and nutrients. Soluble nutrients track storage-weighted concentration and leave at the outflow concentration. Settling rates are read from `nutrients-res.nut`.
+Each reservoir names a release table. Names that begin with `ctbl_` refer to a conditions table; all others refer to a decision table in [`res_rel.dtl`](../input-reference/dtl.md). The decision table conditions are evaluated as described in [Decision tables](decision-tables.md), and every action that fires adds a release. Release options (the `option` of a `release` action):
 
-### Reservoir pesticides, salts, constituents
+| Option | Release for the day |
+|---|---|
+| `rate` | constant × 86400 (constant in m³/s) |
+| `rate_pct` | constant % of the principal volume |
+| `inflo_rate` | larger of (inflow + second constant × 86400) and constant × 86400 |
+| `inflo_frac` | constant × inflow |
+| `ab_emer` | all storage above the emergency volume |
+| `days` | (storage − lower bound) / constant days, where the lower bound is 0, or a fraction (second constant) of the principal or emergency volume |
+| `dyrt` | (storage − lower bound) / constant days + second constant % of the principal volume, with the lower bound 0, the principal or the emergency volume |
+| `dyrt1` | as `dyrt`, with the lower bound taken from a condition of the table |
+| `inflo_targ` | inflow + (storage − target), with the target a fraction of the principal volume taken from a condition |
+| `weir` | discharge over a weir from [`weir.res`](../input-reference/res.md#weirres) |
+| `meas` | measured release from a recall file |
+| `natlake` | natural lake outflow, $k_r\,S_{eff}\,(S_{eff}/(S_{max} - S_0))^{1.5}$ with $S_0$ a fraction of the principal volume and $S_{max}$ the principal volume |
+| `nonirr-h06`, `irr-h06` | Hanasaki et al. (2006) release for non-irrigation and irrigation reservoirs, from the long-term mean monthly inflow and demand |
+| `hydrop` | hydropower release: mean inflow scaled by a storage factor and a seasonal factor |
 
-`res_pest.f90`, `res_salt.f90`, and `res_cs.f90` run when those constituent modules are active. See [Pesticides](pesticides.md) and [Salts and constituents](salts-constituents.md).
+## Reservoir sediment
 
-### Wetlands on HRUs
+When the suspended sediment concentration is above the equilibrium concentration `nsed`, the excess settles:
 
-Wetlands are configured per HRU via `wet_initial.f90` and `wetland.wet`. Each wetland has:
+$$
+C_{sed,i} = (C_{sed} - C_{eq})\,e^{-0.184\,d_{50}} + C_{eq}
+$$
 
-- Principal volume `wet_ob%pvol` (m^3) computed from `wet_hyd%pdep` (principal depth, mm) times the HRU area.
-- Emergency volume `wet_ob%evol` (m^3) from `wet_hyd%edep`.
-- Principal and emergency surface areas `psa` and `esa`.
-- Optional weir geometry `weir_hgt` and `weir_wid` read from `weir.res`.
+where $d_{50}$ is the median particle size in [`sediment.res`](../input-reference/res.md#sedimentres) (µm). Sediment leaves with the release at the settled concentration. When the concentration is at or below `nsed`, no sediment is released.
 
-The wetland state `wet(iihru)` is the same `water_body` type used for reservoirs. In `hru_control.f90` the HRU surface runoff is routed into the wetland (`wet(j) = wet(j) + ht1`), the wetland runs its water balance and release (using the same `res_hydro` machinery on a wetland), and the outflow is added to the HRU outgoing hydrograph. Storage to depth uses a quadratic relation from `wet_hyd%bcoef` and `wet_hyd%ccoef`:
+## Reservoir nutrients
 
-```
-depth^2 * ccoef + depth * bcoef = (1 - flo / pvol)
-```
+Organic N, particulate P, soluble N (nitrate, ammonium, nitrite) and soluble P are removed by settling. The fraction removed each day is
 
-with the positive root taken.
+$$
+f = \min\left(1,\;(C - C_{min})\,r\,\theta^{\,T - 20}\right)
+$$
 
-Wetlands run their own sediment, nutrient, pesticide, salt, and constituent routines using the same module code paths as reservoirs.
+| Symbol | Meaning | Input |
+|---|---|---|
+| $C$ | concentration of the pool | mg/L |
+| $C_{min}$ | minimum concentration for settling | `n_min_stl`, `p_min_stl` |
+| $r$ | settling rate; for organic N and particulate P it differs between the mid-year period (`mid_start` to `mid_end` months) and the rest of the year; soluble N and P have one rate each | `mid_n_stl`, `n_stl`, `mid_p_stl`, `p_stl`; positions 8 and 9 for soluble N and P |
+| $\theta$ | temperature factor | `theta_n`, `theta_p` |
+| $T$ | air temperature | °C |
 
-## Switches and parameters
+For soluble N and P the fraction is multiplied by 0.2. After settling, the release takes nutrients in proportion to its share of the water.
 
-| Switch / parameter | Default | File | Effect |
-|--------------------|---------|------|--------|
-| `res_hyd%iyres` | per reservoir | `hydrology-res.res` | Year reservoir comes online |
-| `res_hyd%mores` | per reservoir | `hydrology-res.res` | Month reservoir comes online |
-| `pvol_m3` | per reservoir | `hydrology-res.res` | Principal volume (m^3) |
-| `evol_m3` | per reservoir | `hydrology-res.res` | Emergency volume (m^3) |
-| `wbody_prm%sed%nsed` | per reservoir | `sediment-res.sed` | Equilibrium sediment concentration (ppm) |
-| `wbody_prm%sed_stlr_co` | per reservoir | `sediment-res.sed` | Sediment settling coefficient |
-| `wbody_prm%weir_hgt` | per reservoir | `weir.res` | Weir height (m) |
-| `wbody_prm%weir_wid` | per reservoir | `weir.res` | Weir width (m) |
-| `res_ob%release_dtl` | per reservoir | [`dtl`](../input-reference/dtl.md) (`res_rel.dtl`) | Decision table name for release rules |
-| `wet_hyd%pdep` | per HRU wetland | `wetland.wet` | Principal depth (mm) |
-| `wet_hyd%edep` | per HRU wetland | `wetland.wet` | Emergency depth (mm) |
-| `wet_hyd%psa` | per HRU wetland | `wetland.wet` | Principal surface area fraction of HRU |
-| `wet_hyd%esa` | per HRU wetland | `wetland.wet` | Emergency surface area fraction of HRU |
-| `wet_hyd%bcoef` | per HRU wetland | `wetland.wet` | Storage-depth quadratic coefficient |
-| `wet_hyd%ccoef` | per HRU wetland | `wetland.wet` | Storage-depth quadratic coefficient |
+Pesticides, salts and constituents in reservoirs are described on the [Pesticides](pesticides.md) and [Salts and constituents](salts-constituents.md) pages.
 
-TODO: verify default values in `hydrology-res.res`, `sediment-res.sed`, `nutrients-res.nut`, `weir.res`, and `wetland.wet` against their respective `_read.f90` readers.
+## Wetlands and paddies
 
-## Implementation
+A wetland covers part of its HRU and stores water on the surface. Its principal and emergency volumes are the HRU area times the depths `dp_ps` and `dp_es` in [`hydrology.wet`](../input-reference/wet.md#hydrologywet). When a weir is assigned in [`weir.res`](../input-reference/res.md#weirres), the principal volume is the HRU area times the weir height, and the emergency volume is at least 1.2 times that.
 
-Source modules in `swatplus/src/`:
+Each day:
 
-- `res_control.f90` is the master daily driver for a reservoir object. Adds inflow, computes the water balance, calls release, sediment, nutrient, pesticide, salt, and constituent routines.
-- `res_hydro.f90` evaluates the release decision table and computes outflow. Houses weir, principal-volume, emergency-volume, Doell, Hanazaki, and HYPE release branches.
-- `res_weir_release.f90` integrates weir discharge over sub-daily steps.
-- `res_rel_conds.f90` evaluates release conditions specific to reservoirs.
-- `res_sediment.f90` computes in-reservoir sediment settling.
-- `res_nutrient.f90` runs in-reservoir nutrient transformations.
-- `res_pest.f90` handles reservoir pesticides.
-- `res_salt.f90`, `res_cs.f90` handle salts and constituents.
-- `res_initial.f90`, `res_allo.f90`, `res_objects.f90` set up reservoir state at simulation start.
-- `res_read.f90`, `res_read_hyd.f90`, `res_read_sed.f90`, `res_read_nut.f90`, `res_read_weir.f90`, `res_read_init.f90`, `res_read_conds.f90`, `res_read_elements.f90`, `res_read_csdb.f90`, `res_read_saltdb.f90`, `res_read_salt_cs.f90` read the reservoir input files.
-- `reservoir_module.f90` defines reservoir types including `wet_ob` for wetlands.
-- `reservoir_data_module.f90` and `reservoir_conditions_module.f90` hold parameter and conditions arrays.
-- `reservoir_output.f90`, `res_pesticide_output.f90`, `res_salt_output.f90`, `res_cs_output.f90` write reservoir outputs.
-- `wet_initial.f90` initialises a wetland on each flagged HRU.
-- `wet_all_initial.f90` initialises all wetlands at simulation start.
-- `wet_fp_init.f90` sets up the wetland-floodplain link to channels.
-- `wet_read.f90`, `wet_read_hyd.f90`, `wet_read_salt_cs.f90` read wetland input files.
-- `wet_irrp.f90` handles irrigation withdrawal from a wetland.
-- `wet_cs.f90`, `wet_cs_output.f90`, `wet_salt.f90`, `wet_salt_output.f90` handle wetland constituents and salts.
+1. Rain and irrigation are added to the wetland.
+2. The wetted area is updated from storage with the volume-depth coefficients of [`hydrology.wet`](../input-reference/wet.md#hydrologywet). Rice paddies are treated as flat and cover the whole HRU.
+3. Seepage into the soil is $24\,K_{sat}\,A$, with $K_{sat}$ the `k` of [`hydrology.wet`](../input-reference/wet.md#hydrologywet) (or the conductivity set by a puddling operation). Seepage that the soil cannot take because it is saturated stays in the wetland. Nutrients move into the top soil layer with the seepage.
+4. Release follows the decision table, or the weir equation for paddies, and becomes surface runoff of the HRU.
+5. Sediment, nutrients, salts and constituents are updated as for reservoirs.
+
+Evaporation from standing water is taken from the wetland first, as part of the HRU soil evaporation, before any water is taken from the soil.
+
+## Parameters
+
+| Parameter | File | Effect |
+|---|---|---|
+| `yr_op`, `mon_op` | [`hydrology.res`](../input-reference/res.md#hydrologyres) | Year and month the reservoir starts operating |
+| `area_ps`, `vol_ps`, `area_es`, `vol_es` | [`hydrology.res`](../input-reference/res.md#hydrologyres) | Surface areas (ha) and volumes (ha-m) at the principal and emergency spillways |
+| `k` | [`hydrology.res`](../input-reference/res.md#hydrologyres), [`hydrology.wet`](../input-reference/wet.md#hydrologywet) | Bottom hydraulic conductivity (mm/h) |
+| `evap_co` | [`hydrology.res`](../input-reference/res.md#hydrologyres) | Evaporation coefficient |
+| `shp_co1`, `shp_co2` | [`hydrology.res`](../input-reference/res.md#hydrologyres) | Release lags for rising and falling outflow |
+| `nsed`, `d50` | [`sediment.res`](../input-reference/res.md#sedimentres) | Equilibrium sediment concentration (mg/L) and median particle size (µm) |
+| settling rates, $\theta$, minimum concentrations | [`nutrients.res`](../input-reference/res.md#nutrientsres) | Nutrient settling |
+| `dp_ps`, `dp_es`, `hru_ps`, `hru_es` | [`hydrology.wet`](../input-reference/wet.md#hydrologywet) | Wetland depths (mm) and HRU fractions at the principal and emergency levels |
+| release table | [`res_rel.dtl`](../input-reference/dtl.md) | Release rules |
 
 ## Related pages
 
-- [Decision tables](decision-tables.md) for how release rules are evaluated.
-- [`dtl`](../input-reference/dtl.md) for the decision table input file format.
-- [`res`](../input-reference/res.md) for the reservoir input files.
-- [`wet`](../input-reference/wet.md) for the wetland input files.
-- [Channels](channels.md) for downstream routing.
-- [Aquifer, reservoir, and plant output](../output-reference/aquifer-reservoir-plant.md).
+- [Reservoir inputs](../input-reference/res.md) and [wetland inputs](../input-reference/wet.md)
+- [Decision tables](decision-tables.md) and the [`*.dtl` files](../input-reference/dtl.md)
+- [Channels](channels.md), [Aquifers](aquifers.md)
+- [Aquifer, reservoir and plant output](../output-reference/aquifer-reservoir-plant.md)
+
+??? quote "Sources"
+
+    Code at revision 62.0.1:
+
+    - Reservoir daily driver: [`src/res_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_control.f90)
+    - Release options: [`src/res_hydro.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_hydro.f90); conditions tables: [`src/res_rel_conds.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_rel_conds.f90); weir release for paddies: [`src/res_weir_release.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_weir_release.f90)
+    - Initialisation, area coefficients and lags: [`src/res_initial.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_initial.f90); reader: [`src/res_read.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_read.f90)
+    - Sediment and nutrients: [`src/res_sediment.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_sediment.f90), [`src/res_nutrient.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/res_nutrient.f90), [`src/theta.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/theta.f90)
+    - Types: [`src/reservoir_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/reservoir_module.f90), [`src/reservoir_data_module.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/reservoir_data_module.f90)
+    - Wetlands: [`src/wetland_control.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wetland_control.f90), [`src/wet_initial.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/wet_initial.f90); evaporation from standing water: [`src/et_act.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/et_act.f90)
+
+    Columns and variables:
+
+    | Column | Variable |
+    |---|---|
+    | `yr_op`, `mon_op` | `res_hyd%iyres`, `%mores` |
+    | `area_ps`, `vol_ps`, `area_es`, `vol_es` | `res_hyd%psa`, `%pvol`, `%esa`, `%evol` |
+    | `evap_co`, `k` | `res_hyd%evrsv`, `%k` |
+    | `shp_co1`, `shp_co2` | `res_hyd%br1`, `%br2`, copied to `res_ob%lag_up`, `%lag_down` |
+    | $\beta_1$, $\beta_2$ | `res_ob%br1`, `res_ob%br2` |
+    | `nsed`, `d50` | `res_sed%nsed`, `%d50`; settling factor `res_prm%sed_stlr_co` |
+    | `mid_start`, `mid_end`, `mid_n_stl`, `n_stl`, `mid_p_stl`, `p_stl` | `res_nut%ires1`, `%ires2`, `%nsetlr1`, `%nsetlr2`, `%psetlr1`, `%psetlr2` |
+    | `chla_co`, `secchi_co` (positions 8 and 9) | `res_nut%nsolr`, `%psolr` (soluble N and P settling rates) |
+    | `theta_n`, `theta_p`, `n_min_stl`, `p_min_stl` | `res_nut%theta_n`, `%theta_p`, `%conc_nmin`, `%conc_pmin` |
+    | wetland `dp_ps`, `dp_es`, `k` | `wet_hyd%pdep`, `%edep`, `%k` (copied to `hru%wet_hc`) |

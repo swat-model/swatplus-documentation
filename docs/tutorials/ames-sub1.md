@@ -1,31 +1,28 @@
 ---
 title: Ames_sub1 walkthrough
-description: A slow walk through the Ames_sub1 reference dataset. Open every input group in file.cio, run the model, read the outputs.
+description: A walk through the Ames_sub1 reference dataset at revision 62.0.1. Open each input group in file.cio, run the model, read the outputs.
 status: review
+verified_against:
+  - swatplus/refdata/Ames_sub1
+verified_at_commit: 6f515368525e7d84089ae0f9d33f4c9115de5679
 ---
 
-`Ames_sub1` is the smallest realistic SWAT+ project in the source tree. One subbasin near Ames, Iowa. Twelve HRUs. Forty-six years of daily climate (1975 to 2020). The folder is at [`swatplus/refdata/Ames_sub1`](https://github.com/swat-model/swatplus/tree/main/refdata/Ames_sub1).
+`Ames_sub1` is the reference dataset used to test SWAT+. It has twelve HRUs near Ames, Iowa, and 46 years of daily simulation (1975 to 2020), with no channels, aquifers or reservoirs. The folder is [`refdata/Ames_sub1`](https://github.com/swat-model/swatplus/tree/62.0.1/refdata/Ames_sub1) in the source repository.
 
-This page opens every file in the project, in the order SWAT+ reads them, explains what is in it, and then runs the model and reads the outputs. Use it as the second pass over a SWAT+ project after the [Quick start](../getting-started/quick-start-ames.md).
+The sections below go through the input files in the order of [`file.cio`](../input-reference/file-cio.md), then run the model and read the outputs, as a second pass after the [Quick start](../getting-started/quick-start-ames.md). Several inputs of this test dataset do not do what their names suggest. They are pointed out where they come up, because they are also the mistakes to look for in a new project.
 
-## Prerequisites
+## file.cio
 
-- A working SWAT+ executable. See [Install](../getting-started/install.md).
-- A local copy of `refdata/Ames_sub1`.
-
-## file.cio: the index of every other input
-
-`file.cio` tells SWAT+ which other files exist. It is the first file the model reads. The literal token `null` means "this slot is not used in this project".
-
-Open `Ames_sub1/file.cio`. The relevant rows for this project are:
+[`file.cio`](../input-reference/file-cio.md) lists every other input file. Most lines in Ames_sub1 are `null`:
 
 ```text
 simulation        time.sim          print.prt         null              object.cnt        null
-basin             codes.bsn         parameters.bsn
+basin             codes.bsn         parameters.bsn    carbon.bsn
 climate           weather-sta.cli   weather-wgn.cli   null              pcp.cli           tmp.cli
 connect           hru.con
 hru               hru-data.hru
 hydrology         hydrology.hyd     topography.hyd
+structural        tiledrain.str     septic.str        filterstrip.str   grassedww.str     bmpuser.str
 hru_parm_db       plants.plt        fertilizer.frt    tillage.til       pesticide.pes     ...   snow.sno
 ops               harv.ops          graze.ops         irr.ops           chem_app.ops      fire.ops   sweep.ops
 lum               landuse.lum       management.sch    cntable.lum       cons_practice.lum ovn_table.lum
@@ -35,11 +32,11 @@ decision_table    lum.dtl
 regions           ls_unit.ele       ...  aqu_catunit.ele
 ```
 
-Most slots are `null`. Ames_sub1 has no channels, no reservoirs, no routing units, no aquifer file. It is a pure HRU water-balance run. The `connect` row points to `hru.con` only.
+The only spatial objects are HRUs ([`hru.con`](../input-reference/con.md)). There is no routing: each HRU's water, sediment and nutrients leave the model, and the results are read per HRU.
 
 Reference: [file.cio](../input-reference/file-cio.md).
 
-## simulation group
+## Simulation settings
 
 ### time.sim
 
@@ -48,206 +45,210 @@ day_start  yrc_start   day_end   yrc_end      step
        0      1975         0      2020         0
 ```
 
-`step = 0` means a daily time step. `day_start = 0` and `day_end = 0` mean run from January 1 of `yrc_start` to December 31 of `yrc_end`.
-
-Reference: [time.sim](../input-reference/time-sim.md).
+Day 0 at the start and end means 1 January of the first year and 31 December of the last. `step` 0 is a daily time step.
 
 ### print.prt
-
-The print configuration. The first block sets the warm-up and date window:
 
 ```text
 nyskip      day_start  yrc_start  day_end   yrc_end   interval
 0           0               1975         0     2020         1
-```
-
-`nyskip = 0` means no warm-up years are discarded from output. The objects table that follows toggles each output file. In Ames_sub1, every row is set to `aa` only:
-
-```text
-objects                  daily       monthly        yearly         avann
-basin_wb                     n             n             n             y
-hru_wb                       n             n             n             y
 ...
+objects                  daily       monthly        yearly         avann
+hru_wb                       y             n             n             y
+hru_nb                       y             n             n             y
+hru_ls                       n             n             n             y
+hru_pw                       y             n             n             y
+hru_cb                       l             y             y             y
+hru_cb_vars                  l             y             y             y
 ```
 
-That is why the run produces `*_aa.txt` files and no daily or monthly outputs.
-
-Reference: [print.prt](../input-reference/print-prt.md).
+`nyskip` 0 means no warm-up years are left out of the outputs; for a real project set it to one to three years. Only HRU outputs are listed. Daily water balance, nutrient and plant output is on, and the carbon rows write daily output for each soil layer (`l`), which is what makes this run's output about 9 GB.
 
 ### object.cnt
 
-Counts of objects to allocate. SWAT+ reads this once and sizes its arrays accordingly.
+Twelve HRUs and no other objects.
 
-Reference: [object.cnt](../input-reference/object-cnt.md).
+References: [time.sim](../input-reference/time-sim.md), [print.prt](../input-reference/print-prt.md), [object.cnt](../input-reference/object-cnt.md).
 
-## basin group
+## Basin settings
 
 ### codes.bsn
 
-Method switches that apply to the whole basin. Open `codes.bsn` and read row 3:
-
 ```text
-pet  event  crack  swift_out  sed_det  rte_cha  deg_cha  wq_cha  nostress  cn  c_fact  carbon  lapse  uhyd  sed_cha  tiledrain  wtable  soil_p  gampt  atmo_dep  stor_max  i_fpwet  gw_flow  idc_till
-  2      0      0          0        0        0        0       0         0   2       0       1      0     1        0          0       0       0      0         0         0        0        0        3
+pet_file  wq_file  pet  event  crack  swift_out  sed_det  rte_cha  deg_cha  wq_cha  nostress  cn  c_fact  carbon  lapse  uhyd  sed_cha  tiledrain  wtable  soil_p  gampt  atmo_dep  stor_max  i_fpwet  gw_flow  idc_till
+null      null     2    0      0      0          0        0        0        0       0         2   0       2       0      1     0        0          0       0       0      0         0         0        0        3
 ```
 
-Notable settings for this project:
+- `pet` 2: potential evapotranspiration by the Hargreaves method.
+- `cn` 2: read but not used in 62.0.1; the curve number always follows soil water.
+- `carbon` 2: the soil carbon model is on, with its parameters from [`carbon.bsn`](../input-reference/carbon-bsn.md) and [`carbon_lyr.bsn`](../input-reference/carbon-lyr-bsn.md).
+- `gampt` 0: curve number runoff (Green and Ampt infiltration is off).
 
-- `pet = 2`: Hargreaves PET.
-- `carbon = 1`: reserved C-FARM slot, which runs no carbon model. The dynamic carbon model now activates on `carbon = 2`; this dataset must be changed to `carbon = 2` to run it.
-- `uhyd = 1`: gamma-function unit hydrograph.
-- `gampt = 0`: curve-number infiltration (the default).
+### parameters.bsn and carbon.bsn
 
-Reference: [codes.bsn](../input-reference/codes-bsn.md).
+Basin-wide parameters and the carbon model coefficients. Ames_sub1 has `1.0` in column 7 of [`parameters.bsn`](../input-reference/parameters-bsn.md), which switches on temperature-dependent pesticide decay.
 
-### parameters.bsn
+References: [codes.bsn](../input-reference/codes-bsn.md), [parameters.bsn](../input-reference/parameters-bsn.md), [carbon.bsn](../input-reference/carbon-bsn.md).
 
-Numeric constants used basin-wide (sediment routing coefficients, plant-water-stress thresholds, surface-runoff lag, and so on). The defaults in this file are the same defaults a fresh QSWAT+ project produces.
+## Climate
 
-Reference: [parameters.bsn](../input-reference/parameters-bsn.md).
+[`weather-sta.cli`](../input-reference/cli.md#weather-stacli) defines one station:
 
-## climate group
+```text
+name        wgn       pcp        tmp        slr   hmd   wnd   wnd_dir   atmo_dep
+wgn_sta1    wgn_001   ames.pcp   ames.tem   sim   sim   sim   null      null
+```
 
-The Ames station has only two climate files: `ames.pcp` (precipitation) and `ames.tem` (temperature, legacy `.tem` extension). The `weather-sta.cli` file lists one station, `weather-wgn.cli` holds the monthly statistical generator for it, and `pcp.cli` and `tmp.cli` are index files that point at `ames.pcp` and `ames.tem` respectively.
+Precipitation comes from `ames.pcp`. Solar radiation, humidity and wind are generated (`sim`) from the monthly statistics in [`weather-wgn.cli`](../input-reference/cli.md#weather-wgncli).
 
-PET is computed by Hargreaves (`pet = 2` above), so there is no PET file. Solar radiation, humidity, and wind are generated from the weather generator.
+Temperature does not come from a file. The station names `ames.tem`, but the temperature file list [`tmp.cli`](../input-reference/cli.md#observed-data-lists) contains only `ames.tmp`, an empty file. The model cannot match the name, writes `ames.tem file not found (tgage)` to `diagnostics.out`, and generates daily temperatures from [`weather-wgn.cli`](../input-reference/cli.md#weather-wgncli). The measured record in `ames.tem` is never read. With Hargreaves PET, which depends on temperature, this affects ET as well.
 
-References: [*.cli](../input-reference/cli.md), [*.pcp](../input-reference/pcp.md), [*.tmp](../input-reference/tmp.md), [*.tem](../input-reference/tem.md).
+[`hru.con`](../input-reference/con.md) gives each HRU the station name `wgn_01`, which is not the name in [`weather-sta.cli`](../input-reference/cli.md#weather-stacli) (`wgn_sta1`). With a single station the model uses it anyway, without a message; in a project with several stations, check that these names match.
 
-## connect, hru, hydrology groups
+References: [weather-sta.cli](../input-reference/cli.md), [*.pcp](../input-reference/pcp.md), [*.tmp](../input-reference/tmp.md), [*.tem](../input-reference/tem.md).
 
-### hru.con
-
-The connectivity file for HRU objects. One row per HRU with its area, coordinates, elevation, and the object the HRU drains to. In Ames_sub1 every HRU drains to itself (`hyd_typ = tot` to a downstream object of `null`), so the basin output is the sum of HRU contributions with no routing.
-
-Reference: [*.con](../input-reference/con.md).
+## HRUs
 
 ### hru-data.hru
 
-The pointer table. Twelve rows, one per HRU. Each row names the topography record, hydrology record, soil, land-use management, soil/plant initialization, surface storage, snow, and field for that HRU:
+Each row names the records an HRU uses:
 
 ```text
-id  name      topo          hydro     soil      lu_mgt           soil_plant_init  surf_stor  snow     field
- 1  hru0001   topohru0001   hyd0001   soil_01-h1   cosy_lum      soilplant1       null       snow001  null
- 2  hru0002   topohru0002   hyd0002   soil_02      mntill_corn_lum soilplant1     null       snow001  null
+id  name      topo          hydro     soil         lu_mgt            soil_plant_init  surf_stor  snow     field
+ 1  hru0001   topohru0001   hyd0001   soil_01-h1   cosy_lum          soilplant1       null       snow001  null
+ 2  hru0002   topohru0002   hyd0002   soil_02      mntill_corn_lum   soilplant1       null       snow001  null
 ...
-12  hru0012   topohru0012   hyd0012   soil_12      cosy_lum      soilplant1       null       snow001  null
+12  hru0012   topohru0012   hyd0012   soil_12      cosy_lum          soilplant1       null       snow001  null
 ```
 
-Eleven of the twelve HRUs are `cosy_lum` (corn-soy rotation). HRU 2 is `mntill_corn_lum` (minimum-till continuous corn). That single contrast is the point of the dataset: the other HRUs differ only in soil.
+Eleven HRUs use `cosy_lum`, a corn and soybean rotation, and HRU 2 uses `mntill_corn_lum`, continuous corn with reduced tillage. Each HRU has a different soil.
 
-Reference: [hru-data.hru](../input-reference/hru.md).
+### hydrology.hyd and topography.hyd
 
-### hydrology.hyd, topography.hyd
+HRU hydrology parameters (lateral flow travel time, `esco`, `epco`, `cn3_swf`, `perco`, `latq_co`, ...) and slope, slope length and lateral flow length.
 
-Per-HRU hydrology and topography parameters. `hydrology.hyd` carries the curve number adjustment, lateral and tile flow coefficients, perco coefficient, ESCO, EPCO, and so on. `topography.hyd` carries slope, slope length, and field length.
+References: [hru-data.hru](../input-reference/hru.md), [hydrology.hyd and topography.hyd](../input-reference/hyd.md).
 
-## hru_parm_db, ops, lum groups
+## Land use and management
 
-These are the parameter and operation databases the HRUs and management schedules look things up in.
+[`landuse.lum`](../input-reference/lum.md) links each land use to a management schedule:
 
-- `plants.plt`: plant-growth parameters per land cover code.
-- `fertilizer.frt`, `tillage.til`, `pesticide.pes`, `urban.urb`, `septic.sep`, `snow.sno`: input databases.
-- `harv.ops`, `graze.ops`, `irr.ops`, `chem_app.ops`, `fire.ops`, `sweep.ops`: management operation databases.
-- `landuse.lum`: each row binds one `lu_mgt` name (used in `hru-data.hru`) to a CN, a management schedule, a conservation practice, and an n-table.
-- `management.sch`: ordered list of operations per management name. The Ames dataset has two: `cosy_lum` (corn-soy rotation) and one continuous-corn variant.
-- `cntable.lum`, `cons_practice.lum`, `ovn_table.lum`: lookups referenced by `landuse.lum`.
+| Land use | Schedule in [`landuse.lum`](../input-reference/lum.md) | Used by |
+|----------|---------------------------|---------|
+| `cosy_lum` | `mgt_01` | HRUs 1 and 3 to 12 |
+| `mntill_corn_lum` | `mgt_08` | HRU 2 |
+| `cosy_lum2` | `mgt_01A` | no HRU |
+| `agrr_lum`, `soyb_lum`, `oats_lum`, `wwht_lum` | `AGRR_rot`, `SOYB_rot`, `OATS_rot`, `WWHT_rot` | no HRU; the schedules are not in [`management.sch`](../input-reference/management.md#managementsch) |
 
-References: [plants.plt](../input-reference/plt.md), [fertilizer.frt](../input-reference/frt.md), [tillage.til](../input-reference/til.md), [snow.sno](../input-reference/sno.md), [*.ops](../input-reference/ops.md), [landuse.lum](../input-reference/lum.md).
+[`management.sch`](../input-reference/management.md#managementsch) contains schedules `mgt_01` to `mgt_12` and `mgt_01A`, each a list of dated operations (tillage, planting, fertilizer, harvest). Two points about the shipped schedules at 62.0.1:
 
-## init, soils, decision_table groups
+- The fertilizer name in the `fert` rows is one column to the right of where the model reads it, so the model finds no fertilizer and the rows apply nothing, without a message. The [management page](../input-reference/management.md) shows the expected layout.
+- [`lum.dtl`](../input-reference/dtl.md) contains a decision table, `irr_year_irr`, meant to limit irrigation to 500 mm a year. At 62.0.1 the yearly total is not reset, so once 500 mm have been applied in total the table stops irrigation for the rest of the run.
 
-- `plant.ini` and `soil_plant.ini`: starting conditions for plant biomass, residue, soil water content, soil nutrient pools.
-- `soils.sol` and `nutrients.sol`: layered soil profiles and per-layer nutrient pools for each named soil.
-- `lum.dtl`: decision tables that govern automatic operations (planting, harvesting) inside the management schedule.
+References: [landuse.lum](../input-reference/lum.md), [management.sch](../input-reference/management.md), [*.dtl](../input-reference/dtl.md).
 
-References: [soils.sol](../input-reference/sol.md), [*.dtl](../input-reference/dtl.md).
+## Databases and initial conditions
 
-## carbon database
+- [`plants.plt`](../input-reference/plt.md), [`fertilizer.frt`](../input-reference/frt.md#fertilizerfrt), [`tillage.til`](../input-reference/til.md), [`pesticide.pes`](../input-reference/pes.md#pesticidepes), [`urban.urb`](../input-reference/str.md#urbanurb), [`septic.sep`](../input-reference/str.md#septicsep), [`snow.sno`](../input-reference/sno.md): parameter databases.
+- [`harv.ops`](../input-reference/ops.md#harvops), [`graze.ops`](../input-reference/ops.md#grazeops), [`irr.ops`](../input-reference/ops.md#irrops), [`chem_app.ops`](../input-reference/ops.md#chem_appops), [`fire.ops`](../input-reference/ops.md#fireops), [`sweep.ops`](../input-reference/ops.md#sweepops): parameters of each type of operation.
+- [`plant.ini`](../input-reference/ini.md#plantini): the plant community each HRU starts with.
+- [`soil_plant.ini`](../input-reference/ini.md#soil_plantini): which nutrient record each HRU's soil starts with.
+- [`soils.sol`](../input-reference/sol.md) and [`nutrients.sol`](../input-reference/ini.md#nutrientssol): soil layers and initial nutrient contents.
 
-The dataset ships `carbon = 1` in `codes.bsn`, which is now the reserved C-FARM slot and runs no carbon model. Set `carbon = 2` to activate the dynamic CENTURY/SWAT-C model; coefficients then come from `carbon.bsn` and `carbon_lyr.bsn`, and initial carbon pools from `soil_plant.ini`.
+References: [plants.plt](../input-reference/plt.md), [fertilizer.frt](../input-reference/frt.md), [tillage.til](../input-reference/til.md), [*.ops](../input-reference/ops.md), [soils.sol](../input-reference/sol.md), [initial conditions](../input-reference/ini.md).
 
-Reference: [carb_coefs.cbn](../input-reference/cbn.md).
+## Running the model
 
-## Run the model
-
-From inside the `Ames_sub1` folder:
+Check that there is about 10 GB of free space, or switch off the daily carbon output first (set the `daily` column of `hru_cb` and `hru_cb_vars` to `n` in [`print.prt`](../input-reference/print-prt.md)). Then, from inside the folder:
 
 ```bash
-./swatplus-<version>-linux-x86_64
+path/to/swatplus-62.0.1-gnu-lin_x86_64-Rel
 ```
 
-The console will fill with `Original Simulation  mm  dd  yyyy Yr N of 46`. The full run takes a few seconds on a recent laptop.
+The screen shows the date being simulated:
 
-## Read the outputs
+```text
+  Original Simulation            1  14  1994 Yr   20 of   46 Time  12:37:36
+```
 
-When the run finishes, the folder contains a new set of files. Start with:
+The run took 4 minutes 20 seconds on a recent Linux workstation, most of it spent writing the daily carbon files.
+
+## Outputs
 
 ### simulation.out
 
 The last lines should be:
 
 ```text
-Original Simulation       12  31  2020 Yr   46 of   46 Time   8:49:53
+  Original Simulation           12  31  2020 Yr   46 of   46 Time  12:40:12
 
-Execution successfully completed
+ Execution successfully completed
 ```
 
-If you do not see `Execution successfully completed`, the run aborted. Look at the last simulated day printed and check `diagnostics.out`.
+If the completion line is missing, the run stopped early; the last date shows where.
 
 ### diagnostics.out
 
-Every line here is a missing reference. The shipped run prints:
-
 ```text
-DIAGNOSTICS.OUT FILE
-corn_lum                CORN_rot     not found in management.sch
-agrr_lum                AGRR_rot     not found in management.sch
-soyb_lum                SOYB_rot     not found in management.sch
-oats_lum                OATS_rot     not found in management.sch
-wwht_lum                WWHT_rot     not found in management.sch
-ames.tem                             file not found (tgage)
-                                     file not found (basins_carbon.tes)
+ DIAGNOSTICS.OUT FILE
+ agrr_lum      AGRR_rot      not found in management.sch
+ soyb_lum      SOYB_rot      not found in management.sch
+ oats_lum      OATS_rot      not found in management.sch
+ wwht_lum      WWHT_rot      not found in management.sch
+ ames.tem                    file not found (tgage)
 ```
 
-The first five lines are land-use entries in `landuse.lum` that reference schedules not present in `management.sch`. They are unused in the run (none of the HRUs use those `lu_mgt` names), so the outputs are still correct. The `ames.tem` line refers to a station gage slot in `weather-sta.cli` that was set; the file exists, but the reader did not match it to the `tgage` slot. `basins_carbon.tes` is an optional carbon test file.
+The first four lines are land uses whose schedules are missing; no HRU uses them, so they do not affect the results. The last line is the temperature file described under [Climate](#climate).
 
 Reference: [Checker and diagnostics](../output-reference/checker-diagnostics.md).
 
 ### checker.out
 
-One row per HRU of the resolved soil parameters:
+One row per HRU with the main soil and hydrology values the model ended up with:
 
 ```text
-sname     hydgrp  zmx(mm)  usle_k  sumfc(mm)  sumul(mm)  usle_p  usle_ls  esco   epco   cn3_swf  perco  latq_co  tiledrain
-soil_01   B       2000.0   0.0     361.5      616.18     1.0     0.3638   0.95   1.0    0.0      0.5    0.01     0
-soil_02   B       2000.0   0.0     361.5      445.67     1.0     0.3638   0.95   1.0    0.0      0.5    0.01     0
+ sname        hydgrp       zmx    usle_k    sumfc     sumul   usle_p  usle_ls   esco   epco  cn3_swf  perco  latq_co  tiledrain
+soil_01-h1    B         2000.0    0.0000  361.500   616.090   1.0000   0.3638 0.9500 1.0000   0.0000 0.5000   0.0100          0
+soil_02       B         2000.0    0.0000  361.500   449.038   0.7500   0.3638 0.9500 1.0000   0.0000 0.5000   0.0100          0
+soil_03-h3    B         2000.0    0.0000  361.500   610.323   1.0000   0.3638 0.9500 1.0000   0.0000 0.5000   0.0100          0
 ...
 ```
 
-In this dataset `usle_k = 0.0` on every HRU. That is a known artifact of the Ames soil definitions; sediment yield will be zero. The `zmx` is 2000 mm on every HRU; the soil rooting depth is taken from `soils.sol`. The `tiledrain` flag is `0` on every HRU.
+`usle_k` is 0 for every soil, so the HRUs produce no sediment. Checking this file for zeros and implausible values is a quick test of any new project.
 
-### basin_wb_aa.txt
+### hru_wb_aa.txt
 
-The basin-average annual water balance. Columns are documented in [Water balance outputs](../output-reference/water-balance.md). A typical line for Ames_sub1:
+The average annual water balance of each HRU. For HRU 1:
 
-```text
-precip   snofall  snomlt   surq_gen  latq   wateryld  perc   et       pet
-1905.2   220.7    219.997  59.5      0.06   59.6      0.003  1846.4   3464.5
-```
+| precip | snofall | surq_gen | latq | perc | et |
+|--------|---------|----------|------|------|----|
+| 952.6 mm | 110.3 mm | 34.7 mm | 0.1 mm | 0.0 mm | 932.5 mm |
 
-Precipitation is 1905 mm, ET is 1846 mm, percolation is essentially zero, and surface runoff is 60 mm. The result is dominated by ET because the basin is small and well-drained and the simulation is at HRU scale only.
+Almost all precipitation leaves as ET and nothing percolates. For a real Iowa watershed, ET would be closer to two thirds of precipitation. Comparing the average annual water balance with regional estimates is the first check of any project, and [soft calibration](../calibration/soft-calibration.md) adjusts it.
+
+Columns: [Water balance outputs](../output-reference/water-balance.md).
 
 ### Other outputs
 
-- `hru_wb_aa.txt`: same fields as `basin_wb_aa.txt`, one row per HRU.
-- `hru_nb_aa.txt`, `hru_ls_aa.txt`, `hru_pw_aa.txt`: nutrient balance, landscape balance, plant and water stress, per HRU.
-- `crop_yld_aa.txt`: average annual yield by HRU and crop.
-- `basin_carbon_aa.txt`, `hru_carbon_aa.txt`: carbon outputs (only when `carbon = 2` activates the carbon model).
+- `hru_nb_*`, `hru_ncycle_*`: nutrient balance and nitrogen cycle per HRU.
+- `hru_ls_aa.txt`: sediment and nutrient losses per HRU.
+- `hru_pw_*`: plant growth and stress per HRU.
+- `crop_yld_yr.txt`, `crop_yld_aa.txt`: yields by HRU and crop.
+- `mgt_out.txt`: every management operation performed, by date and HRU. Use it to check that the schedules do what was intended.
+- `hru_carbvars.txt`, `hru_cflux_stat.txt`, `hru_cpool_stat.txt` and the other carbon files: see [Carbon outputs](../output-reference/carbon.md).
 
-## What to change next
+The shipped folder also contains `basin_*` files and others that this run does not write. They are left from earlier model versions; see [Quick start](../getting-started/quick-start-ames.md#before-running).
 
-- Switch the PET method by editing `codes.bsn` (`pet = 0` for Priestley-Taylor, `pet = 1` for Penman-Monteith). See the [cookbook](../tutorials/cookbook.md).
-- Turn on daily output by setting `daily` to `y` in `print.prt` for the rows you care about.
-- Change `nyskip` in `print.prt` to discard the first few years as warm-up.
-- Read the [Carbon notebook](../tutorials/carbon-notebook.md) for plotting the carbon outputs.
+## Changes to try
+
+- Set `nyskip` to 2 in [`print.prt`](../input-reference/print-prt.md) and compare `hru_wb_aa.txt`.
+- Rename `ames.tmp` to `ames.tem` in [`tmp.cli`](../input-reference/cli.md#observed-data-lists) so that the measured temperatures are used, and compare ET.
+- Change the PET method in [`codes.bsn`](../input-reference/codes-bsn.md) (`pet` 0 for Priestley-Taylor, 1 for Penman-Monteith); both need solar radiation, humidity and wind, which are generated here. See the [cookbook](../tutorials/cookbook.md).
+- Follow the [Carbon notebook](../tutorials/carbon-notebook.md) to plot the carbon output.
+
+??? quote "Sources"
+
+    - Dataset: [`refdata/Ames_sub1`](https://github.com/swat-model/swatplus/tree/62.0.1/refdata/Ames_sub1) at 62.0.1.
+    - Run: the 62.0.1 `gnu-lin_x86_64` release executable, 20 October 2026. `diagnostics.out`, `checker.out`, `hru_wb_aa.txt` and the run time are from that run.
+    - Fertilizer column: the `fert` case of [`src/mgt_sched.f90`](https://github.com/swat-model/swatplus/blob/62.0.1/src/mgt_sched.f90) uses `mgt%op1`, the fertilizer matched from `op_data1` (column 5); the Ames `fert` rows have `null` there and the name in `op_data2`. Details on [management.sch](../input-reference/management.md).
+    - Station and file name lookups, and the irrigation decision table: see [weather-sta.cli](../input-reference/cli.md) and [decision tables](../input-reference/dtl.md).
