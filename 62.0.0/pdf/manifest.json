@@ -1,0 +1,1176 @@
+{
+  "site_url": "https://docs.swat.tamu.edu/62.0.0/",
+  "prefix": "/62.0.0",
+  "nodes": [
+    {
+      "slug": "swatplus-documentation",
+      "type": "root",
+      "title": "Full Documentation",
+      "pdf": "/62.0.0/pdf/swatplus-documentation.pdf",
+      "url": "/62.0.0/",
+      "parent": null,
+      "pages": 307
+    },
+    {
+      "slug": "pages/index",
+      "type": "page",
+      "title": "Home",
+      "pdf": "/62.0.0/pdf/pages/index.pdf",
+      "url": "/62.0.0/",
+      "parent": "swatplus-documentation",
+      "pages": 1
+    },
+    {
+      "slug": "sections/getting-started",
+      "type": "section",
+      "title": "Getting Started",
+      "pdf": "/62.0.0/pdf/sections/getting-started.pdf",
+      "url": "/62.0.0/getting-started/",
+      "parent": "swatplus-documentation",
+      "pages": 13
+    },
+    {
+      "slug": "pages/getting-started/index",
+      "type": "page",
+      "title": "Getting Started",
+      "pdf": "/62.0.0/pdf/pages/getting-started/index.pdf",
+      "url": "/62.0.0/getting-started/",
+      "parent": "sections/getting-started",
+      "pages": 1
+    },
+    {
+      "slug": "sections/getting-started-introduction",
+      "type": "section",
+      "title": "Introduction",
+      "pdf": "/62.0.0/pdf/sections/getting-started-introduction.pdf",
+      "url": "/62.0.0/introduction/",
+      "parent": "sections/getting-started",
+      "pages": 6
+    },
+    {
+      "slug": "pages/introduction/index",
+      "type": "page",
+      "title": "Introduction",
+      "pdf": "/62.0.0/pdf/pages/introduction/index.pdf",
+      "url": "/62.0.0/introduction/",
+      "parent": "sections/getting-started-introduction",
+      "pages": 1
+    },
+    {
+      "slug": "pages/introduction/what-is-swatplus",
+      "type": "page",
+      "title": "What is SWAT+",
+      "pdf": "/62.0.0/pdf/pages/introduction/what-is-swatplus.pdf",
+      "url": "/62.0.0/introduction/what-is-swatplus/",
+      "parent": "sections/getting-started-introduction",
+      "pages": 1
+    },
+    {
+      "slug": "pages/introduction/swat-vs-swatplus",
+      "type": "page",
+      "title": "SWAT vs SWAT+",
+      "pdf": "/62.0.0/pdf/pages/introduction/swat-vs-swatplus.pdf",
+      "url": "/62.0.0/introduction/swat-vs-swatplus/",
+      "parent": "sections/getting-started-introduction",
+      "pages": 2
+    },
+    {
+      "slug": "pages/introduction/citing-and-license",
+      "type": "page",
+      "title": "Citing and license",
+      "pdf": "/62.0.0/pdf/pages/introduction/citing-and-license.pdf",
+      "url": "/62.0.0/introduction/citing-and-license/",
+      "parent": "sections/getting-started-introduction",
+      "pages": 1
+    },
+    {
+      "slug": "pages/introduction/release-notes",
+      "type": "page",
+      "title": "Release notes",
+      "pdf": "/62.0.0/pdf/pages/introduction/release-notes.pdf",
+      "url": "/62.0.0/introduction/release-notes/",
+      "parent": "sections/getting-started-introduction",
+      "pages": 1
+    },
+    {
+      "slug": "pages/getting-started/install",
+      "type": "page",
+      "title": "Install",
+      "pdf": "/62.0.0/pdf/pages/getting-started/install.pdf",
+      "url": "/62.0.0/getting-started/install/",
+      "parent": "sections/getting-started",
+      "pages": 2
+    },
+    {
+      "slug": "pages/getting-started/quick-start-ames",
+      "type": "page",
+      "title": "Quick start: Ames_sub1",
+      "pdf": "/62.0.0/pdf/pages/getting-started/quick-start-ames.pdf",
+      "url": "/62.0.0/getting-started/quick-start-ames/",
+      "parent": "sections/getting-started",
+      "pages": 2
+    },
+    {
+      "slug": "pages/getting-started/project-folder-anatomy",
+      "type": "page",
+      "title": "Project folder anatomy",
+      "pdf": "/62.0.0/pdf/pages/getting-started/project-folder-anatomy.pdf",
+      "url": "/62.0.0/getting-started/project-folder-anatomy/",
+      "parent": "sections/getting-started",
+      "pages": 3
+    },
+    {
+      "slug": "pages/getting-started/first-watershed",
+      "type": "page",
+      "title": "Your first watershed",
+      "pdf": "/62.0.0/pdf/pages/getting-started/first-watershed.pdf",
+      "url": "/62.0.0/getting-started/first-watershed/",
+      "parent": "sections/getting-started",
+      "pages": 2
+    },
+    {
+      "slug": "sections/model-theory",
+      "type": "section",
+      "title": "Model Theory",
+      "pdf": "/62.0.0/pdf/sections/model-theory.pdf",
+      "url": "/62.0.0/model-theory/",
+      "parent": "swatplus-documentation",
+      "pages": 46
+    },
+    {
+      "slug": "pages/model-theory/index",
+      "type": "page",
+      "title": "Model Theory",
+      "pdf": "/62.0.0/pdf/pages/model-theory/index.pdf",
+      "url": "/62.0.0/model-theory/",
+      "parent": "sections/model-theory",
+      "pages": 1
+    },
+    {
+      "slug": "pages/model-theory/overview-water-balance",
+      "type": "page",
+      "title": "Overview and water balance",
+      "pdf": "/62.0.0/pdf/pages/model-theory/overview-water-balance.pdf",
+      "url": "/62.0.0/model-theory/overview-water-balance/",
+      "parent": "sections/model-theory",
+      "pages": 2
+    },
+    {
+      "slug": "pages/model-theory/climate-weather",
+      "type": "page",
+      "title": "Climate and weather",
+      "pdf": "/62.0.0/pdf/pages/model-theory/climate-weather.pdf",
+      "url": "/62.0.0/model-theory/climate-weather/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/hydrology",
+      "type": "page",
+      "title": "Hydrology",
+      "pdf": "/62.0.0/pdf/pages/model-theory/hydrology.pdf",
+      "url": "/62.0.0/model-theory/hydrology/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "pages/model-theory/soil-water-temperature",
+      "type": "page",
+      "title": "Soil water and temperature",
+      "pdf": "/62.0.0/pdf/pages/model-theory/soil-water-temperature.pdf",
+      "url": "/62.0.0/model-theory/soil-water-temperature/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/erosion-sediment",
+      "type": "page",
+      "title": "Erosion and sediment",
+      "pdf": "/62.0.0/pdf/pages/model-theory/erosion-sediment.pdf",
+      "url": "/62.0.0/model-theory/erosion-sediment/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/plant-growth-lum",
+      "type": "page",
+      "title": "Plant growth and land use management",
+      "pdf": "/62.0.0/pdf/pages/model-theory/plant-growth-lum.pdf",
+      "url": "/62.0.0/model-theory/plant-growth-lum/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "pages/model-theory/nutrient-cycling",
+      "type": "page",
+      "title": "Nutrient cycling",
+      "pdf": "/62.0.0/pdf/pages/model-theory/nutrient-cycling.pdf",
+      "url": "/62.0.0/model-theory/nutrient-cycling/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "pages/model-theory/carbon",
+      "type": "page",
+      "title": "Carbon",
+      "pdf": "/62.0.0/pdf/pages/model-theory/carbon.pdf",
+      "url": "/62.0.0/model-theory/carbon/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "pages/model-theory/pesticides",
+      "type": "page",
+      "title": "Pesticides",
+      "pdf": "/62.0.0/pdf/pages/model-theory/pesticides.pdf",
+      "url": "/62.0.0/model-theory/pesticides/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/salts-constituents",
+      "type": "page",
+      "title": "Salts and constituents",
+      "pdf": "/62.0.0/pdf/pages/model-theory/salts-constituents.pdf",
+      "url": "/62.0.0/model-theory/salts-constituents/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/channels",
+      "type": "page",
+      "title": "Channels",
+      "pdf": "/62.0.0/pdf/pages/model-theory/channels.pdf",
+      "url": "/62.0.0/model-theory/channels/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "pages/model-theory/aquifers",
+      "type": "page",
+      "title": "Aquifers",
+      "pdf": "/62.0.0/pdf/pages/model-theory/aquifers.pdf",
+      "url": "/62.0.0/model-theory/aquifers/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/reservoirs-wetlands",
+      "type": "page",
+      "title": "Reservoirs and wetlands",
+      "pdf": "/62.0.0/pdf/pages/model-theory/reservoirs-wetlands.pdf",
+      "url": "/62.0.0/model-theory/reservoirs-wetlands/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/recall-point-sources",
+      "type": "page",
+      "title": "Recall and point sources",
+      "pdf": "/62.0.0/pdf/pages/model-theory/recall-point-sources.pdf",
+      "url": "/62.0.0/model-theory/recall-point-sources/",
+      "parent": "sections/model-theory",
+      "pages": 3
+    },
+    {
+      "slug": "pages/model-theory/decision-tables",
+      "type": "page",
+      "title": "Decision tables",
+      "pdf": "/62.0.0/pdf/pages/model-theory/decision-tables.pdf",
+      "url": "/62.0.0/model-theory/decision-tables/",
+      "parent": "sections/model-theory",
+      "pages": 4
+    },
+    {
+      "slug": "sections/input-reference",
+      "type": "section",
+      "title": "Input Reference",
+      "pdf": "/62.0.0/pdf/sections/input-reference.pdf",
+      "url": "/62.0.0/input-reference/",
+      "parent": "swatplus-documentation",
+      "pages": 169
+    },
+    {
+      "slug": "pages/input-reference/index",
+      "type": "page",
+      "title": "Input Reference",
+      "pdf": "/62.0.0/pdf/pages/input-reference/index.pdf",
+      "url": "/62.0.0/input-reference/",
+      "parent": "sections/input-reference",
+      "pages": 3
+    },
+    {
+      "slug": "sections/input-reference-simulation-control",
+      "type": "section",
+      "title": "Simulation control",
+      "pdf": "/62.0.0/pdf/sections/input-reference-simulation-control.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 9
+    },
+    {
+      "slug": "pages/input-reference/file-cio",
+      "type": "page",
+      "title": "file.cio",
+      "pdf": "/62.0.0/pdf/pages/input-reference/file-cio.pdf",
+      "url": "/62.0.0/input-reference/file-cio/",
+      "parent": "sections/input-reference-simulation-control",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/time-sim",
+      "type": "page",
+      "title": "time.sim",
+      "pdf": "/62.0.0/pdf/pages/input-reference/time-sim.pdf",
+      "url": "/62.0.0/input-reference/time-sim/",
+      "parent": "sections/input-reference-simulation-control",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/print-prt",
+      "type": "page",
+      "title": "print.prt",
+      "pdf": "/62.0.0/pdf/pages/input-reference/print-prt.pdf",
+      "url": "/62.0.0/input-reference/print-prt/",
+      "parent": "sections/input-reference-simulation-control",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/object-cnt",
+      "type": "page",
+      "title": "object.cnt",
+      "pdf": "/62.0.0/pdf/pages/input-reference/object-cnt.pdf",
+      "url": "/62.0.0/input-reference/object-cnt/",
+      "parent": "sections/input-reference-simulation-control",
+      "pages": 2
+    },
+    {
+      "slug": "sections/input-reference-basin-parameters",
+      "type": "section",
+      "title": "Basin parameters",
+      "pdf": "/62.0.0/pdf/sections/input-reference-basin-parameters.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 14
+    },
+    {
+      "slug": "pages/input-reference/codes-bsn",
+      "type": "page",
+      "title": "codes.bsn",
+      "pdf": "/62.0.0/pdf/pages/input-reference/codes-bsn.pdf",
+      "url": "/62.0.0/input-reference/codes-bsn/",
+      "parent": "sections/input-reference-basin-parameters",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/parameters-bsn",
+      "type": "page",
+      "title": "parameters.bsn",
+      "pdf": "/62.0.0/pdf/pages/input-reference/parameters-bsn.pdf",
+      "url": "/62.0.0/input-reference/parameters-bsn/",
+      "parent": "sections/input-reference-basin-parameters",
+      "pages": 4
+    },
+    {
+      "slug": "pages/input-reference/carbon-bsn",
+      "type": "page",
+      "title": "carbon.bsn",
+      "pdf": "/62.0.0/pdf/pages/input-reference/carbon-bsn.pdf",
+      "url": "/62.0.0/input-reference/carbon-bsn/",
+      "parent": "sections/input-reference-basin-parameters",
+      "pages": 5
+    },
+    {
+      "slug": "pages/input-reference/carbon-lyr-bsn",
+      "type": "page",
+      "title": "carbon_lyr.bsn",
+      "pdf": "/62.0.0/pdf/pages/input-reference/carbon-lyr-bsn.pdf",
+      "url": "/62.0.0/input-reference/carbon-lyr-bsn/",
+      "parent": "sections/input-reference-basin-parameters",
+      "pages": 3
+    },
+    {
+      "slug": "sections/input-reference-spatial-and-connectivity",
+      "type": "section",
+      "title": "Spatial and connectivity",
+      "pdf": "/62.0.0/pdf/sections/input-reference-spatial-and-connectivity.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 18
+    },
+    {
+      "slug": "pages/input-reference/con",
+      "type": "page",
+      "title": "*.con",
+      "pdf": "/62.0.0/pdf/pages/input-reference/con.pdf",
+      "url": "/62.0.0/input-reference/con/",
+      "parent": "sections/input-reference-spatial-and-connectivity",
+      "pages": 4
+    },
+    {
+      "slug": "pages/input-reference/hru",
+      "type": "page",
+      "title": "hru-data.hru",
+      "pdf": "/62.0.0/pdf/pages/input-reference/hru.pdf",
+      "url": "/62.0.0/input-reference/hru/",
+      "parent": "sections/input-reference-spatial-and-connectivity",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/hyd",
+      "type": "page",
+      "title": "hydrology and topography",
+      "pdf": "/62.0.0/pdf/pages/input-reference/hyd.pdf",
+      "url": "/62.0.0/input-reference/hyd/",
+      "parent": "sections/input-reference-spatial-and-connectivity",
+      "pages": 9
+    },
+    {
+      "slug": "pages/input-reference/recall",
+      "type": "page",
+      "title": "recall",
+      "pdf": "/62.0.0/pdf/pages/input-reference/recall.pdf",
+      "url": "/62.0.0/input-reference/recall/",
+      "parent": "sections/input-reference-spatial-and-connectivity",
+      "pages": 3
+    },
+    {
+      "slug": "sections/input-reference-climate",
+      "type": "section",
+      "title": "Climate",
+      "pdf": "/62.0.0/pdf/sections/input-reference-climate.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 18
+    },
+    {
+      "slug": "pages/input-reference/cli",
+      "type": "page",
+      "title": "*.cli",
+      "pdf": "/62.0.0/pdf/pages/input-reference/cli.pdf",
+      "url": "/62.0.0/input-reference/cli/",
+      "parent": "sections/input-reference-climate",
+      "pages": 9
+    },
+    {
+      "slug": "pages/input-reference/pcp",
+      "type": "page",
+      "title": "*.pcp",
+      "pdf": "/62.0.0/pdf/pages/input-reference/pcp.pdf",
+      "url": "/62.0.0/input-reference/pcp/",
+      "parent": "sections/input-reference-climate",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/tmp",
+      "type": "page",
+      "title": "*.tmp",
+      "pdf": "/62.0.0/pdf/pages/input-reference/tmp.pdf",
+      "url": "/62.0.0/input-reference/tmp/",
+      "parent": "sections/input-reference-climate",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/tem",
+      "type": "page",
+      "title": "*.tem",
+      "pdf": "/62.0.0/pdf/pages/input-reference/tem.pdf",
+      "url": "/62.0.0/input-reference/tem/",
+      "parent": "sections/input-reference-climate",
+      "pages": 1
+    },
+    {
+      "slug": "pages/input-reference/sno",
+      "type": "page",
+      "title": "snow.sno",
+      "pdf": "/62.0.0/pdf/pages/input-reference/sno.pdf",
+      "url": "/62.0.0/input-reference/sno/",
+      "parent": "sections/input-reference-climate",
+      "pages": 3
+    },
+    {
+      "slug": "sections/input-reference-soils-and-land-use",
+      "type": "section",
+      "title": "Soils and land use",
+      "pdf": "/62.0.0/pdf/sections/input-reference-soils-and-land-use.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 14
+    },
+    {
+      "slug": "pages/input-reference/sol",
+      "type": "page",
+      "title": "soils.sol",
+      "pdf": "/62.0.0/pdf/pages/input-reference/sol.pdf",
+      "url": "/62.0.0/input-reference/sol/",
+      "parent": "sections/input-reference-soils-and-land-use",
+      "pages": 5
+    },
+    {
+      "slug": "pages/input-reference/lum",
+      "type": "page",
+      "title": "landuse.lum",
+      "pdf": "/62.0.0/pdf/pages/input-reference/lum.pdf",
+      "url": "/62.0.0/input-reference/lum/",
+      "parent": "sections/input-reference-soils-and-land-use",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/lum-tables",
+      "type": "page",
+      "title": "lum lookup tables",
+      "pdf": "/62.0.0/pdf/pages/input-reference/lum-tables.pdf",
+      "url": "/62.0.0/input-reference/lum-tables/",
+      "parent": "sections/input-reference-soils-and-land-use",
+      "pages": 6
+    },
+    {
+      "slug": "sections/input-reference-channels",
+      "type": "section",
+      "title": "Channels",
+      "pdf": "/62.0.0/pdf/sections/input-reference-channels.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 14
+    },
+    {
+      "slug": "pages/input-reference/cha",
+      "type": "page",
+      "title": "*.cha (legacy)",
+      "pdf": "/62.0.0/pdf/pages/input-reference/cha.pdf",
+      "url": "/62.0.0/input-reference/cha/",
+      "parent": "sections/input-reference-channels",
+      "pages": 6
+    },
+    {
+      "slug": "pages/input-reference/sd-channel",
+      "type": "page",
+      "title": "sd_channel",
+      "pdf": "/62.0.0/pdf/pages/input-reference/sd-channel.pdf",
+      "url": "/62.0.0/input-reference/sd-channel/",
+      "parent": "sections/input-reference-channels",
+      "pages": 8
+    },
+    {
+      "slug": "sections/input-reference-aquifers-reservoirs-wetlands",
+      "type": "section",
+      "title": "Aquifers, reservoirs, wetlands",
+      "pdf": "/62.0.0/pdf/sections/input-reference-aquifers-reservoirs-wetlands.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 14
+    },
+    {
+      "slug": "pages/input-reference/aqu",
+      "type": "page",
+      "title": "*.aqu",
+      "pdf": "/62.0.0/pdf/pages/input-reference/aqu.pdf",
+      "url": "/62.0.0/input-reference/aqu/",
+      "parent": "sections/input-reference-aquifers-reservoirs-wetlands",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/res",
+      "type": "page",
+      "title": "*.res",
+      "pdf": "/62.0.0/pdf/pages/input-reference/res.pdf",
+      "url": "/62.0.0/input-reference/res/",
+      "parent": "sections/input-reference-aquifers-reservoirs-wetlands",
+      "pages": 7
+    },
+    {
+      "slug": "pages/input-reference/wet",
+      "type": "page",
+      "title": "*.wet",
+      "pdf": "/62.0.0/pdf/pages/input-reference/wet.pdf",
+      "url": "/62.0.0/input-reference/wet/",
+      "parent": "sections/input-reference-aquifers-reservoirs-wetlands",
+      "pages": 4
+    },
+    {
+      "slug": "sections/input-reference-management",
+      "type": "section",
+      "title": "Management",
+      "pdf": "/62.0.0/pdf/sections/input-reference-management.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 36
+    },
+    {
+      "slug": "pages/input-reference/ops",
+      "type": "page",
+      "title": "*.ops",
+      "pdf": "/62.0.0/pdf/pages/input-reference/ops.pdf",
+      "url": "/62.0.0/input-reference/ops/",
+      "parent": "sections/input-reference-management",
+      "pages": 13
+    },
+    {
+      "slug": "pages/input-reference/dtl",
+      "type": "page",
+      "title": "*.dtl",
+      "pdf": "/62.0.0/pdf/pages/input-reference/dtl.pdf",
+      "url": "/62.0.0/input-reference/dtl/",
+      "parent": "sections/input-reference-management",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/plt",
+      "type": "page",
+      "title": "plants.plt",
+      "pdf": "/62.0.0/pdf/pages/input-reference/plt.pdf",
+      "url": "/62.0.0/input-reference/plt/",
+      "parent": "sections/input-reference-management",
+      "pages": 4
+    },
+    {
+      "slug": "pages/input-reference/frt",
+      "type": "page",
+      "title": "fertilizer.frt",
+      "pdf": "/62.0.0/pdf/pages/input-reference/frt.pdf",
+      "url": "/62.0.0/input-reference/frt/",
+      "parent": "sections/input-reference-management",
+      "pages": 4
+    },
+    {
+      "slug": "pages/input-reference/til",
+      "type": "page",
+      "title": "tillage.til",
+      "pdf": "/62.0.0/pdf/pages/input-reference/til.pdf",
+      "url": "/62.0.0/input-reference/til/",
+      "parent": "sections/input-reference-management",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/cbn",
+      "type": "page",
+      "title": "carb_coefs.cbn (deprecated)",
+      "pdf": "/62.0.0/pdf/pages/input-reference/cbn.pdf",
+      "url": "/62.0.0/input-reference/cbn/",
+      "parent": "sections/input-reference-management",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/trt",
+      "type": "page",
+      "title": "treatment.trt",
+      "pdf": "/62.0.0/pdf/pages/input-reference/trt.pdf",
+      "url": "/62.0.0/input-reference/trt/",
+      "parent": "sections/input-reference-management",
+      "pages": 1
+    },
+    {
+      "slug": "pages/input-reference/manure-allocation",
+      "type": "page",
+      "title": "manure allocation",
+      "pdf": "/62.0.0/pdf/pages/input-reference/manure-allocation.pdf",
+      "url": "/62.0.0/input-reference/manure-allocation/",
+      "parent": "sections/input-reference-management",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/management",
+      "type": "page",
+      "title": "management schedule and minor inputs",
+      "pdf": "/62.0.0/pdf/pages/input-reference/management.pdf",
+      "url": "/62.0.0/input-reference/management/",
+      "parent": "sections/input-reference-management",
+      "pages": 8
+    },
+    {
+      "slug": "sections/input-reference-initial-conditions",
+      "type": "section",
+      "title": "Initial conditions",
+      "pdf": "/62.0.0/pdf/sections/input-reference-initial-conditions.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 9
+    },
+    {
+      "slug": "pages/input-reference/ini",
+      "type": "page",
+      "title": "*.ini files",
+      "pdf": "/62.0.0/pdf/pages/input-reference/ini.pdf",
+      "url": "/62.0.0/input-reference/ini/",
+      "parent": "sections/input-reference-initial-conditions",
+      "pages": 9
+    },
+    {
+      "slug": "sections/input-reference-structural-bmps",
+      "type": "section",
+      "title": "Structural BMPs",
+      "pdf": "/62.0.0/pdf/sections/input-reference-structural-bmps.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 12
+    },
+    {
+      "slug": "pages/input-reference/str",
+      "type": "page",
+      "title": "*.str family",
+      "pdf": "/62.0.0/pdf/pages/input-reference/str.pdf",
+      "url": "/62.0.0/input-reference/str/",
+      "parent": "sections/input-reference-structural-bmps",
+      "pages": 12
+    },
+    {
+      "slug": "sections/input-reference-pollutants",
+      "type": "section",
+      "title": "Pollutants",
+      "pdf": "/62.0.0/pdf/sections/input-reference-pollutants.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 6
+    },
+    {
+      "slug": "pages/input-reference/pes",
+      "type": "page",
+      "title": "pesticide",
+      "pdf": "/62.0.0/pdf/pages/input-reference/pes.pdf",
+      "url": "/62.0.0/input-reference/pes/",
+      "parent": "sections/input-reference-pollutants",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/pth",
+      "type": "page",
+      "title": "pathogen",
+      "pdf": "/62.0.0/pdf/pages/input-reference/pth.pdf",
+      "url": "/62.0.0/input-reference/pth/",
+      "parent": "sections/input-reference-pollutants",
+      "pages": 2
+    },
+    {
+      "slug": "pages/input-reference/mtl",
+      "type": "page",
+      "title": "metals",
+      "pdf": "/62.0.0/pdf/pages/input-reference/mtl.pdf",
+      "url": "/62.0.0/input-reference/mtl/",
+      "parent": "sections/input-reference-pollutants",
+      "pages": 1
+    },
+    {
+      "slug": "sections/input-reference-groundwater",
+      "type": "section",
+      "title": "Groundwater",
+      "pdf": "/62.0.0/pdf/sections/input-reference-groundwater.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 8
+    },
+    {
+      "slug": "pages/input-reference/gwflow",
+      "type": "page",
+      "title": "gwflow",
+      "pdf": "/62.0.0/pdf/pages/input-reference/gwflow.pdf",
+      "url": "/62.0.0/input-reference/gwflow/",
+      "parent": "sections/input-reference-groundwater",
+      "pages": 8
+    },
+    {
+      "slug": "sections/input-reference-solute-transport",
+      "type": "section",
+      "title": "Solute transport",
+      "pdf": "/62.0.0/pdf/sections/input-reference-solute-transport.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 7
+    },
+    {
+      "slug": "pages/input-reference/salt",
+      "type": "page",
+      "title": "salt (rtb salt)",
+      "pdf": "/62.0.0/pdf/pages/input-reference/salt.pdf",
+      "url": "/62.0.0/input-reference/salt/",
+      "parent": "sections/input-reference-solute-transport",
+      "pages": 3
+    },
+    {
+      "slug": "pages/input-reference/cs",
+      "type": "page",
+      "title": "constituents (rtb cs)",
+      "pdf": "/62.0.0/pdf/pages/input-reference/cs.pdf",
+      "url": "/62.0.0/input-reference/cs/",
+      "parent": "sections/input-reference-solute-transport",
+      "pages": 3
+    },
+    {
+      "slug": "sections/input-reference-water-allocation",
+      "type": "section",
+      "title": "Water allocation",
+      "pdf": "/62.0.0/pdf/sections/input-reference-water-allocation.pdf",
+      "url": null,
+      "parent": "sections/input-reference",
+      "pages": 7
+    },
+    {
+      "slug": "pages/input-reference/water-allocation",
+      "type": "page",
+      "title": "water allocation",
+      "pdf": "/62.0.0/pdf/pages/input-reference/water-allocation.pdf",
+      "url": "/62.0.0/input-reference/water-allocation/",
+      "parent": "sections/input-reference-water-allocation",
+      "pages": 7
+    },
+    {
+      "slug": "sections/output-reference",
+      "type": "section",
+      "title": "Output Reference",
+      "pdf": "/62.0.0/pdf/sections/output-reference.pdf",
+      "url": "/62.0.0/output-reference/",
+      "parent": "swatplus-documentation",
+      "pages": 28
+    },
+    {
+      "slug": "pages/output-reference/index",
+      "type": "page",
+      "title": "Output Reference",
+      "pdf": "/62.0.0/pdf/pages/output-reference/index.pdf",
+      "url": "/62.0.0/output-reference/",
+      "parent": "sections/output-reference",
+      "pages": 2
+    },
+    {
+      "slug": "pages/output-reference/naming-convention",
+      "type": "page",
+      "title": "Naming convention",
+      "pdf": "/62.0.0/pdf/pages/output-reference/naming-convention.pdf",
+      "url": "/62.0.0/output-reference/naming-convention/",
+      "parent": "sections/output-reference",
+      "pages": 3
+    },
+    {
+      "slug": "pages/output-reference/water-balance",
+      "type": "page",
+      "title": "Water balance",
+      "pdf": "/62.0.0/pdf/pages/output-reference/water-balance.pdf",
+      "url": "/62.0.0/output-reference/water-balance/",
+      "parent": "sections/output-reference",
+      "pages": 3
+    },
+    {
+      "slug": "pages/output-reference/channel-sediment-nutrient",
+      "type": "page",
+      "title": "Channel, sediment, nutrient",
+      "pdf": "/62.0.0/pdf/pages/output-reference/channel-sediment-nutrient.pdf",
+      "url": "/62.0.0/output-reference/channel-sediment-nutrient/",
+      "parent": "sections/output-reference",
+      "pages": 4
+    },
+    {
+      "slug": "pages/output-reference/aquifer-reservoir-plant",
+      "type": "page",
+      "title": "Aquifer, reservoir, plant",
+      "pdf": "/62.0.0/pdf/pages/output-reference/aquifer-reservoir-plant.pdf",
+      "url": "/62.0.0/output-reference/aquifer-reservoir-plant/",
+      "parent": "sections/output-reference",
+      "pages": 4
+    },
+    {
+      "slug": "pages/output-reference/carbon",
+      "type": "page",
+      "title": "Carbon",
+      "pdf": "/62.0.0/pdf/pages/output-reference/carbon.pdf",
+      "url": "/62.0.0/output-reference/carbon/",
+      "parent": "sections/output-reference",
+      "pages": 5
+    },
+    {
+      "slug": "pages/output-reference/gwflow",
+      "type": "page",
+      "title": "gwflow",
+      "pdf": "/62.0.0/pdf/pages/output-reference/gwflow.pdf",
+      "url": "/62.0.0/output-reference/gwflow/",
+      "parent": "sections/output-reference",
+      "pages": 3
+    },
+    {
+      "slug": "pages/output-reference/checker-diagnostics",
+      "type": "page",
+      "title": "Checker and diagnostics",
+      "pdf": "/62.0.0/pdf/pages/output-reference/checker-diagnostics.pdf",
+      "url": "/62.0.0/output-reference/checker-diagnostics/",
+      "parent": "sections/output-reference",
+      "pages": 3
+    },
+    {
+      "slug": "pages/output-reference/post-processing",
+      "type": "page",
+      "title": "Post-processing",
+      "pdf": "/62.0.0/pdf/pages/output-reference/post-processing.pdf",
+      "url": "/62.0.0/output-reference/post-processing/",
+      "parent": "sections/output-reference",
+      "pages": 3
+    },
+    {
+      "slug": "sections/developer-guide",
+      "type": "section",
+      "title": "Developer Guide",
+      "pdf": "/62.0.0/pdf/sections/developer-guide.pdf",
+      "url": "/62.0.0/developer-guide/",
+      "parent": "swatplus-documentation",
+      "pages": 19
+    },
+    {
+      "slug": "pages/developer-guide/index",
+      "type": "page",
+      "title": "Developer Guide",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/index.pdf",
+      "url": "/62.0.0/developer-guide/",
+      "parent": "sections/developer-guide",
+      "pages": 1
+    },
+    {
+      "slug": "pages/developer-guide/build-cmake",
+      "type": "page",
+      "title": "Build from source (CMake)",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/build-cmake.pdf",
+      "url": "/62.0.0/developer-guide/build-cmake/",
+      "parent": "sections/developer-guide",
+      "pages": 2
+    },
+    {
+      "slug": "pages/developer-guide/visual-studio-windows",
+      "type": "page",
+      "title": "Visual Studio (Windows)",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/visual-studio-windows.pdf",
+      "url": "/62.0.0/developer-guide/visual-studio-windows/",
+      "parent": "sections/developer-guide",
+      "pages": 3
+    },
+    {
+      "slug": "pages/developer-guide/vscode-codespaces",
+      "type": "page",
+      "title": "VS Code Codespaces",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/vscode-codespaces.pdf",
+      "url": "/62.0.0/developer-guide/vscode-codespaces/",
+      "parent": "sections/developer-guide",
+      "pages": 3
+    },
+    {
+      "slug": "pages/developer-guide/testing",
+      "type": "page",
+      "title": "Testing",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/testing.pdf",
+      "url": "/62.0.0/developer-guide/testing/",
+      "parent": "sections/developer-guide",
+      "pages": 2
+    },
+    {
+      "slug": "pages/developer-guide/tagging-releases",
+      "type": "page",
+      "title": "Tagging and releases",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/tagging-releases.pdf",
+      "url": "/62.0.0/developer-guide/tagging-releases/",
+      "parent": "sections/developer-guide",
+      "pages": 2
+    },
+    {
+      "slug": "pages/developer-guide/coding-conventions",
+      "type": "page",
+      "title": "Coding conventions",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/coding-conventions.pdf",
+      "url": "/62.0.0/developer-guide/coding-conventions/",
+      "parent": "sections/developer-guide",
+      "pages": 5
+    },
+    {
+      "slug": "pages/developer-guide/code-of-conduct",
+      "type": "page",
+      "title": "Code of conduct",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/code-of-conduct.pdf",
+      "url": "/62.0.0/developer-guide/code-of-conduct/",
+      "parent": "sections/developer-guide",
+      "pages": 1
+    },
+    {
+      "slug": "pages/developer-guide/contributing",
+      "type": "page",
+      "title": "Contributing",
+      "pdf": "/62.0.0/pdf/pages/developer-guide/contributing.pdf",
+      "url": "/62.0.0/developer-guide/contributing/",
+      "parent": "sections/developer-guide",
+      "pages": 1
+    },
+    {
+      "slug": "sections/other",
+      "type": "section",
+      "title": "Other",
+      "pdf": "/62.0.0/pdf/sections/other.pdf",
+      "url": "/62.0.0/source-reference/",
+      "parent": "swatplus-documentation",
+      "pages": 31
+    },
+    {
+      "slug": "sections/other-calibration",
+      "type": "section",
+      "title": "Calibration",
+      "pdf": "/62.0.0/pdf/sections/other-calibration.pdf",
+      "url": "/62.0.0/calibration/",
+      "parent": "sections/other",
+      "pages": 18
+    },
+    {
+      "slug": "pages/calibration/index",
+      "type": "page",
+      "title": "Calibration",
+      "pdf": "/62.0.0/pdf/pages/calibration/index.pdf",
+      "url": "/62.0.0/calibration/",
+      "parent": "sections/other-calibration",
+      "pages": 1
+    },
+    {
+      "slug": "pages/calibration/soft-calibration",
+      "type": "page",
+      "title": "Soft calibration",
+      "pdf": "/62.0.0/pdf/pages/calibration/soft-calibration.pdf",
+      "url": "/62.0.0/calibration/soft-calibration/",
+      "parent": "sections/other-calibration",
+      "pages": 2
+    },
+    {
+      "slug": "pages/calibration/hard-calibration",
+      "type": "page",
+      "title": "Hard calibration",
+      "pdf": "/62.0.0/pdf/pages/calibration/hard-calibration.pdf",
+      "url": "/62.0.0/calibration/hard-calibration/",
+      "parent": "sections/other-calibration",
+      "pages": 2
+    },
+    {
+      "slug": "pages/calibration/parameter-change-files",
+      "type": "page",
+      "title": "Parameter change files",
+      "pdf": "/62.0.0/pdf/pages/calibration/parameter-change-files.pdf",
+      "url": "/62.0.0/calibration/parameter-change-files/",
+      "parent": "sections/other-calibration",
+      "pages": 11
+    },
+    {
+      "slug": "pages/calibration/conditions-regionalization",
+      "type": "page",
+      "title": "Conditions and regionalization",
+      "pdf": "/62.0.0/pdf/pages/calibration/conditions-regionalization.pdf",
+      "url": "/62.0.0/calibration/conditions-regionalization/",
+      "parent": "sections/other-calibration",
+      "pages": 2
+    },
+    {
+      "slug": "pages/calibration/sensitivity-workflow",
+      "type": "page",
+      "title": "Sensitivity workflow",
+      "pdf": "/62.0.0/pdf/pages/calibration/sensitivity-workflow.pdf",
+      "url": "/62.0.0/calibration/sensitivity-workflow/",
+      "parent": "sections/other-calibration",
+      "pages": 2
+    },
+    {
+      "slug": "sections/other-tutorials-and-examples",
+      "type": "section",
+      "title": "Tutorials and examples",
+      "pdf": "/62.0.0/pdf/sections/other-tutorials-and-examples.pdf",
+      "url": "/62.0.0/tutorials/",
+      "parent": "sections/other",
+      "pages": 13
+    },
+    {
+      "slug": "pages/tutorials/index",
+      "type": "page",
+      "title": "Tutorials",
+      "pdf": "/62.0.0/pdf/pages/tutorials/index.pdf",
+      "url": "/62.0.0/tutorials/",
+      "parent": "sections/other-tutorials-and-examples",
+      "pages": 1
+    },
+    {
+      "slug": "pages/tutorials/ames-sub1",
+      "type": "page",
+      "title": "Ames_sub1 walkthrough",
+      "pdf": "/62.0.0/pdf/pages/tutorials/ames-sub1.pdf",
+      "url": "/62.0.0/tutorials/ames-sub1/",
+      "parent": "sections/other-tutorials-and-examples",
+      "pages": 5
+    },
+    {
+      "slug": "pages/tutorials/osu-1hru",
+      "type": "page",
+      "title": "Osu_1hru walkthrough",
+      "pdf": "/62.0.0/pdf/pages/tutorials/osu-1hru.pdf",
+      "url": "/62.0.0/tutorials/osu-1hru/",
+      "parent": "sections/other-tutorials-and-examples",
+      "pages": 4
+    },
+    {
+      "slug": "pages/tutorials/carbon-notebook",
+      "type": "page",
+      "title": "Carbon notebook",
+      "pdf": "/62.0.0/pdf/pages/tutorials/carbon-notebook.pdf",
+      "url": "/62.0.0/tutorials/carbon-notebook/",
+      "parent": "sections/other-tutorials-and-examples",
+      "pages": 2
+    },
+    {
+      "slug": "pages/tutorials/cookbook",
+      "type": "page",
+      "title": "Cookbook",
+      "pdf": "/62.0.0/pdf/pages/tutorials/cookbook.pdf",
+      "url": "/62.0.0/tutorials/cookbook/",
+      "parent": "sections/other-tutorials-and-examples",
+      "pages": 2
+    },
+    {
+      "slug": "pages/source-reference/index",
+      "type": "page",
+      "title": "Source reference",
+      "pdf": "/62.0.0/pdf/pages/source-reference/index.pdf",
+      "url": "/62.0.0/source-reference/",
+      "parent": "sections/other",
+      "pages": 1
+    },
+    {
+      "slug": "sections/faq",
+      "type": "section",
+      "title": "FAQ",
+      "pdf": "/62.0.0/pdf/sections/faq.pdf",
+      "url": "/62.0.0/faq-troubleshooting/",
+      "parent": "swatplus-documentation",
+      "pages": 9
+    },
+    {
+      "slug": "pages/faq-troubleshooting/index",
+      "type": "page",
+      "title": "Faq Troubleshooting",
+      "pdf": "/62.0.0/pdf/pages/faq-troubleshooting/index.pdf",
+      "url": "/62.0.0/faq-troubleshooting/",
+      "parent": "sections/faq",
+      "pages": 1
+    },
+    {
+      "slug": "pages/faq-troubleshooting/common-runtime-errors",
+      "type": "page",
+      "title": "Common runtime errors",
+      "pdf": "/62.0.0/pdf/pages/faq-troubleshooting/common-runtime-errors.pdf",
+      "url": "/62.0.0/faq-troubleshooting/common-runtime-errors/",
+      "parent": "sections/faq",
+      "pages": 3
+    },
+    {
+      "slug": "pages/faq-troubleshooting/water-balance-issues",
+      "type": "page",
+      "title": "Water balance issues",
+      "pdf": "/62.0.0/pdf/pages/faq-troubleshooting/water-balance-issues.pdf",
+      "url": "/62.0.0/faq-troubleshooting/water-balance-issues/",
+      "parent": "sections/faq",
+      "pages": 3
+    },
+    {
+      "slug": "pages/faq-troubleshooting/performance-tips",
+      "type": "page",
+      "title": "Performance tips",
+      "pdf": "/62.0.0/pdf/pages/faq-troubleshooting/performance-tips.pdf",
+      "url": "/62.0.0/faq-troubleshooting/performance-tips/",
+      "parent": "sections/faq",
+      "pages": 2
+    }
+  ]
+}
